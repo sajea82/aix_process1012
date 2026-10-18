@@ -43,7 +43,7 @@
         <div class="glass-card rounded-2xl p-6 flex flex-col md:flex-row justify-between items-center gap-6">
             <div class="space-y-2">
                 <h2 class="text-2xl font-bold text-white">권역별 주요 관광명소 & 빅데이터 통계</h2>
-                <p class="text-sm text-slate-400">지역을 선택하시면 세부 시·군 유입 순위와 연령대별 이미지 카드 추천 코스가 변경됩니다.</p>
+                <p class="text-sm text-slate-400">지역을 선택하시면 세부 시·군 유입 순위와 세대별(2030 / 5060) 추천 명소 TOP 5 카드가 변경됩니다.</p>
             </div>
             <div class="flex bg-slate-800/80 p-1.5 rounded-xl border border-slate-700/60" id="regionTabs">
                 <button onclick="switchRegion('cb')" id="btn-cb" class="tab-btn active px-5 py-2.5 rounded-lg font-semibold text-sm transition">충청북도</button>
@@ -71,58 +71,57 @@
             </div>
         </div>
 
-        <!-- Section 2: 2030 Generation Recommended Places (Image Cards) -->
+        <!-- Section 2: 2030 Generation Recommended Places TOP 5 -->
         <div class="space-y-4">
             <div class="flex justify-between items-end">
                 <div>
                     <div class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-pink-500/20 text-pink-300 mb-1">
                         <i class="fa-solid fa-bolt mr-1"></i> 트렌디 / 오션뷰 / 체험
                     </div>
-                    <h3 class="text-xl font-bold text-white">2030 세대 추천 대표 명소 TOP 3</h3>
+                    <h3 class="text-xl font-bold text-white">2030 세대 추천 대표 명소 TOP 5</h3>
                 </div>
                 <span class="text-xs text-slate-400" id="age2030Subtitle">충청북도 인기 핫플레이스</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="cards2030">
-                <!-- Dynamic Image Cards Loaded via JS -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4" id="cards2030"></div>
         </div>
 
-        <!-- Section 3: 5060 Generation Recommended Places (Image Cards) -->
+        <!-- Section 3: 5060 Generation Recommended Places TOP 5 -->
         <div class="space-y-4">
             <div class="flex justify-between items-end">
                 <div>
                     <div class="inline-flex items-center px-2.5 py-0.5 rounded text-xs font-semibold bg-emerald-500/20 text-emerald-300 mb-1">
                         <i class="fa-solid fa-tree mr-1"></i> 자연 / 힐링 / 역사
                     </div>
-                    <h3 class="text-xl font-bold text-white">5060 세대 추천 대표 명소 TOP 3</h3>
+                    <h3 class="text-xl font-bold text-white">5060 세대 추천 대표 명소 TOP 5</h3>
                 </div>
                 <span class="text-xs text-slate-400" id="age5060Subtitle">충청북도 힐링 & 역사 코스</span>
             </div>
 
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6" id="cards5060">
-                <!-- Dynamic Image Cards Loaded via JS -->
-            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-4" id="cards5060"></div>
         </div>
 
     </main>
 
     <script>
-        // Data Store per Region
         const regionData = {
             cb: {
                 name: "충청북도",
                 tel: { labels: ['청주시', '충주시', '단양군', '제천시', '음성군'], data: [11927, 3136, 2400, 2100, 1500] },
                 mep: { labels: ['청주시', '단양군', '충주시', '제천시', '진천군'], data: [2450, 1760, 1420, 1180, 850] },
                 p2030: [
-                    { name: "청주 수암골 벽화마을", tag: "핫플레이스", img: "https://images.unsplash.com/photo-1513836279014-a89f7a76ae86?auto=format&fit=crop&w=600&q=80", count: "1,800건", desc: "트렌디한 감성 카페거리와 야경 명소" },
-                    { name: "단양 만천하스카이워크", tag: "액티비티", img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80", count: "1,200건", desc: "남한강 절경과 짚와이어 체험" },
-                    { name: "청주 성안길", tag: "도심 탐방", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=80", count: "950건", desc: "다양한 맛집과 젊음의 거리" }
+                    { name: "단양만천하스카이워크", tag: "액티비티", img: "wiki_tour_images/충청북도/단양만천하스카이워크.jpg", count: "1,200건", desc: "남한강 절경과 짚와이어 체험" },
+                    { name: "단양잔도길", tag: "트레킹", img: "wiki_tour_images/충청북도/단양잔도길.jpg", count: "950건", desc: "강 위를 걷는 짜릿한 스릴의 길" },
+                    { name: "제천청풍호반케이블카", tag: "파노라마", img: "wiki_tour_images/충청북도/제천청풍호반케이블카.jpg", count: "890건", desc: "청풍호의 풍경을 한눈에 담는 케이블카" },
+                    { name: "보은말티재전망대", tag: "이색 포토존", img: "wiki_tour_images/충청북도/보은말티재전망대.jpg", count: "820건", desc: "굽이치는 꼬부랑길의 절경" },
+                    { name: "청주수암골", tag: "핫플레이스", img: "wiki_tour_images/충청북도/청주수암골.jpg", count: "780건", desc: "벽화마을과 야경이 예쁜 카페거리" }
                 ],
                 p5060: [
-                    { name: "청주 청남대", tag: "대통령 별장", img: "https://images.unsplash.com/photo-1582510003544-4d00b7f74220?auto=format&fit=crop&w=600&q=80", count: "3,400건", desc: "대청호반을 품은 정원과 산책로" },
-                    { name: "단양 도담삼봉", tag: "단양 팔경", img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=600&q=80", count: "1,000건", desc: "남한강 위 장엄하게 선 세 봉우리" },
-                    { name: "제천 의림지", tag: "역사 저수지", img: "https://images.unsplash.com/photo-1448375240586-882707db888b?auto=format&fit=crop&w=600&q=80", count: "880건", desc: "오랜 역사와 수양버들 산책길" }
+                    { name: "청주청남대", tag: "대통령 별장", img: "wiki_tour_images/충청북도/청주청남대.jpg", count: "3,400건", desc: "대청호반을 품은 정원과 산책로" },
+                    { name: "단양도담삼봉", tag: "단양 팔경", img: "wiki_tour_images/충청북도/단양도담삼봉.jpg", count: "1,000건", desc: "남한강 위 장엄하게 선 세 봉우리" },
+                    { name: "제천의림지", tag: "역사 저수지", img: "wiki_tour_images/충청북도/제천의림지.jpg", count: "880건", desc: "오랜 역사와 수양버들 산책길" },
+                    { name: "청수상당산성", tag: "역사 성곽", img: "wiki_tour_images/충청북도/청수상당산성.jpg", count: "790건", desc: "탁 트인 전경과 아늑한 산책로" },
+                    { name: "충주수안보온천", tag: "온천 휴양", img: "wiki_tour_images/충청북도/충주수안보온천.jpg", count: "710건", desc: "왕의 온천으로 유명한 힐링 휴양지" }
                 ]
             },
             cn: {
@@ -130,29 +129,37 @@
                 tel: { labels: ['천안시', '아산시', '공주시', '태안군', '보령시'], data: [8655, 4164, 2579, 2100, 1850] },
                 mep: { labels: ['천안시', '태안군', '보령시', '아산시', '서산시'], data: [2890, 1980, 1650, 1420, 1100] },
                 p2030: [
-                    { name: "보령 대천해수욕장", tag: "오션뷰", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", count: "3,200건", desc: "젊은 피서객과 해양 스포츠 메카" },
-                    { name: "태안 꽃지해수욕장", tag: "일몰 명소", img: "https://images.unsplash.com/photo-1519046904884-53103b34b206?auto=format&fit=crop&w=600&q=80", count: "1,650건", desc: "할미·할아비 바위 사이 드넓은 해변" },
-                    { name: "안면도 오션뷰 카페거리", tag: "드라이브", img: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?auto=format&fit=crop&w=600&q=80", count: "1,280건", desc: "바다를 바라보며 즐기는 여유" }
+                    { name: "보령대천해수욕장", tag: "오션뷰", img: "wiki_tour_images/충청남도/보령대천해수욕장.jpg", count: "3,200건", desc: "젊은 피서객과 해양 스포츠 메카" },
+                    { name: "태안꽃지해변", tag: "일몰 명소", img: "wiki_tour_images/충청남도/태안꽃지해변.jpg", count: "1,650건", desc: "할미·할아비 바위 사이 드넓은 해변" },
+                    { name: "아산지중해마을", tag: "이색 거리", img: "wiki_tour_images/충청남도/아산지중해마을.jpg", count: "1,280건", desc: "이국적인 건축물과 예쁜 카페들" },
+                    { name: "당진삽교호놀이동산", tag: "레트로 감성", img: "wiki_tour_images/충청남도/당진삽교호놀이동산.jpg", count: "1,150건", desc: "대관람차와 조개구이 핫플" },
+                    { name: "공주한옥마을", tag: "한옥스테이", img: "wiki_tour_images/충청남도/공주한옥마을.jpg", count: "980건", desc: "고즈넉하고 아늑한 전통 숙소" }
                 ],
                 p5060: [
-                    { name: "천안 독립기념관", tag: "역사 유산", img: "https://images.unsplash.com/photo-1541872703-74c5e44368f9?auto=format&fit=crop&w=600&q=80", count: "2,900건", desc: "가족 단위 단풍나무 숲길과 역사 교육" },
-                    { name: "아산 덕산온천", tag: "온천 힐링", img: "https://images.unsplash.com/photo-1540555700478-4be289fbecef?auto=format&fit=crop&w=600&q=80", count: "1,500건", desc: "전통 스파 및 온천 휴양지" },
-                    { name: "공주 공산성", tag: "백제 유적", img: "https://images.unsplash.com/photo-1590523277543-a94d2e4eb00b?auto=format&fit=crop&w=600&q=80", count: "1,120건", desc: "금강을 굽어보는 고즈넉한 성곽길" }
+                    { name: "천안독립기념관", tag: "역사 유산", img: "wiki_tour_images/충청남도/천안독립기념관.jpg", count: "2,900건", desc: "단풍나무 숲길과 역사 교육의 장" },
+                    { name: "태안안면도자연휴양림", tag: "소나무 숲", img: "wiki_tour_images/충청남도/태안안면도자연휴양림.jpg", count: "1,500건", desc: "피톤치드 가득한 힐링 산책로" },
+                    { name: "공주공산성", tag: "백제 유적", img: "wiki_tour_images/충청남도/공주공산성.jpg", count: "1,120건", desc: "금강을 굽어보는 고즈넉한 성곽길" },
+                    { name: "부여낙화암", tag: "백제 역사", img: "wiki_tour_images/충청남도/부여낙화암.jpg", count: "950건", desc: "백마강 유람선과 역사 탐방" },
+                    { name: "서산마애삼존불상", tag: "백제 미소", img: "wiki_tour_images/충청남도/서산마애삼존불상.jpg", count: "890건", desc: "국보로 지정된 온화한 백제의 미소" }
                 ]
             },
             jn: {
-                name: "전남·광주통합특별시",
+                name: "전남·광주",
                 tel: { labels: ['광주 서구', '광주 북구', '전남 여수시', '전남 순천시', '광주 광산구'], data: [5677, 5179, 4950, 4200, 5064] },
                 mep: { labels: ['전남 여수시', '전남 순천시', '전남 목포시', '광주 북구', '전남 담양군'], data: [3258, 2120, 1450, 1280, 1150] },
                 p2030: [
-                    { name: "여수 낭만포차거리", tag: "밤바다 야경", img: "https://images.unsplash.com/photo-1519501025264-65ba15a82390?auto=format&fit=crop&w=600&q=80", count: "2,800건", desc: "여수 밤바다와 버스킹 음악의 거리" },
-                    { name: "광주 동명동 카페거리", tag: "트렌드 핫플", img: "https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?auto=format&fit=crop&w=600&q=80", count: "1,000건", desc: "젊은 세대가 찾는 분위기 좋은 카페" },
-                    { name: "목포 해상케이블카", tag: "파노라마 뷰", img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=600&q=80", count: "920건", desc: "다도해와 유달산을 관통하는 케이블카" }
+                    { name: "여수낭만포차거리", tag: "밤바다 야경", img: "wiki_tour_images/전남광주권/여수낭만포차거리.jpg", count: "2,800건", desc: "여수 밤바다와 버스킹 음악의 거리" },
+                    { name: "광주동명동카페거리", tag: "트렌드 핫플", img: "wiki_tour_images/전남광주권/광주동명동카페거리.jpg", count: "1,000건", desc: "젊은 세대가 찾는 분위기 좋은 카페" },
+                    { name: "목포해상케이블카", tag: "파노라마 뷰", img: "wiki_tour_images/전남광주권/목포해상케이블카.jpg", count: "920건", desc: "다도해와 유달산을 관통하는 케이블카" },
+                    { name: "신안퍼플섬", tag: "이색 포토존", img: "wiki_tour_images/전남광주권/신안퍼플섬.jpg", count: "850건", desc: "온통 보라빛으로 물든 아름다운 섬" },
+                    { name: "여수향일암", tag: "일출 명소", img: "wiki_tour_images/전남광주권/여수향일암.jpg", count: "780건", desc: "기암절벽과 탁 트인 남해 바다 뷰" }
                 ],
                 p5060: [
-                    { name: "순천만 국가정원", tag: "대한민국 1호 정원", img: "https://images.unsplash.com/photo-1585320806297-9794b3e4eeae?auto=format&fit=crop&w=600&q=80", count: "2,200건", desc: "세계 각국의 정원과 억새 습지" },
-                    { name: "여수 오동도", tag: "동백나무 군락", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80", count: "1,850건", desc: "한려해상 국립공원의 보석 같은 섬" },
-                    { name: "광주 무등산 국립공원", tag: "주상절리대", img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=600&q=80", count: "1,310건", desc: "서석대와 입석대가 만든 웅장한 자연" }
+                    { name: "순천만국가정원", tag: "대한민국 1호 정원", img: "wiki_tour_images/전남광주권/순천만국가정원.jpg", count: "2,200건", desc: "세계 각국의 정원과 억새 습지" },
+                    { name: "여수오동도", tag: "동백나무 군락", img: "wiki_tour_images/전남광주권/여수오동도.jpg", count: "1,850건", desc: "한려해상 국립공원의 보석 같은 섬" },
+                    { name: "광주무등산국립공원", tag: "주상절리대", img: "wiki_tour_images/전남광주권/광주무등산국립공원.jpg", count: "1,310건", desc: "서석대와 입석대가 만든 웅장한 자연" },
+                    { name: "담양메타세쿼이아길", tag: "힐링 산책", img: "wiki_tour_images/전남광주권/담양메타세쿼이아길.jpg", count: "1,100건", desc: "이국적이고 아름다운 가로수길" },
+                    { name: "담양죽녹원", tag: "대나무숲", img: "wiki_tour_images/전남광주권/담양죽녹원.jpg", count: "950건", desc: "시원한 대나무 숲길과 힐링 산책로" }
                 ]
             }
         };
@@ -196,6 +203,19 @@
             });
         }
 
+        function handleImageError(imgElement, originalSrc) {
+            if (!imgElement.dataset.tried) {
+                imgElement.dataset.tried = "1";
+                imgElement.src = originalSrc.replace('.jpg', '.JPG');
+            } else if (imgElement.dataset.tried === "1") {
+                imgElement.dataset.tried = "2";
+                imgElement.src = originalSrc.replace('.jpg', '.png');
+            } else if (imgElement.dataset.tried === "2") {
+                imgElement.dataset.tried = "3";
+                imgElement.src = originalSrc.replace('.jpg', '.PNG');
+            }
+        }
+
         function renderCards(regionKey) {
             const data = regionData[regionKey];
 
@@ -204,17 +224,19 @@
 
             const container2030 = document.getElementById('cards2030');
             container2030.innerHTML = data.p2030.map(item => `
-                <div class="glass-card rounded-xl overflow-hidden hover:border-pink-500/50 transition group">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-3 left-3 bg-pink-500/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+                <div class="glass-card rounded-xl overflow-hidden hover:border-pink-500/50 transition group flex flex-col justify-between">
+                    <div class="relative h-36 overflow-hidden bg-slate-900">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleImageError(this, '${item.img}')">
+                        <span class="absolute top-2 left-2 bg-pink-500/95 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
                             ${item.tag}
                         </span>
                     </div>
-                    <div class="p-5 space-y-2">
-                        <h4 class="text-lg font-bold text-white group-hover:text-pink-400 transition">${item.name}</h4>
-                        <p class="text-xs text-slate-400">${item.desc}</p>
-                        <div class="pt-2 flex justify-between items-center text-xs border-t border-slate-700/50">
+                    <div class="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-white group-hover:text-pink-400 transition truncate">${item.name}</h4>
+                            <p class="text-[11px] text-slate-400 line-clamp-2">${item.desc}</p>
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-[11px] border-t border-slate-700/50">
                             <span class="text-slate-400">검색 집중도</span>
                             <span class="font-bold text-pink-400">${item.count}</span>
                         </div>
@@ -224,17 +246,19 @@
 
             const container5060 = document.getElementById('cards5060');
             container5060.innerHTML = data.p5060.map(item => `
-                <div class="glass-card rounded-xl overflow-hidden hover:border-emerald-500/50 transition group">
-                    <div class="relative h-48 overflow-hidden">
-                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                        <span class="absolute top-3 left-3 bg-emerald-500/90 text-white text-xs font-bold px-2.5 py-1 rounded-full shadow">
+                <div class="glass-card rounded-xl overflow-hidden hover:border-emerald-500/50 transition group flex flex-col justify-between">
+                    <div class="relative h-36 overflow-hidden bg-slate-900">
+                        <img src="${item.img}" alt="${item.name}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300" onerror="handleImageError(this, '${item.img}')">
+                        <span class="absolute top-2 left-2 bg-emerald-500/95 text-white text-[10px] font-bold px-2 py-0.5 rounded-full shadow">
                             ${item.tag}
                         </span>
                     </div>
-                    <div class="p-5 space-y-2">
-                        <h4 class="text-lg font-bold text-white group-hover:text-emerald-400 transition">${item.name}</h4>
-                        <p class="text-xs text-slate-400">${item.desc}</p>
-                        <div class="pt-2 flex justify-between items-center text-xs border-t border-slate-700/50">
+                    <div class="p-4 space-y-1.5 flex-1 flex flex-col justify-between">
+                        <div>
+                            <h4 class="text-sm font-bold text-white group-hover:text-emerald-400 transition truncate">${item.name}</h4>
+                            <p class="text-[11px] text-slate-400 line-clamp-2">${item.desc}</p>
+                        </div>
+                        <div class="pt-2 flex justify-between items-center text-[11px] border-t border-slate-700/50">
                             <span class="text-slate-400">검색 집중도</span>
                             <span class="font-bold text-emerald-400">${item.count}</span>
                         </div>
@@ -255,7 +279,6 @@
             renderCards(key);
         }
 
-        // Initial Load (Default: 충북 cb)
         window.onload = () => {
             switchRegion('cb');
         };
