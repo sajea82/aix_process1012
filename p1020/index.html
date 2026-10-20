@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelMate - 10월 인기 여행지 추천</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Leaflet CSS & JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f4f1e8; color: #222; }
+        .hide { display: none !important; }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between">
+
+    <!-- TOP NAVIGATION -->
+    <header class="w-full bg-[#f4f1e8] py-4 px-8 flex justify-between items-center border-b border-stone-300">
+        <div class="flex items-center gap-2 cursor-pointer" onclick="goHome()">
+            <span class="font-black text-xl tracking-wider">✈️ TravelMate</span>
+        </div>
+        <div class="flex items-center gap-6 text-sm font-medium text-stone-700">
+            <span class="cursor-pointer hover:text-black" onclick="goHome()">탐색</span>
+            <span class="cursor-pointer hover:text-black" onclick="goHome()">인기추천</span>
+            <span class="cursor-pointer hover:text-black" onclick="goHome()">지역별관광지</span>
+            <span class="cursor-pointer hover:text-black">투어리가이드</span>
+        </div>
+        <div class="flex items-center gap-3">
+            <div class="bg-amber-100 text-amber-800 text-xs px-3 py-1.5 rounded-full font-bold flex items-center gap-1 shadow-sm">
+                <span>⭐ 2025년 10월 데이터</span>
+            </div>
+            <div class="w-9 h-9 rounded-full bg-stone-300 overflow-hidden border border-stone-400 flex items-center justify-center font-bold text-stone-700">
+                TM
+            </div>
+        </div>
+    </header>
+
+    <!-- ================= PAGE 1: MAIN ================= -->
+    <main id="page-main" class="w-full flex-grow">
+        <!-- 1/6 Hero Banner -->
+        <section class="w-full px-6 py-4">
+            <div class="max-w-7xl mx-auto rounded-3xl overflow-hidden relative shadow-lg h-[280px] flex items-center justify-center text-center bg-stone-900">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1600&q=80" alt="가을 풍경" class="absolute inset-0 w-full h-full object-cover opacity-60">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+                <div class="relative z-10 text-white px-4">
+                    <span class="bg-amber-500/90 text-white text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider mb-2 inline-block">10월 빅데이터 추천</span>
+                    <h1 class="text-3xl md:text-4xl font-black mb-2">10월 인기 여행지를 추천합니다.</h1>
+                    <p class="text-sm md:text-base text-stone-200 max-w-xl mx-auto mb-4 font-light">빅데이터가 증명하는 전국의 명소와 실시간 관광 통계를 지금 확인해 보세요.</p>
+                    <button onclick="goToDetail('gg')" class="bg-white text-stone-900 px-6 py-2.5 rounded-full font-bold text-sm shadow hover:bg-stone-100 transition">
+                        인기 여행지 보러가기 &rarr;
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Sub Title -->
+        <div class="max-w-7xl mx-auto px-6 mt-4 mb-2">
+            <p class="text-stone-500 text-sm font-medium">어디로 떠나야 할지 고민되시나요? 빅데이터가 증명하는 10월 최고의 여행지.</p>
+        </div>
+
+        <!-- Top 3 Most Searched Section -->
+        <section class="max-w-7xl mx-auto px-6 mb-10">
+            <div class="bg-amber-200/60 border border-amber-300 rounded-3xl p-6 shadow-sm">
+                <h2 class="text-lg font-black text-amber-900 mb-4 flex items-center gap-2">
+                    <span>🔥 가장 많이 찾은 대표 여행지</span>
+                </h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div onclick="goToDetail('gg')" class="bg-white rounded-2xl p-4 shadow hover:shadow-md transition cursor-pointer flex gap-4 items-center">
+                        <img src="images/경기/에버랜드.jpg" onerror="this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=300&q=80'" class="w-20 h-20 rounded-xl object-cover">
+                        <div>
+                            <span class="bg-stone-900 text-white text-xs px-2 py-0.5 rounded-md font-bold">1위</span>
+                            <h3 class="font-bold text-base mt-1">경기도</h3>
+                            <p class="text-xs text-stone-500">수도권 근교 힐링 명소</p>
+                            <span class="text-xs font-bold text-amber-600 mt-1 inline-block">20,150,000건</span>
+                        </div>
+                    </div>
+                    <div onclick="goToDetail('seoul')" class="bg-white rounded-2xl p-4 shadow hover:shadow-md transition cursor-pointer flex gap-4 items-center">
+                        <img src="images/서울/여의도한강공원.jpg" onerror="this.src='https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=300&q=80'" class="w-20 h-20 rounded-xl object-cover">
+                        <div>
+                            <span class="bg-stone-700 text-white text-xs px-2 py-0.5 rounded-md font-bold">2위</span>
+                            <h3 class="font-bold text-base mt-1">서울특별시</h3>
+                            <p class="text-xs text-stone-500">도심 속 문화와 야경</p>
+                            <span class="text-xs font-bold text-amber-600 mt-1 inline-block">19,500,000건</span>
+                        </div>
+                    </div>
+                    <div onclick="goToDetail('ic')" class="bg-white rounded-2xl p-4 shadow hover:shadow-md transition cursor-pointer flex gap-4 items-center">
+                        <img src="images/인천/월미도.jpg" onerror="this.src='https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=300&q=80'" class="w-20 h-20 rounded-xl object-cover">
+                        <div>
+                            <span class="bg-stone-600 text-white text-xs px-2 py-0.5 rounded-md font-bold">3위</span>
+                            <h3 class="font-bold text-base mt-1">인천광역시</h3>
+                            <p class="text-xs text-stone-500">바다와 공항이 있는 항구</p>
+                            <span class="text-xs font-bold text-amber-600 mt-1 inline-block">14,800,000건</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- National 17 Regions Grid -->
+        <section class="max-w-7xl mx-auto px-6 pb-16">
+            <div class="flex justify-between items-center mb-6">
+                <h2 class="text-xl font-black text-stone-900">전국 17개 광역지자체 검색 순위</h2>
+                <span class="text-xs text-stone-500 font-medium">📍 카드를 클릭하여 상세 페이지로 이동하세요</span>
+            </div>
+            <div id="region-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+                <!-- Dynamically filled by JS -->
+            </div>
+        </section>
+    </main>
+
+    <!-- ================= PAGE 2: DETAIL (Dashboard) ================= -->
+    <div id="page-detail" class="w-full flex-grow hide px-6 py-6 max-w-7xl mx-auto">
+        <!-- Header Nav -->
+        <div class="flex justify-between items-center mb-6">
+            <button onclick="goHome()" class="bg-stone-900 text-white px-4 py-2 rounded-full font-bold text-xs flex items-center gap-2 hover:bg-stone-800 transition">
+                &larr; 전국 목록으로
+            </button>
+            <div id="detail-region-title" class="text-xl font-black text-stone-900">지역명</div>
+            <div class="bg-amber-100 text-amber-800 text-xs px-3 py-1 rounded-full font-bold">
+                ⭐ 2025년 10월 데이터
+            </div>
+        </div>
+
+        <!-- Top Section: Map & Top 10 List -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 mb-8">
+            <!-- Left: Map Container -->
+            <div class="lg:col-span-6 bg-white rounded-3xl p-4 shadow-md border border-stone-200 flex flex-col">
+                <div class="bg-stone-100 p-3 rounded-2xl mb-3 flex items-center justify-between">
+                    <div>
+                        <h3 id="map-header-title" class="font-black text-sm text-stone-800">📍 지도 위치</h3>
+                        <p class="text-xs text-stone-500">마커를 클릭하면 상세 팝업이 열립니다.</p>
+                    </div>
+                </div>
+                <div id="map" class="w-full h-[480px] rounded-2xl z-10"></div>
+            </div>
+
+            <!-- Right: Top 10 List with Generation Selector -->
+            <div class="lg:col-span-6 bg-[#fbf9f4] rounded-3xl p-5 shadow-md border border-stone-200 flex flex-col">
+                <!-- 노란색 세대별 선택 영역 -->
+                <div class="bg-amber-300 rounded-2xl p-4 mb-4 shadow-sm">
+                    <div class="flex justify-between items-center mb-2">
+                        <h3 id="top10-header-title" class="font-black text-stone-900 text-sm">인기 관광지 TOP 10</h3>
+                        <span class="text-[11px] text-stone-800 font-bold">세대를 클릭하세요</span>
+                    </div>
+                    <!-- 세대별 탭 버튼 (20대~60대) -->
+                    <div class="grid grid-cols-5 gap-1.5 bg-amber-400/60 p-1 rounded-xl">
+                        <button onclick="switchGeneration('20')" id="btn-gen-20" class="py-1.5 rounded-lg text-xs font-bold transition text-stone-900">20대</button>
+                        <button onclick="switchGeneration('30')" id="btn-gen-30" class="py-1.5 rounded-lg text-xs font-bold transition text-stone-900">30대</button>
+                        <button onclick="switchGeneration('40')" id="btn-gen-40" class="py-1.5 rounded-lg text-xs font-bold transition text-stone-900">40대</button>
+                        <button onclick="switchGeneration('50')" id="btn-gen-50" class="py-1.5 rounded-lg text-xs font-bold transition text-stone-900">50대</button>
+                        <button onclick="switchGeneration('60')" id="btn-gen-60" class="py-1.5 rounded-lg text-xs font-bold transition text-stone-900">60대이상</button>
+                    </div>
+                </div>
+
+                <!-- TOP 10 Cards Container -->
+                <div id="top10-container" class="space-y-3 overflow-y-auto max-h-[400px] pr-1">
+                    <!-- Dynamically filled -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Bottom Section: Generation Summary Cards -->
+        <section class="bg-[#181c24] rounded-3xl p-6 text-white shadow-xl">
+            <div class="mb-6 border-b border-stone-800 pb-4">
+                <h3 id="gen-box-title" class="text-lg font-black flex items-center gap-2">
+                    <span>📍 연령대별 선호 대표 장소 비교</span>
+                </h3>
+                <p class="text-xs text-stone-400 mt-1">각 세대별 카드를 클릭하면 해당 세대의 순위로 즉시 전환됩니다.</p>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+                <div onclick="switchGeneration('20')" class="bg-stone-900/80 border border-stone-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition">
+                    <div class="font-bold text-sm text-amber-400 mb-2">⚡ 20대 순위 미리보기</div>
+                    <div id="card-gen-20-preview" class="space-y-1.5 text-xs text-stone-300"></div>
+                </div>
+                <div onclick="switchGeneration('30')" class="bg-stone-900/80 border border-stone-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition">
+                    <div class="font-bold text-sm text-cyan-400 mb-2">👤 30대 순위 미리보기</div>
+                    <div id="card-gen-30-preview" class="space-y-1.5 text-xs text-stone-300"></div>
+                </div>
+                <div onclick="switchGeneration('40')" class="bg-stone-900/80 border border-stone-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition">
+                    <div class="font-bold text-sm text-yellow-400 mb-2">👥 40대 순위 미리보기</div>
+                    <div id="card-gen-40-preview" class="space-y-1.5 text-xs text-stone-300"></div>
+                </div>
+                <div onclick="switchGeneration('50')" class="bg-stone-900/80 border border-stone-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition">
+                    <div class="font-bold text-sm text-emerald-400 mb-2">🌲 50대 순위 미리보기</div>
+                    <div id="card-gen-50-preview" class="space-y-1.5 text-xs text-stone-300"></div>
+                </div>
+                <div onclick="switchGeneration('60')" class="bg-stone-900/80 border border-stone-800 rounded-2xl p-4 cursor-pointer hover:border-amber-500 transition">
+                    <div class="font-bold text-sm text-purple-400 mb-2">⛰️ 60대 순위 미리보기</div>
+                    <div id="card-gen-60-preview" class="space-y-1.5 text-xs text-stone-300"></div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- ================= PAGE 3: POPUP MODAL ================= -->
+    <div id="modal-backdrop" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4 hide">
+        <div class="bg-[#fcfaf7] w-full max-w-lg rounded-3xl overflow-hidden shadow-2xl relative border border-stone-300">
+            <button onclick="closeModal()" class="absolute top-4 right-4 z-20 bg-stone-900 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold hover:bg-stone-700 shadow">
+                ✕
+            </button>
+            <div class="relative h-56 bg-stone-800">
+                <img id="modal-img" src="" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=800&q=80'">
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+            </div>
+            <div class="p-6">
+                <div class="flex justify-between items-start mb-2">
+                    <h2 id="modal-title" class="text-2xl font-black text-stone-900">장소명</h2>
+                    <span id="modal-badge" class="bg-amber-500 text-white font-bold text-xs px-3 py-1 rounded-full shadow-sm">검색 순위 1위</span>
+                </div>
+                <p id="modal-addr" class="text-xs text-stone-500 mb-4 flex items-center gap-1">📍 주소 정보</p>
+                <div class="bg-white border border-stone-200 rounded-2xl p-4 mb-6 shadow-sm">
+                    <p id="modal-desc" class="text-xs text-stone-700 leading-relaxed">상세 설명</p>
+                </div>
+                <div class="grid grid-cols-2 gap-3 mb-6">
+                    <button onclick="alert('카카오맵 길안내 연동')" class="bg-yellow-400 hover:bg-yellow-500 text-stone-900 font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
+                        💬 카카오맵 길안내
+                    </button>
+                    <button onclick="alert('네이버 지도 길안내 연동')" class="bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-2.5 px-4 rounded-xl text-xs flex items-center justify-center gap-2 shadow transition">
+                        🧭 네이버 지도 길안내
+                    </button>
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-stone-700 mb-2 block flex items-center gap-1">
+                        <span class="w-2 h-2 rounded-full bg-red-600"></span> 홍보 및 소개 동영상
+                    </span>
+                    <div class="bg-stone-900 rounded-2xl h-32 flex flex-col items-center justify-center text-stone-400 text-xs border border-stone-800">
+                        <span class="text-red-500 font-black text-base mb-1">▶ YouTube</span>
+                        <span>동영상을 재생할 수 없음</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="w-full text-center py-6 text-stone-500 text-xs border-t border-stone-300 mt-12 bg-[#f4f1e8]">
+        © 2026 TravelMate. All rights reserved.
+    </footer>
+
+    <!-- REAL DATA SCRIPT (파이썬 변환 파일) -->
+    <script src="data.js"></script>
+
+    <!-- APP LOGIC -->
+    <script>
+        const FALLBACK_IMAGES = [
+            "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1538481199705-c710c4e965fc?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1488646953014-85cb44e25828?auto=format&fit=crop&w=400&q=80",
+            "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=400&q=80"
+        ];
+
+        // 17개 광역시도 및 폴더 매칭
+        const REGION_FOLDER_MAP = {
+            "gg": "경기", "dj": "대전", "sj": "세종", "ulsan": "울산",
+            "jn": "전남광주", "cn": "충남", "cb": "충북", "gw": "강원",
+            "seoul": "서울", "ic": "인천", "bs": "부산", "jb": "전북",
+            "jj": "제주", "gn": "경남", "gb": "경북", "dg": "대구"
+        };
+
+        const REGIONS = [
+            { code: "seoul", name: "서울특별시", desc: "도심 속 문화와 야경", count: "19,500,000건" },
+            { code: "gg", name: "경기도", desc: "수도권 근교 힐링 명소", count: "20,150,000건" },
+            { code: "ic", name: "인천광역시", desc: "바다와 공항이 있는 항구", count: "14,800,000건" },
+            { code: "gw", name: "강원특별자치도", desc: "청정 자연과 해변의 도시", count: "12,450,000건" },
+            { code: "cb", name: "충청북도", desc: "내륙의 호수와 산", count: "8,500,000건" },
+            { code: "cn", name: "충청남도", desc: "서해안 낙조와 온천", count: "9,800,000건" },
+            { code: "dj", name: "대전광역시", desc: "과학과 꿀잼의 도시", count: "8,100,000건" },
+            { code: "sj", name: "세종특별자치시", desc: "스마트 행정 중심 복합도시", count: "5,400,000건" },
+            { code: "jb", name: "전북특별자치도", desc: "한옥마을과 전통 문화", count: "10,900,000건" },
+            { code: "jn", name: "전남광주통합특별시", desc: "맛과 예의 고장", count: "11,200,000건" },
+            { code: "bs", name: "부산광역시", desc: "환상적인 해수욕장과 야경", count: "16,200,000건" },
+            { code: "dg", name: "대구광역시", desc: "패션과 문화의 중심", count: "9,200,000건" },
+            { code: "ulsan", name: "울산광역시", desc: "태화강과 고래의 고장", count: "7,600,000건" },
+            { code: "gb", name: "경상북도", desc: "신라 천년의 고도", count: "11,500,000건" },
+            { code: "gn", name: "경상남도", desc: "남해안 다도해와 역사", count: "10,300,000건" },
+            { code: "jj", name: "제주특별자치도", desc: "국내 최고의 휴양 섬", count: "15,600,000건" }
+        ];
+
+        let currentRegionCode = 'seoul';
+        let currentGeneration = '20';
+        let map = null;
+        let markers = [];
+
+        function getImagePath(regionCode, spotName, idx) {
+            const folderName = REGION_FOLDER_MAP[regionCode] || "서울";
+            const cleanSpotName = spotName.trim();
+            return `images/${folderName}/${cleanSpotName}.jpg`;
+        }
+
+        window.onload = function() {
+            const grid = document.getElementById('region-grid');
+            grid.innerHTML = REGIONS.map((reg, idx) => {
+                const folderName = REGION_FOLDER_MAP[reg.code] || "서울";
+                const imgUrl = `images/${folderName}/main.jpg`;
+                const fallbackImg = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+                return `
+                    <div onclick="goToDetail('${reg.code}')" class="bg-white rounded-2xl p-4 shadow-sm hover:shadow-md transition cursor-pointer border border-stone-200 flex flex-col justify-between">
+                        <div>
+                            <div class="relative h-36 rounded-xl overflow-hidden mb-3 bg-stone-200">
+                                <img src="${imgUrl}" onerror="this.src='${fallbackImg}'" class="w-full h-full object-cover">
+                                <span class="absolute top-2 left-2 bg-black/70 text-white text-[10px] px-2 py-0.5 rounded font-bold uppercase">${reg.code}</span>
+                            </div>
+                            <h3 class="font-bold text-base text-stone-900">${reg.name}</h3>
+                            <p class="text-xs text-stone-500 mt-0.5">${reg.desc}</p>
+                        </div>
+                        <div class="mt-4 flex justify-between items-center pt-2 border-t border-stone-100">
+                            <span class="text-xs font-bold text-amber-600">${reg.count}</span>
+                            <span class="text-xs font-bold text-stone-700 bg-stone-100 px-2 py-1 rounded-lg">상세보기 &rarr;</span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        };
+
+        function goHome() {
+            document.getElementById('page-detail').classList.add('hide');
+            document.getElementById('page-main').classList.remove('hide');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function goToDetail(code) {
+            currentRegionCode = code;
+            currentGeneration = '20';
+            document.getElementById('page-main').classList.add('hide');
+            document.getElementById('page-detail').classList.remove('hide');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            const regInfo = REGIONS.find(r => r.code === code) || REGIONS[0];
+            document.getElementById('detail-region-title').innerText = regInfo.name;
+            document.getElementById('map-header-title').innerText = `📍 ${regInfo.name} 지도`;
+            document.getElementById('top10-header-title').innerText = `${regInfo.name} 인기 관광지 TOP 10`;
+            document.getElementById('gen-box-title').innerHTML = `<span>📍 [${regInfo.name}] 연령대별 선호 대표 장소 비교</span>`;
+
+            renderGenerationData();
+            initMap();
+        }
+
+        function switchGeneration(gen) {
+            currentGeneration = gen;
+            renderGenerationData();
+            updateMapMarkers();
+        }
+
+        function renderGenerationData() {
+            ['20', '30', '40', '50', '60'].forEach(g => {
+                const btn = document.getElementById(`btn-gen-${g}`);
+                if (btn) {
+                    if (g === currentGeneration) {
+                        btn.className = "py-1.5 rounded-lg text-xs font-bold bg-stone-900 text-amber-300 shadow";
+                    } else {
+                        btn.className = "py-1.5 rounded-lg text-xs font-bold text-stone-800 hover:bg-amber-400";
+                    }
+                }
+            });
+
+            const regionData = (typeof REAL_TOUR_DATA !== 'undefined' && REAL_TOUR_DATA[currentRegionCode]) ? REAL_TOUR_DATA[currentRegionCode] : {};
+            const list = regionData[currentGeneration] || [];
+
+            const top10Container = document.getElementById('top10-container');
+            if (list.length === 0) {
+                top10Container.innerHTML = `<div class="p-6 text-center text-xs text-stone-500">해당 지역의 ${currentGeneration}대 데이터가 없습니다.</div>`;
+            } else {
+                top10Container.innerHTML = list.map((item, idx) => {
+                    const imgUrl = getImagePath(currentRegionCode, item.name, idx);
+                    const fallbackImg = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+                    return `
+                        <div onclick='openModal(${JSON.stringify(item)}, "${imgUrl}", "${fallbackImg}")' class="bg-white rounded-2xl p-3 shadow-sm hover:shadow transition cursor-pointer flex items-center justify-between border border-stone-200">
+                            <div class="flex items-center gap-3">
+                                <div class="w-8 h-8 rounded-xl bg-amber-500 text-white font-black text-xs flex items-center justify-center shadow-sm">
+                                    ${item.rank}
+                                </div>
+                                <img src="${imgUrl}" onerror="this.src='${fallbackImg}'" class="w-12 h-12 rounded-xl object-cover">
+                                <div>
+                                    <h4 class="font-bold text-sm text-stone-900">${item.name}</h4>
+                                    <p class="text-[11px] text-stone-500">${item.cat} · ${currentRegionCode.toUpperCase()} 지역</p>
+                                </div>
+                            </div>
+                            <div class="text-right pr-2">
+                                <span class="text-xs font-black text-amber-600">${item.ratio}</span>
+                                <span class="text-[10px] text-stone-400 block hover:underline">상세보기 &gt;</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // 하단 세대별 미리보기 카드
+            ['20', '30', '40', '50', '60'].forEach(g => {
+                const previewList = (typeof REAL_TOUR_DATA !== 'undefined' && REAL_TOUR_DATA[currentRegionCode]) ? (REAL_TOUR_DATA[currentRegionCode][g] || []) : [];
+                const previewContainer = document.getElementById(`card-gen-${g}-preview`);
+                if (previewContainer) {
+                    if (previewList.length === 0) {
+                        previewContainer.innerHTML = `<span class="text-stone-500 text-[11px]">데이터 없음</span>`;
+                    } else {
+                        previewContainer.innerHTML = previewList.slice(0, 3).map(item => `
+                            <div class="flex justify-between items-center py-0.5 border-b border-stone-800/50">
+                                <span class="truncate text-stone-300"><b>${item.rank}.</b> ${item.name}</span>
+                                <span class="text-amber-400 font-bold">${item.ratio}</span>
+                            </div>
+                        `).join('');
+                    }
+                }
+            });
+        }
+
+        function initMap() {
+            if (map) {
+                map.remove();
+                map = null;
+            }
+            map = L.map('map').setView([37.5665, 126.9780], 11);
+            L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                attribution: '&copy; OpenStreetMap contributors'
+            }).addTo(map);
+
+            updateMapMarkers();
+        }
+
+        function updateMapMarkers() {
+            if (!map) return;
+            markers.forEach(m => map.removeLayer(m));
+            markers = [];
+
+            const regionData = (typeof REAL_TOUR_DATA !== 'undefined' && REAL_TOUR_DATA[currentRegionCode]) ? REAL_TOUR_DATA[currentRegionCode] : {};
+            const list = regionData[currentGeneration] || [];
+            const bounds = [];
+
+            list.forEach((item, idx) => {
+                if (item.lat && item.lng) {
+                    const latLng = [parseFloat(item.lat), parseFloat(item.lng)];
+                    bounds.push(latLng);
+
+                    const marker = L.marker(latLng).addTo(map);
+                    const imgUrl = getImagePath(currentRegionCode, item.name, idx);
+                    const fallbackImg = FALLBACK_IMAGES[idx % FALLBACK_IMAGES.length];
+
+                    marker.bindPopup(`
+                        <div style="font-family:'Noto Sans KR'; font-size:12px;">
+                            <b>${item.rank}위. ${item.name}</b><br>
+                            검색 비율: ${item.ratio}<br>
+                            <button onclick='openModal(${JSON.stringify(item)}, "${imgUrl}", "${fallbackImg}")' style="margin-top:4px; background:#f59e0b; color:white; border:none; padding:2px 8px; border-radius:4px; cursor:pointer; font-weight:bold;">상세보기</button>
+                        </div>
+                    `);
+                    markers.push(marker);
+                }
+            });
+
+            if (bounds.length > 0) {
+                map.fitBounds(bounds, { padding: [30, 30] });
+            }
+        }
+
+        function openModal(item, imgUrl, fallbackImg) {
+            document.getElementById('modal-title').innerText = item.name;
+            document.getElementById('modal-badge').innerText = `검색 순위 ${item.rank}위`;
+            const regObj = REGIONS.find(r => r.code === currentRegionCode);
+            document.getElementById('modal-addr').innerText = `📍 ${regObj ? regObj.name : '해당 지역'} ${item.name}`;
+            document.getElementById('modal-desc').innerText = `${item.name}은(는) ${currentGeneration}대 방문객들 사이에서 인기 있는 ${item.cat} 명소입니다. 빅데이터 검색 비율 ${item.ratio}를 기록하고 있습니다.`;
+            
+            const modalImg = document.getElementById('modal-img');
+            modalImg.src = imgUrl;
+            modalImg.onerror = function() { this.src = fallbackImg; };
+
+            document.getElementById('modal-backdrop').classList.remove('hide');
+        }
+
+        function closeModal() {
+            document.getElementById('modal-backdrop').classList.add('hide');
+        }
+    </script>
+</body>
+</html>
