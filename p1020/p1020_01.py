@@ -1,55 +1,39 @@
-import json
-import os
 import pandas as pd
+import glob
+import os
 
-script_dir = os.path.dirname(os.path.abspath(__file__))
-total_dir = os.path.join(script_dir, "total_by_generation")
+script_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
+base_dir = script_dir if os.path.exists(os.path.join(script_dir, 'extracted_csvs')) else os.path.abspath(os.path.join(script_dir, '..'))
 
-# 데이터를 담을 구조체 초기화
-dataset = {}
+ages = ['20', '30', '40', '50', '60']
 
-generations = ["20", "30", "40", "50", "60"]
+# total_by_generation 폴더 경로 확인 및 생성
+target_total_dir = os.path.join(base_dir, 'extracted_csvs', 'total_by_generation')
+if not os.path.exists(target_total_dir):
+    os.makedirs(target_total_dir, exist_ok=True)
 
-if not os.path.exists(total_dir):
-  print(f"❌ 오류: '{total_dir}' 폴더를 찾을 수 없습니다. 경로를 확인해 주세요.")
-else:
-  for gen in generations:
-    file_path = os.path.join(total_dir, f"total_{gen}.csv")
-    if os.path.exists(file_path):
-      df = pd.read_csv(file_path, encoding="utf-8-sig")
+for age in ages:
+    total_path = os.path.join(target_total_dir, f'total_{age}.csv')
+    
+    # 기존 파일 로드 또는 새 데이터프레임 생성
+    if os.path.exists(total_path):
+        df_total = pd.read_csv(total_path, encoding='utf-8')
+        df_filtered = df_total[~df_total['지역코드'].isin(['gj', 'jn'])]
+    else:
+        df_filtered = pd.DataFrame(columns=['지역코드', '순위', '관광지ID', '관심지점명', '구분', '연령대', '비율', '위도', '경도'])
 
-      for _, row in df.iterrows():
-        # 지역코드 가져오기 (없으면 기본 'gw')
-        r_code = str(row.get("지역코드", "gw")).lower().strip()
+    # p_file 또는 각 지역 폴더에서 정제된 gj, jn 파일 병합
+    sub_dfs = []
+    for r_code in ['gj', 'jn']:
+        folder = '광주광역시' if r_code == 'gj' else '전라남도'
+        matched_files = glob.glob(os.path.join(base_dir, '**', folder, f'{r_code}_{age}.csv'), recursive=True)
+        if matched_files:
+            sub_dfs.append(pd.read_csv(matched_files[0], encoding='utf-8'))
 
-        if r_code not in dataset:
-          dataset[r_code] = {}
-        if gen not in dataset[r_code]:
-          dataset[r_code][gen] = []
+    if sub_dfs:
+        df_sub = pd.concat(sub_dfs, ignore_index=True)
+        df_final = pd.concat([df_filtered, df_sub], ignore_index=True)
+        df_final.to_csv(total_path, index=False, encoding='utf-8-sig')
+        print(f"✅ total_{age}.csv 파일에 광주(gj) 및 전남(jn) 데이터 통합 완료!")
 
-        dataset[r_code][gen].append({
-            "rank": int(row.get("순위", 1)),
-            "name": str(row.get("관심지점명", "")),
-            "cat": str(row.get("구분", "관광명소")),
-            "ratio": f"{row.get('비율', 0)}%",
-            "lat": float(row.get("위도", 37.5)),
-            "lng": float(row.get("경도", 127.0)),
-        })
-
-  # JavaScript 파일로 저장 (HTML에서 바로 로드 가능)
-  js_content = (
-      "const REAL_TOUR_DATA ="
-      f" {json.dumps(dataset, ensure_ascii=False, indent=2)};"
-  )
-  output_js_path = os.path.join(script_dir, "data.js")
-
-  with open(output_js_path, "w", encoding="utf-8") as js_file:
-    js_file.write(js_content)
-
-  print("=" * 50)
-  print(" 🎉 'data.js' 파일 변환 완료!")
-  print(
-      " 이제 사용자님이 조사하신 실제 데이터가 대시보드에 완벽하게"
-      " 연동됩니다."
-  )
-  print("=" * 50)
+print("\n🎉 모든 세대별 통합 파일(total_20.csv ~ total_60.csv)에 위·경도 포함 데이터가 성공적으로 반영되었습니다!")
