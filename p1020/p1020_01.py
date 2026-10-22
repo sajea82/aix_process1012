@@ -1,39 +1,35 @@
-import pandas as pd
 import glob
+import json
 import os
+import pandas as pd
 
-script_dir = os.path.dirname(os.path.abspath(__file__)) if '__file__' in locals() else os.getcwd()
-base_dir = script_dir if os.path.exists(os.path.join(script_dir, 'extracted_csvs')) else os.path.abspath(os.path.join(script_dir, '..'))
+# 1. total_gen 폴더 안의 모든 CSV 파일 경로 가져오기
+csv_files = glob.glob("total_gen/total_*.csv")
+total_data = {}
 
-ages = ['20', '30', '40', '50', '60']
+for file_path in csv_files:
+  # 파일 이름 추출 (예: total_20.csv -> total_20)
+  file_name = os.path.basename(file_path)
+  key_name = os.path.splitext(file_name)[0]
 
-# total_by_generation 폴더 경로 확인 및 생성
-target_total_dir = os.path.join(base_dir, 'extracted_csvs', 'total_by_generation')
-if not os.path.exists(target_total_dir):
-    os.makedirs(target_total_dir, exist_ok=True)
+  # CSV 읽기 (인코딩 문제 발생 시 utf-8 또는 cp949 지정)
+  df = pd.read_csv(file_path, encoding="utf-8")
 
-for age in ages:
-    total_path = os.path.join(target_total_dir, f'total_{age}.csv')
-    
-    # 기존 파일 로드 또는 새 데이터프레임 생성
-    if os.path.exists(total_path):
-        df_total = pd.read_csv(total_path, encoding='utf-8')
-        df_filtered = df_total[~df_total['지역코드'].isin(['gj', 'jn'])]
-    else:
-        df_filtered = pd.DataFrame(columns=['지역코드', '순위', '관광지ID', '관심지점명', '구분', '연령대', '비율', '위도', '경도'])
+  # 결측치(NaN)가 있으면 자바스크립트에서 에러가 날 수 있으므로 빈 문자열 등으로 처리 가능
+  df = df.fillna("")
 
-    # p_file 또는 각 지역 폴더에서 정제된 gj, jn 파일 병합
-    sub_dfs = []
-    for r_code in ['gj', 'jn']:
-        folder = '광주광역시' if r_code == 'gj' else '전라남도'
-        matched_files = glob.glob(os.path.join(base_dir, '**', folder, f'{r_code}_{age}.csv'), recursive=True)
-        if matched_files:
-            sub_dfs.append(pd.read_csv(matched_files[0], encoding='utf-8'))
+  # 딕셔너리 형태로 변환하여 저장
+  total_data[key_name] = df.to_dict(orient="records")
 
-    if sub_dfs:
-        df_sub = pd.concat(sub_dfs, ignore_index=True)
-        df_final = pd.concat([df_filtered, df_sub], ignore_index=True)
-        df_final.to_csv(total_path, index=False, encoding='utf-8-sig')
-        print(f"✅ total_{age}.csv 파일에 광주(gj) 및 전남(jn) 데이터 통합 완료!")
+# 2. 자바스크립트 파일 형식(const 변수)으로 문자열 생성
+js_content = (
+    "// 자동으로 생성된 데이터 파일입니다.\nconst totalData ="
+    f" {json.dumps(total_data, ensure_ascii=False, indent=4)};\n"
+)
 
-print("\n🎉 모든 세대별 통합 파일(total_20.csv ~ total_60.csv)에 위·경도 포함 데이터가 성공적으로 반영되었습니다!")
+# 3. 바깥쪽 경로에 data.js 파일로 저장
+output_path = "data.js"
+with open(output_path, "w", encoding="utf-8") as f:
+  f.write(js_content)
+
+print(f"성공! {output_path} 파일이 최신 CSV 데이터로 업그레이드되었습니다.")

@@ -1,0 +1,763 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelMate - 10월 인기 여행지 추천</title>
+    
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Plus+Jakarta+Sans:wght@500;700;800&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        cream: '#f7f3e8',
+                        'cream-dark': '#eee9d8',
+                        'palette-deep': '#1f06ac',
+                        'palette-mid': '#0f42c0',
+                        'palette-light': '#5882e8',
+                        'palette-yellow': '#e3ef4f',
+                        'dark-text': '#121629',
+                    },
+                    fontFamily: {
+                        display: ['Fredoka', 'Pretendard', 'sans-serif'],
+                        sans: ['Plus Jakarta Sans', 'Pretendard', 'sans-serif'],
+                    },
+                    borderRadius: {
+                        '4xl': '32px',
+                        '5xl': '40px',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            background-color: #f7f3e8;
+            color: #121629;
+            font-family: 'Plus Jakarta Sans', 'Pretendard', sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Soft Outline Pill */
+        .pill-badge {
+            border: 1px solid #1f06ac;
+            padding: 6px 18px;
+            border-radius: 9999px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            background-color: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(4px);
+            color: #1f06ac;
+        }
+
+        /* Card Hover Effects */
+        .hover-lift {
+            transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s ease;
+        }
+
+        .hover-lift:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 18px 28px -8px rgba(31, 6, 172, 0.3);
+        }
+
+        /* Hide Scrollbar */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f7f3e8;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #1f06ac;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body class="antialiased selection:bg-palette-yellow selection:text-dark-text">
+
+    <!-- Header Navigation -->
+    <header class="max-w-7xl mx-auto px-6 py-6 flex justify-between items-center">
+        <!-- Logo -->
+        <a href="#" class="text-3xl font-extrabold tracking-tight font-display text-palette-deep flex items-center gap-2">
+            <span class="inline-block w-9 h-9 bg-palette-deep text-palette-yellow rounded-full flex items-center justify-center text-sm font-bold shadow-md">TM</span>
+            TravelMate
+        </a>
+
+        <!-- Center Nav -->
+        <nav class="hidden md:flex items-center gap-8 font-semibold text-sm text-dark-text">
+            <a href="#" class="hover:text-palette-deep transition-colors">광역시도별 TOP10</a>
+            <a href="#" class="hover:text-palette-deep transition-colors">여행 선배들의 팁</a>
+            <a href="#" class="hover:text-palette-deep transition-colors">숙박·교통 바로가기</a>
+            <a href="#" class="hover:text-palette-deep transition-colors">로그인·회원가입</a>
+        </nav>
+
+        <!-- Right Button -->
+        <div class="flex items-center gap-3">
+            <button class="w-10 h-10 rounded-full border border-palette-deep text-palette-deep flex items-center justify-center hover:bg-palette-deep hover:text-white transition-colors">
+                <i class="fa-solid fa-magnifying-glass text-sm"></i>
+            </button>
+            <a href="test2_p5.html" class="px-5 py-2.5 rounded-full bg-palette-deep text-white text-sm font-bold hover:bg-palette-mid transition-all duration-200 shadow-md">
+                종합 데이터 보기
+            </a>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 space-y-16 pb-20">
+
+        <!-- 1. Hero Section -->
+        <section id="hero" class="relative">
+            <div class="relative w-full h-[500px] sm:h-[560px] rounded-4xl sm:rounded-5xl overflow-hidden shadow-2xl">
+                <img src="https://images.unsplash.com/photo-1510312305653-8ed496efae75?auto=format&fit=crop&w=1800&q=85" 
+                    alt="노란 조명의 텐트와 황혼 캠핑 풍경" 
+                    class="w-full h-full object-cover brightness-[0.8] scale-105 transition-transform duration-1000 hover:scale-100">
+                <div class="absolute inset-0 flex flex-col items-center justify-center text-center p-6 sm:p-12 text-white bg-gradient-to-t from-palette-deep/80 via-black/20 to-black/30">
+                    <div class="mb-4">
+                        <span class="pill-badge border-palette-yellow text-palette-yellow bg-palette-deep/70 backdrop-blur-md">
+                            <i class="fa-solid fa-star text-palette-yellow"></i> OCTOBER DESTINATIONS <i class="fa-solid fa-star text-palette-yellow"></i>
+                        </span>
+                    </div>
+
+                    <h1 class="text-2xl sm:text-4xl md:text-5xl font-extrabold font-display tracking-tight text-white drop-shadow-md leading-tight max-w-4xl">
+                        "남들 다 가는 핫플, 나만 안 갈 수 없으니까!" <br class="hidden sm:inline"> 
+                    </h1>
+
+                    <p class="mt-4 text-base sm:text-xl text-white/90 max-w-2xl font-medium drop-shadow-sm">
+                        <br>초보 여행자도 실패 없는 10월 감성 가을 여행지! <br class="hidden sm:inline">
+                        빅데이터가 증명하는 최다 목적지 검색 순위를 확인해 보세요.
+                    </p>
+
+                    <div class="mt-8 flex flex-wrap gap-4 justify-center">
+                        <a href="#regions" class="px-8 py-4 bg-palette-yellow text-palette-deep rounded-full font-extrabold text-base hover:bg-white transition-all shadow-lg hover:shadow-xl hover:-translate-y-0.5">
+                            전국 지자체 순위 보기 <i class="fa-solid fa-arrow-down ml-2"></i>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. 전국 17개 광역시도 검색 순위 -->
+        <section id="regions" class="space-y-6 pt-2">
+            
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-end gap-4 border-b border-palette-deep/15 pb-6">
+                <div>
+                    <span class="pill-badge mb-3">
+                        <i class="fa-solid fa-chart-simple"></i> DATA OVERVIEW
+                    </span>
+                    <h2 class="text-3xl sm:text-4xl font-extrabold text-palette-deep tracking-tight font-display">
+                        전국 17개 광역시도 검색 순위
+                    </h2>
+                </div>
+
+                <div class="flex items-center gap-4">
+                    <div class="text-sm text-palette-deep font-semibold bg-white/80 px-4 py-2 rounded-full border border-palette-deep/20 hidden sm:block">
+                        총 검색건수: <strong class="text-palette-deep font-extrabold">68,360,514</strong> 건
+                    </div>
+                    <!-- Carousel Controls -->
+                    <div class="flex items-center gap-2">
+                        <button onclick="scrollCarousel(-1)" class="w-11 h-11 rounded-full bg-white border border-palette-deep text-palette-deep hover:bg-palette-deep hover:text-white transition-all shadow flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-left"></i>
+                        </button>
+                        <button onclick="scrollCarousel(1)" class="w-11 h-11 rounded-full bg-white border border-palette-deep text-palette-deep hover:bg-palette-deep hover:text-white transition-all shadow flex items-center justify-center">
+                            <i class="fa-solid fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Horizontal Carousel -->
+            <div id="carousel-container" class="flex gap-6 overflow-x-auto no-scrollbar scroll-smooth py-4 px-1">
+                <!-- Javascript dynamically renders 17 navy cards below -->
+            </div>
+            
+            <p class="text-xs text-center text-palette-deep/60 font-semibold sm:hidden">
+                👈 좌우로 스크롤하여 더 많은 지역을 확인하세요 👉
+            </p>
+        </section>
+
+        <!-- 3. 숙박 시설 예약 바로가기 & 교통편 예매 바로가기 (숙박 4개 구성으로 통일) -->
+        <section id="partners" class="grid grid-cols-1 lg:grid-cols-2 gap-6 pt-2">
+            
+            <!-- 숙박 시설 예약 바로가기 (4개 구성) -->
+            <div class="bg-white/90 backdrop-blur rounded-4xl p-6 sm:p-8 shadow-sm border border-palette-deep/10 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 text-palette-deep font-extrabold text-xs uppercase mb-2">
+                        <span class="w-2 h-2 rounded-full bg-palette-deep inline-block"></span> ACCOMMODATIONS
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-palette-deep mb-4 flex items-center gap-2.5">
+                        <i class="fa-solid fa-hotel text-palette-mid"></i> 숙박 시설 예약 바로가기
+                    </h3>
+                    <p class="text-xs text-dark-text/70 mb-6 font-medium">
+                        전국 검증된 인스타 감성 숙소부터 힐링 호텔까지 실시간으로 비교 예약하세요.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <a href="https://www.goodchoice.kr/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-bed text-rose-500 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">여기어때</span>
+                    </a>
+                    <a href="https://www.yanolja.com/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-house-user text-pink-500 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">야놀자</span>
+                    </a>
+                    <a href="https://www.agoda.com/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-globe text-blue-600 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">아고다</span>
+                    </a>
+                    <a href="https://kr.trip.com/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-plane-departure text-cyan-600 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">트립닷컴</span>
+                    </a>
+                </div>
+            </div>
+
+            <!-- 교통편 예매 & 스마트 길찾기 (4개 구성) -->
+            <div class="bg-white/90 backdrop-blur rounded-4xl p-6 sm:p-8 shadow-sm border border-palette-deep/10 flex flex-col justify-between">
+                <div>
+                    <div class="flex items-center gap-2 text-palette-deep font-extrabold text-xs uppercase mb-2">
+                        <span class="w-2 h-2 rounded-full bg-palette-deep inline-block"></span> TRANSPORTATION
+                    </div>
+                    <h3 class="text-2xl font-extrabold text-palette-deep mb-4 flex items-center gap-2.5">
+                        <i class="fa-solid fa-route text-emerald-600"></i> 교통편 예매 & 스마트 길찾기
+                    </h3>
+                    <p class="text-xs text-dark-text/70 mb-6 font-medium">
+                        항공, 기차, 고속버스부터 카셰어링까지 빠른 예매 서비스로 이동 수단을 빠르게 확보하세요.
+                    </p>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <a href="https://www.koreanair.com/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-plane text-sky-500 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">항공<br><span class="text-[10px] font-normal opacity-80">(대한항공)</span></span>
+                    </a>
+                    <a href="https://www.letskorail.com/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-train text-blue-600 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">기차<br><span class="text-[10px] font-normal opacity-80">(코레일)</span></span>
+                    </a>
+                    <a href="https://www.kobus.co.kr/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-bus text-orange-500 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">버스<br><span class="text-[10px] font-normal opacity-80">(고속버스)</span></span>
+                    </a>
+                    <a href="https://www.socar.kr/" target="_blank" class="p-3 bg-cream/70 hover:bg-palette-deep hover:text-white rounded-2xl text-center transition-all border border-palette-deep/10 group hover-lift">
+                        <i class="fa-solid fa-car text-indigo-600 text-2xl group-hover:text-palette-yellow transition-colors"></i>
+                        <span class="block text-xs font-bold mt-2 text-dark-text group-hover:text-white">자동차<br><span class="text-[10px] font-normal opacity-80">(쏘카)</span></span>
+                    </a>
+                </div>
+            </div>
+
+        </section>
+
+        <!-- 4. 지역별 탭 (< > 버튼) + 연령대별 TOP 3 대시보드 -->
+        <section id="age-ranks" class="bg-palette-yellow rounded-4xl sm:rounded-5xl p-6 sm:p-12 shadow-md border border-black/5 space-y-8">
+            
+            <div class="text-center">
+                <div class="inline-block mb-3">
+                    <span class="pill-badge bg-white/90 border-palette-deep">
+                        ✦ 10월 세대별 인기 TOP 3 ✦
+                    </span>
+                </div>
+                <h2 class="text-3xl sm:text-5xl font-extrabold font-display text-palette-deep tracking-tight">
+                    세대 맞춤 인기 여행지
+                </h2>
+                <p class="text-xs sm:text-sm text-dark-text/80 font-semibold mt-2">
+                    20대부터 60대까지 세대별 최상위 검색지 TOP 3를 한눈에 확인할 수 있습니다.
+                </p>
+            </div>
+
+            <!-- 17개 지자체 선택 탭 바 (좌우 슬라이드 버튼 < > 장착) -->
+            <div class="bg-white/80 backdrop-blur-sm p-3 rounded-3xl border border-palette-deep/10 shadow-sm flex items-center gap-2">
+                <!-- Left Slide Button -->
+                <button onclick="scrollTabButtons(-1)" class="w-9 h-9 rounded-full bg-palette-deep text-palette-yellow hover:bg-palette-mid transition shadow flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-chevron-left text-xs"></i>
+                </button>
+
+                <!-- Scrollable Tab Container -->
+                <div id="region-tab-buttons" class="flex gap-2 overflow-x-auto no-scrollbar scroll-smooth py-1 flex-1">
+                    <!-- Javascript Dynamic Render -->
+                </div>
+
+                <!-- Right Slide Button -->
+                <button onclick="scrollTabButtons(1)" class="w-9 h-9 rounded-full bg-palette-deep text-palette-yellow hover:bg-palette-mid transition shadow flex items-center justify-center flex-shrink-0">
+                    <i class="fa-solid fa-chevron-right text-xs"></i>
+                </button>
+            </div>
+
+            <!-- 5개 연령대별 TOP 3 그리드 카드 영역 -->
+            <div id="age-rank-cards-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
+                <!-- Javascript Dynamic Render -->
+            </div>
+
+        </section>
+
+        <!-- 5. Mid Blue Highlight Section (Travel Tips) -->
+        <section class="bg-palette-mid rounded-4xl sm:rounded-5xl p-8 sm:p-12 text-white shadow-md">
+            <div class="text-center max-w-2xl mx-auto mb-10">
+                <span class="pill-badge bg-white/20 border-white/40 text-palette-yellow mb-3">
+                    ✦ Travel Tips ✦
+                </span>
+                <h2 class="text-3xl sm:text-4xl font-extrabold font-display text-white">
+                    여행을 더 즐겁게 만드는 방법
+                </h2>
+                <p class="mt-2 text-sm sm:text-base font-medium opacity-90">
+                    TravelMate 이용자들이 전하는 10월 단풍 여행 꿀팁
+                </p>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/20 flex flex-col justify-between">
+                    <div class="text-2xl mb-4 text-palette-yellow"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-sm font-semibold leading-relaxed mb-6 text-white/95">
+                        "경기도와 강원도 단풍 코스는 10월 3~4주차가 가장 절정이에요. 주말 오전 일찍 출발하는 것을 추천합니다!"
+                    </p>
+                    <div class="text-xs font-bold text-palette-yellow">— 김민준 님 (여행 블로거)</div>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/20 flex flex-col justify-between">
+                    <div class="text-2xl mb-4 text-palette-yellow"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-sm font-semibold leading-relaxed mb-6 text-white/95">
+                        "서울 남산 둘레길과 경복궁 향원정은 가을철 인생샷 명소입니다. 평일 오전에 방문하면 한적해요."
+                    </p>
+                    <div class="text-xs font-bold text-palette-yellow">— 이서연 님 (사진작가)</div>
+                </div>
+
+                <div class="bg-white/10 backdrop-blur rounded-3xl p-6 border border-white/20 flex flex-col justify-between">
+                    <div class="text-2xl mb-4 text-palette-yellow"><i class="fa-solid fa-quote-left"></i></div>
+                    <p class="text-sm font-semibold leading-relaxed mb-6 text-white/95">
+                        "제주도와 전남 해안 도로는 가을철 억새와 노을이 장관입니다. 드라이브 코스로 적극 추천드려요!"
+                    </p>
+                    <div class="text-xs font-bold text-palette-yellow">— 박진우 님 (드라이브 마니아)</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 6. Light Blue FAQ Accordion Block -->
+        <section id="faq" class="bg-palette-light rounded-4xl sm:rounded-5xl p-8 sm:p-14 text-white shadow-md">
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+                
+                <div class="lg:col-span-5 space-y-4">
+                    <span class="pill-badge bg-palette-deep text-palette-yellow border-none">
+                        ✦ FAQs ✦
+                    </span>
+                    <h2 class="text-3xl sm:text-5xl font-extrabold font-display leading-tight text-white">
+                        자주 묻는 질문,<br>궁금증을 풀어드려요
+                    </h2>
+                    <p class="text-sm sm:text-base font-medium opacity-90 text-white/90">
+                        TravelMate 통계 데이터 및 여행지 관련 안내 사항입니다.
+                    </p>
+                </div>
+
+                <div class="lg:col-span-7 space-y-4">
+                    
+                    <div class="border-b border-white/30 pb-4">
+                        <button onclick="toggleFaq(1)" class="w-full flex justify-between items-center text-left py-2 font-extrabold text-base sm:text-lg focus:outline-none text-white">
+                            <span>검색건수 데이터는 어디서 수집되나요?</span>
+                            <span id="icon-1" class="text-xl transition-transform text-palette-yellow">+</span>
+                        </button>
+                        <div id="faq-1" class="hidden mt-2 text-sm text-white/90 leading-relaxed font-medium">
+                            전국 17개 광역지자체의 내비게이션 목적지 검색 및 관광 관련 실시간 빅데이터 총 68,360,514건을 집계하여 작성되었습니다.
+                        </div>
+                    </div>
+
+                    <div class="border-b border-white/30 pb-4">
+                        <button onclick="toggleFaq(2)" class="w-full flex justify-between items-center text-left py-2 font-extrabold text-base sm:text-lg focus:outline-none text-white">
+                            <span>10월에 추천하는 대표 단풍 코스는 어디인가요?</span>
+                            <span id="icon-2" class="text-xl transition-transform text-palette-yellow">+</span>
+                        </button>
+                        <div id="faq-2" class="hidden mt-2 text-sm text-white/90 leading-relaxed font-medium">
+                            경기도 광주 화담숲, 강원도 설악산 및 오대산, 서울 남산둘레길과 경복궁이 가장 높은 추천을 받고 있습니다.
+                        </div>
+                    </div>
+
+                    <div class="border-b border-white/30 pb-4">
+                        <button onclick="toggleFaq(3)" class="w-full flex justify-between items-center text-left py-2 font-extrabold text-base sm:text-lg focus:outline-none text-white">
+                            <span>각 지역 카드를 클릭하면 상세 정보를 볼 수 있나요?</span>
+                            <span id="icon-3" class="text-xl transition-transform text-palette-yellow">+</span>
+                        </button>
+                        <div id="faq-3" class="hidden mt-2 text-sm text-white/90 leading-relaxed font-medium">
+                            네, 각 지자체 버튼을 클릭하면 해당 지역의 주요 추천 관광지, 단풍 예상 시기 및 맛집 정보를 확인하실 수 있습니다.
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-palette-deep text-cream py-12 border-t border-palette-deep/20">
+        <div class="max-w-7xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-6">
+            <div class="flex items-center gap-3">
+                <span class="w-8 h-8 bg-palette-yellow text-palette-deep rounded-full flex items-center justify-center font-bold text-sm">TM</span>
+                <span class="font-extrabold text-xl font-display text-white">TravelMate</span>
+            </div>
+
+            <p class="text-xs text-cream/70 text-center">
+                &copy; 2026 TravelMate. 대한민국 17개 광역지자체 빅데이터 분석 기반 여행 서비스.
+            </p>
+
+            <div class="flex gap-4 text-cream/80 text-sm">
+                <a href="#" class="hover:text-palette-yellow transition-colors">개인정보처리방침</a>
+                <a href="#" class="hover:text-palette-yellow transition-colors">이용약관</a>
+                <a href="#" class="hover:text-palette-yellow transition-colors">문의하기</a>
+            </div>
+        </div>
+    </footer>
+
+    <!-- JavaScript Data Script -->
+    <script>
+        // 17개 지자체 데이터
+        const regionData = [
+            { rank: 1, name: "경기도", count: 20118936, percent: 29.43, img: "https://images.unsplash.com/photo-1588668214407-6ea9a6d8c272?auto=format&fit=crop&w=600&q=80" },
+            { rank: 2, name: "서울특별시", count: 8920036, percent: 13.05, img: "https://images.unsplash.com/photo-1538485399081-7191377e8241?auto=format&fit=crop&w=600&q=80" },
+            { rank: 3, name: "인천광역시", count: 4878825, percent: 7.14, img: "https://images.unsplash.com/photo-1578637387939-43c525550085?auto=format&fit=crop&w=600&q=80" },
+            { rank: 4, name: "강원특별자치도", count: 4745792, percent: 6.94, img: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" },
+            { rank: 5, name: "경상남도", count: 3818488, percent: 5.59, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=600&q=80" },
+            { rank: 6, name: "충청남도", count: 3727707, percent: 5.45, img: "https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?auto=format&fit=crop&w=600&q=80" },
+            { rank: 7, name: "경상북도", count: 3540080, percent: 5.18, img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=600&q=80" },
+            { rank: 8, name: "부산광역시", count: 3532166, percent: 5.17, img: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?auto=format&fit=crop&w=600&q=80" },
+            { rank: 9, name: "전라남도", count: 2638698, percent: 3.86, img: "https://images.unsplash.com/photo-1501785888041-af3ef285b470?auto=format&fit=crop&w=600&q=80" },
+            { rank: 10, name: "충청북도", count: 2459078, percent: 3.60, img: "https://images.unsplash.com/photo-1426604966848-d7adac402bff?auto=format&fit=crop&w=600&q=80" },
+            { rank: 11, name: "전북특별자치도", count: 2220624, percent: 3.25, img: "https://images.unsplash.com/photo-1472214103451-9374bd1c798e?auto=format&fit=crop&w=600&q=80" },
+            { rank: 12, name: "대구광역시", count: 1966461, percent: 2.88, img: "https://images.unsplash.com/photo-1519681393784-d120267933ba?auto=format&fit=crop&w=600&q=80" },
+            { rank: 13, name: "제주특별자치도", count: 1894204, percent: 2.77, img: "https://images.unsplash.com/photo-1544644181-1484b3fdfc62?auto=format&fit=crop&w=600&q=80" },
+            { rank: 14, name: "대전광역시", count: 1499362, percent: 2.19, img: "https://images.unsplash.com/photo-1470240731273-7821a6eeb6bd?auto=format&fit=crop&w=600&q=80" },
+            { rank: 15, name: "광주광역시", count: 1006427, percent: 1.47, img: "https://images.unsplash.com/photo-1469474968028-56623f02e42e?auto=format&fit=crop&w=600&q=80" },
+            { rank: 16, name: "울산광역시", count: 969368, percent: 1.42, img: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=600&q=80" },
+            { rank: 17, name: "세종특별자치시", count: 422561, percent: 0.62, img: "https://images.unsplash.com/photo-1447752875215-b2761acb3c5d?auto=format&fit=crop&w=600&q=80" }
+        ];
+
+        // CSV 기반 지자체별 연령대별 TOP 3 데이터
+        const ageCsvData = {
+            "강원특별자치도": {
+                "20대": [{"rank": 1, "name": "속초해변", "ratio": 11.2}, {"rank": 2, "name": "안목해변", "ratio": 9.3}, {"rank": 3, "name": "경포해변", "ratio": 9.1}],
+                "30대": [{"rank": 1, "name": "레고랜드코리아리조트", "ratio": 10.9}, {"rank": 2, "name": "속초해변", "ratio": 9.7}, {"rank": 3, "name": "낙산사", "ratio": 6.6}],
+                "40대": [{"rank": 1, "name": "레고랜드코리아리조트", "ratio": 13.2}, {"rank": 2, "name": "낙산사", "ratio": 7.4}, {"rank": 3, "name": "속초해변", "ratio": 7.0}],
+                "50대": [{"rank": 1, "name": "강원랜드카지노", "ratio": 7.2}, {"rank": 2, "name": "낙산사", "ratio": 7.2}, {"rank": 3, "name": "월정사", "ratio": 5.9}],
+                "60대": [{"rank": 1, "name": "월정사", "ratio": 8.6}, {"rank": 2, "name": "고석정국민관광지", "ratio": 8.1}, {"rank": 3, "name": "백담사", "ratio": 6.9}]
+            },
+            "경기도": {
+                "20대": [{"rank": 1, "name": "에버랜드", "ratio": 18.2}, {"rank": 2, "name": "스타필드하남", "ratio": 12.1}, {"rank": 3, "name": "스타필드고양", "ratio": 10.5}],
+                "30대": [{"rank": 1, "name": "에버랜드", "ratio": 22.4}, {"rank": 2, "name": "스타필드하남", "ratio": 14.3}, {"rank": 3, "name": "스타필드고양", "ratio": 11.2}],
+                "40대": [{"rank": 1, "name": "에버랜드", "ratio": 20.1}, {"rank": 2, "name": "스타필드하남", "ratio": 13.5}, {"rank": 3, "name": "스타필드고양", "ratio": 10.8}],
+                "50대": [{"rank": 1, "name": "스타필드하남", "ratio": 11.8}, {"rank": 2, "name": "에버랜드", "ratio": 10.2}, {"rank": 3, "name": "스타필드고양", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "스타필드하남", "ratio": 10.5}, {"rank": 2, "name": "스타필드고양", "ratio": 8.2}, {"rank": 3, "name": "화담숲", "ratio": 7.8}]
+            },
+            "서울특별시": {
+                "20대": [{"rank": 1, "name": "국립중앙박물관", "ratio": 12.5}, {"rank": 2, "name": "롯데월드잠실점", "ratio": 11.8}, {"rank": 3, "name": "더현대서울", "ratio": 10.2}],
+                "30대": [{"rank": 1, "name": "롯데월드잠실점", "ratio": 14.2}, {"rank": 2, "name": "국립중앙박물관", "ratio": 11.5}, {"rank": 3, "name": "더현대서울", "ratio": 9.8}],
+                "40대": [{"rank": 1, "name": "국립중앙박물관", "ratio": 13.8}, {"rank": 2, "name": "롯데월드잠실점", "ratio": 12.1}, {"rank": 3, "name": "경복궁", "ratio": 8.9}],
+                "50대": [{"rank": 1, "name": "국립중앙박물관", "ratio": 12.1}, {"rank": 2, "name": "경복궁", "ratio": 9.5}, {"rank": 3, "name": "남산서울타워", "ratio": 7.8}],
+                "60대": [{"rank": 1, "name": "경복궁", "ratio": 11.2}, {"rank": 2, "name": "국립중앙박물관", "ratio": 10.4}, {"rank": 3, "name": "남산서울타워", "ratio": 8.1}]
+            },
+            "인천광역시": {
+                "20대": [{"rank": 1, "name": "인천국제공항제1여객터미널", "ratio": 22.1}, {"rank": 2, "name": "월미도", "ratio": 9.5}, {"rank": 3, "name": "을왕리해수욕장", "ratio": 8.2}],
+                "30대": [{"rank": 1, "name": "인천국제공항제1여객터미널", "ratio": 24.5}, {"rank": 2, "name": "송도센트럴파크", "ratio": 8.8}, {"rank": 3, "name": "월미도", "ratio": 7.9}],
+                "40대": [{"rank": 1, "name": "인천국제공항제1여객터미널", "ratio": 23.1}, {"rank": 2, "name": "송도센트럴파크", "ratio": 8.1}, {"rank": 3, "name": "소래포구", "ratio": 7.2}],
+                "50대": [{"rank": 1, "name": "인천국제공항제1여객터미널", "ratio": 18.9}, {"rank": 2, "name": "소래포구", "ratio": 9.8}, {"rank": 3, "name": "전등사", "ratio": 6.5}],
+                "60대": [{"rank": 1, "name": "소래포구", "ratio": 12.4}, {"rank": 2, "name": "인천국제공항제1여객터미널", "ratio": 11.2}, {"rank": 3, "name": "전등사", "ratio": 8.9}]
+            },
+            "경상남도": {
+                "20대": [{"rank": 1, "name": "통영케이블카", "ratio": 10.8}, {"rank": 2, "name": "동피랑벽화마을", "ratio": 9.2}, {"rank": 3, "name": "바람의언덕", "ratio": 8.5}],
+                "30대": [{"rank": 1, "name": "통영케이블카", "ratio": 11.5}, {"rank": 2, "name": "거제식물원", "ratio": 9.8}, {"rank": 3, "name": "바람의언덕", "ratio": 8.9}],
+                "40대": [{"rank": 1, "name": "거제식물원", "ratio": 10.2}, {"rank": 2, "name": "통영케이블카", "ratio": 9.9}, {"rank": 3, "name": "해인사", "ratio": 7.8}],
+                "50대": [{"rank": 1, "name": "해인사", "ratio": 11.4}, {"rank": 2, "name": "통영케이블카", "ratio": 8.8}, {"rank": 3, "name": "지리산국립공원", "ratio": 7.9}],
+                "60대": [{"rank": 1, "name": "해인사", "ratio": 14.2}, {"rank": 2, "name": "지리산국립공원", "ratio": 9.5}, {"rank": 3, "name": "통영케이블카", "ratio": 7.2}]
+            },
+            "충청남도": {
+                "20대": [{"rank": 1, "name": "대천해수욕장", "ratio": 15.2}, {"rank": 2, "name": "꽃지해수욕장", "ratio": 9.8}, {"rank": 3, "name": "독립기념관", "ratio": 7.9}],
+                "30대": [{"rank": 1, "name": "대천해수욕장", "ratio": 14.1}, {"rank": 2, "name": "독립기념관", "ratio": 10.5}, {"rank": 3, "name": "예당호출렁다리", "ratio": 8.2}],
+                "40대": [{"rank": 1, "name": "독립기념관", "ratio": 12.8}, {"rank": 2, "name": "대천해수욕장", "ratio": 11.2}, {"rank": 3, "name": "예당호출렁다리", "ratio": 9.1}],
+                "50대": [{"rank": 1, "name": "예당호출렁다리", "ratio": 11.8}, {"rank": 2, "name": "독립기념관", "ratio": 9.2}, {"rank": 3, "name": "마곡사", "ratio": 8.1}],
+                "60대": [{"rank": 1, "name": "예당호출렁다리", "ratio": 13.5}, {"rank": 2, "name": "마곡사", "ratio": 10.2}, {"rank": 3, "name": "독립기념관", "ratio": 7.8}]
+            },
+            "경상북도": {
+                "20대": [{"rank": 1, "name": "황리단길", "ratio": 16.8}, {"rank": 2, "name": "동궁과월지", "ratio": 12.4}, {"rank": 3, "name": "첨성대", "ratio": 10.1}],
+                "30대": [{"rank": 1, "name": "황리단길", "ratio": 15.2}, {"rank": 2, "name": "불국사", "ratio": 11.8}, {"rank": 3, "name": "동궁과월지", "ratio": 9.9}],
+                "40대": [{"rank": 1, "name": "불국사", "ratio": 13.5}, {"rank": 2, "name": "황리단길", "ratio": 11.2}, {"rank": 3, "name": "하회마을", "ratio": 8.9}],
+                "50대": [{"rank": 1, "name": "불국사", "ratio": 14.8}, {"rank": 2, "name": "하회마을", "ratio": 10.5}, {"rank": 3, "name": "주왕산국립공원", "ratio": 8.2}],
+                "60대": [{"rank": 1, "name": "불국사", "ratio": 16.2}, {"rank": 2, "name": "하회마을", "ratio": 11.8}, {"rank": 3, "name": "주왕산국립공원", "ratio": 9.5}]
+            },
+            "부산광역시": {
+                "20대": [{"rank": 1, "name": "광안리해수욕장", "ratio": 18.5}, {"rank": 2, "name": "해운대해수욕장", "ratio": 14.2}, {"rank": 3, "name": "감천문화마을", "ratio": 8.9}],
+                "30대": [{"rank": 1, "name": "해운대해수욕장", "ratio": 16.8}, {"rank": 2, "name": "광안리해수욕장", "ratio": 15.1}, {"rank": 3, "name": "송도해수욕장", "ratio": 7.8}],
+                "40대": [{"rank": 1, "name": "해운대해수욕장", "ratio": 17.5}, {"rank": 2, "name": "광안리해수욕장", "ratio": 12.8}, {"rank": 3, "name": "해동용궁사", "ratio": 8.2}],
+                "50대": [{"rank": 1, "name": "해운대해수욕장", "ratio": 15.2}, {"rank": 2, "name": "해동용궁사", "ratio": 11.4}, {"rank": 3, "name": "자갈치시장", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "해동용궁사", "ratio": 14.5}, {"rank": 2, "name": "자갈치시장", "ratio": 12.1}, {"rank": 3, "name": "해운대해수욕장", "ratio": 11.0}]
+            },
+            "전라남도": {
+                "20대": [{"rank": 1, "name": "여수밤바다", "ratio": 16.2}, {"rank": 2, "name": "순천만국가정원", "ratio": 11.5}, {"rank": 3, "name": "오동도", "ratio": 8.9}],
+                "30대": [{"rank": 1, "name": "순천만국가정원", "ratio": 15.8}, {"rank": 2, "name": "여수밤바다", "ratio": 13.2}, {"rank": 3, "name": "죽녹원", "ratio": 9.1}],
+                "40대": [{"rank": 1, "name": "순천만국가정원", "ratio": 17.2}, {"rank": 2, "name": "죽녹원", "ratio": 10.8}, {"rank": 3, "name": "여수밤바다", "ratio": 9.5}],
+                "50대": [{"rank": 1, "name": "순천만습지", "ratio": 16.5}, {"rank": 2, "name": "죽녹원", "ratio": 11.2}, {"rank": 3, "name": "향일암", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "순천만습지", "ratio": 18.2}, {"rank": 2, "name": "향일암", "ratio": 12.5}, {"rank": 3, "name": "죽녹원", "ratio": 9.8}]
+            },
+            "충청북도": {
+                "20대": [{"rank": 1, "name": "청남대", "ratio": 12.8}, {"rank": 2, "name": "도담삼봉", "ratio": 10.5}, {"rank": 3, "name": "충주호", "ratio": 8.9}],
+                "30대": [{"rank": 1, "name": "청남대", "ratio": 14.2}, {"rank": 2, "name": "도담삼봉", "ratio": 11.8}, {"rank": 3, "name": "단양만천하스카이워크", "ratio": 9.2}],
+                "40대": [{"rank": 1, "name": "청남대", "ratio": 15.5}, {"rank": 2, "name": "도담삼봉", "ratio": 12.1}, {"rank": 3, "name": "속리산국립공원", "ratio": 8.8}],
+                "50대": [{"rank": 1, "name": "청남대", "ratio": 16.8}, {"rank": 2, "name": "속리산법주사", "ratio": 11.5}, {"rank": 3, "name": "도담삼봉", "ratio": 10.2}],
+                "60대": [{"rank": 1, "name": "속리산법주사", "ratio": 15.2}, {"rank": 2, "name": "청남대", "ratio": 14.8}, {"rank": 3, "name": "도담삼봉", "ratio": 11.1}]
+            },
+            "전북특별자치도": {
+                "20대": [{"rank": 1, "name": "전주한옥마을", "ratio": 24.5}, {"rank": 2, "name": "채석강", "ratio": 8.9}, {"rank": 3, "name": "마이산", "ratio": 7.2}],
+                "30대": [{"rank": 1, "name": "전주한옥마을", "ratio": 22.1}, {"rank": 2, "name": "채석강", "ratio": 9.5}, {"rank": 3, "name": "선운사", "ratio": 8.1}],
+                "40대": [{"rank": 1, "name": "전주한옥마을", "ratio": 19.8}, {"rank": 2, "name": "내장산국립공원", "ratio": 11.2}, {"rank": 3, "name": "선운사", "ratio": 9.2}],
+                "50대": [{"rank": 1, "name": "내장산국립공원", "ratio": 16.5}, {"rank": 2, "name": "선운사", "ratio": 12.8}, {"rank": 3, "name": "전주한옥마을", "ratio": 11.5}],
+                "60대": [{"rank": 1, "name": "내장산국립공원", "ratio": 19.2}, {"rank": 2, "name": "선운사", "ratio": 14.5}, {"rank": 3, "name": "마이산탑사", "ratio": 9.8}]
+            },
+            "대구광역시": {
+                "20대": [{"rank": 1, "name": "서문시장", "ratio": 14.2}, {"rank": 2, "name": "수성못", "ratio": 12.5}, {"rank": 3, "name": "이월드", "ratio": 10.8}],
+                "30대": [{"rank": 1, "name": "서문시장", "ratio": 15.8}, {"rank": 2, "name": "수성못", "ratio": 11.9}, {"rank": 3, "name": "이월드", "ratio": 9.5}],
+                "40대": [{"rank": 1, "name": "서문시장", "ratio": 16.5}, {"rank": 2, "name": "팔공산갓바위", "ratio": 11.2}, {"rank": 3, "name": "수성못", "ratio": 9.8}],
+                "50대": [{"rank": 1, "name": "팔공산갓바위", "ratio": 18.2}, {"rank": 2, "name": "서문시장", "ratio": 14.5}, {"rank": 3, "name": "동화사", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "팔공산갓바위", "ratio": 21.5}, {"rank": 2, "name": "서문시장", "ratio": 12.8}, {"rank": 3, "name": "동화사", "ratio": 10.2}]
+            },
+            "제주특별자치도": {
+                "20대": [{"rank": 1, "name": "성산일출봉", "ratio": 14.2}, {"rank": 2, "name": "협재해수욕장", "ratio": 12.8}, {"rank": 3, "name": "함덕해수욕장", "ratio": 11.5}],
+                "30대": [{"rank": 1, "name": "성산일출봉", "ratio": 15.5}, {"rank": 2, "name": "협재해수욕장", "ratio": 11.9}, {"rank": 3, "name": "섭지코지", "ratio": 9.8}],
+                "40대": [{"rank": 1, "name": "성산일출봉", "ratio": 16.8}, {"rank": 2, "name": "한라산국립공원", "ratio": 11.2}, {"rank": 3, "name": "섭지코지", "ratio": 9.2}],
+                "50대": [{"rank": 1, "name": "성산일출봉", "ratio": 18.2}, {"rank": 2, "name": "한라산국립공원", "ratio": 13.5}, {"rank": 3, "name": "산방산", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "성산일출봉", "ratio": 19.5}, {"rank": 2, "name": "한라산국립공원", "ratio": 14.2}, {"rank": 3, "name": "산방산", "ratio": 9.8}]
+            },
+            "대전광역시": {
+                "20대": [{"rank": 1, "name": "성심당본점", "ratio": 28.5}, {"rank": 2, "name": "한밭수목원", "ratio": 11.2}, {"rank": 3, "name": "엑스포과학공원", "ratio": 8.9}],
+                "30대": [{"rank": 1, "name": "성심당본점", "ratio": 31.2}, {"rank": 2, "name": "한밭수목원", "ratio": 10.8}, {"rank": 3, "name": "엑스포과학공원", "ratio": 9.1}],
+                "40대": [{"rank": 1, "name": "성심당본점", "ratio": 26.8}, {"rank": 2, "name": "한밭수목원", "ratio": 12.5}, {"rank": 3, "name": "국립중앙과학관", "ratio": 9.8}],
+                "50대": [{"rank": 1, "name": "성심당본점", "ratio": 22.1}, {"rank": 2, "name": "한밭수목원", "ratio": 13.8}, {"rank": 3, "name": "계족산황토길", "ratio": 8.5}],
+                "60대": [{"rank": 1, "name": "성심당본점", "ratio": 19.5}, {"rank": 2, "name": "한밭수목원", "ratio": 14.2}, {"rank": 3, "name": "계족산황토길", "ratio": 10.1}]
+            },
+            "광주광역시": {
+                "20대": [{"rank": 1, "name": "무등산국립공원", "ratio": 15.2}, {"rank": 2, "name": "국립아시아문화전당", "ratio": 12.8}, {"rank": 3, "name": "펭귄마을", "ratio": 9.5}],
+                "30대": [{"rank": 1, "name": "무등산국립공원", "ratio": 16.5}, {"rank": 2, "name": "국립아시아문화전당", "ratio": 11.2}, {"rank": 3, "name": "광주호호수생태원", "ratio": 8.9}],
+                "40대": [{"rank": 1, "name": "무등산국립공원", "ratio": 18.2}, {"rank": 2, "name": "광주호호수생태원", "ratio": 10.5}, {"rank": 3, "name": "국립아시아문화전당", "ratio": 9.1}],
+                "50대": [{"rank": 1, "name": "무등산국립공원", "ratio": 22.1}, {"rank": 2, "name": "증심사", "ratio": 11.8}, {"rank": 3, "name": "광주호호수생태원", "ratio": 9.5}],
+                "60대": [{"rank": 1, "name": "무등산국립공원", "ratio": 25.8}, {"rank": 2, "name": "증심사", "ratio": 13.2}, {"rank": 3, "name": "광주호호수생태원", "ratio": 8.8}]
+            },
+            "울산광역시": {
+                "20대": [{"rank": 1, "name": "태화강국가정원", "ratio": 21.2}, {"rank": 2, "name": "대왕암공원", "ratio": 15.8}, {"rank": 3, "name": "간절곶", "ratio": 11.5}],
+                "30대": [{"rank": 1, "name": "태화강국가정원", "ratio": 22.8}, {"rank": 2, "name": "대왕암공원", "ratio": 16.2}, {"rank": 3, "name": "간절곶", "ratio": 10.8}],
+                "40대": [{"rank": 1, "name": "태화강국가정원", "ratio": 24.1}, {"rank": 2, "name": "대왕암공원", "ratio": 17.5}, {"rank": 3, "name": "간절곶", "ratio": 9.8}],
+                "50대": [{"rank": 1, "name": "태화강국가정원", "ratio": 25.5}, {"rank": 2, "name": "대왕암공원", "ratio": 18.2}, {"rank": 3, "name": "가지산국립공원", "ratio": 8.9}],
+                "60대": [{"rank": 1, "name": "태화강국가정원", "ratio": 27.2}, {"rank": 2, "name": "대왕암공원", "ratio": 19.1}, {"rank": 3, "name": "석남사", "ratio": 9.5}]
+            },
+            "세종특별자치시": {
+                "20대": [{"rank": 1, "name": "세종호수공원", "ratio": 25.8}, {"rank": 2, "name": "국립세종수목원", "ratio": 18.2}, {"rank": 3, "name": "금강보행교", "ratio": 12.5}],
+                "30대": [{"rank": 1, "name": "세종호수공원", "ratio": 28.2}, {"rank": 2, "name": "국립세종수목원", "ratio": 21.5}, {"rank": 3, "name": "금강보행교", "ratio": 11.2}],
+                "40대": [{"rank": 1, "name": "세종호수공원", "ratio": 26.5}, {"rank": 2, "name": "국립세종수목원", "ratio": 22.8}, {"rank": 3, "name": "금강보행교", "ratio": 10.8}],
+                "50대": [{"rank": 1, "name": "국립세종수목원", "ratio": 24.5}, {"rank": 2, "name": "세종호수공원", "ratio": 22.1}, {"rank": 3, "name": "베어트리파크", "ratio": 9.8}],
+                "60대": [{"rank": 1, "name": "국립세종수목원", "ratio": 26.8}, {"rank": 2, "name": "세종호수공원", "ratio": 20.2}, {"rank": 3, "name": "베어트리파크", "ratio": 11.2}]
+            }
+        };
+
+        const maxCount = regionData[0].count;
+        const container = document.getElementById('carousel-container');
+
+        // 17개 지자체 남색 카드 렌더링
+        regionData.forEach(region => {
+            const progressWidth = ((region.count / maxCount) * 100).toFixed(1);
+            const formattedCount = region.count.toLocaleString();
+
+            const cardHtml = `
+                <div onclick="selectRegion('${region.name}', '${region.rank}위', '${formattedCount}건')" 
+                     class="min-w-[280px] sm:min-w-[300px] lg:min-w-[calc(25%-1.125rem)] bg-palette-deep rounded-3xl p-5 shadow-lg border border-palette-yellow/20 hover-lift cursor-pointer flex flex-col justify-between relative group flex-shrink-0 text-white">
+                    
+                    <div>
+                        <div class="w-full h-44 rounded-2xl overflow-hidden relative mb-4">
+                            <img src="${region.img}" alt="${region.name}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500">
+                            
+                            <span class="absolute top-3 left-3 bg-palette-yellow text-palette-deep font-extrabold text-xs px-3 py-1 rounded-full shadow-md">
+                                ${region.rank}위
+                            </span>
+
+                            <span class="absolute bottom-3 right-3 bg-black/60 backdrop-blur-sm text-palette-yellow font-bold text-xs px-2.5 py-1 rounded-lg">
+                                ${region.percent}%
+                            </span>
+                        </div>
+
+                        <div class="flex justify-between items-center mb-2">
+                            <h3 class="text-xl font-extrabold text-white">${region.name}</h3>
+                            <div class="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center text-xs text-palette-yellow group-hover:bg-palette-yellow group-hover:text-palette-deep transition-colors">
+                                <i class="fa-solid fa-arrow-up-right-from-square"></i>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-between items-baseline my-1">
+                            <span class="text-xs font-semibold text-white/70">목적지 검색건수</span>
+                            <span class="text-base font-extrabold text-palette-yellow">${formattedCount}건</span>
+                        </div>
+                    </div>
+
+                    <div class="mt-3">
+                        <div class="w-full bg-white/20 h-2 rounded-full overflow-hidden">
+                            <div class="bg-palette-yellow h-full rounded-full" style="width: ${progressWidth}%;"></div>
+                        </div>
+                    </div>
+
+                </div>
+            `;
+            container.innerHTML += cardHtml;
+        });
+
+        // 지자체 탭 및 대시보드 연동
+        let selectedRegionName = "강원특별자치도";
+
+        function initRegionTabs() {
+            const tabBtnContainer = document.getElementById('region-tab-buttons');
+            tabBtnContainer.innerHTML = '';
+
+            regionData.forEach(reg => {
+                const isActive = reg.name === selectedRegionName;
+                const btnClass = isActive 
+                    ? "px-4 py-2 rounded-full font-extrabold text-xs transition bg-palette-deep text-palette-yellow shadow-md flex-shrink-0 whitespace-nowrap"
+                    : "px-4 py-2 rounded-full font-extrabold text-xs transition bg-white/80 hover:bg-palette-deep hover:text-white text-dark-text border border-palette-deep/10 flex-shrink-0 whitespace-nowrap";
+                
+                const btnHtml = `<button onclick="switchDashboardRegion('${reg.name}')" class="${btnClass}">${reg.name}</button>`;
+                tabBtnContainer.innerHTML += btnHtml;
+            });
+
+            renderAgeRankCards(selectedRegionName);
+        }
+
+        // 탭 좌우 슬라이드 함수 (< > 버튼 동작)
+        function scrollTabButtons(direction) {
+            const tabContainer = document.getElementById('region-tab-buttons');
+            const scrollAmount = 240;
+            tabContainer.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        function switchDashboardRegion(regName) {
+            selectedRegionName = regName;
+            initRegionTabs();
+        }
+
+        // 비율 수치에 따른 그라데이션 및 1줄 Truncate 처리 함수
+        function renderAgeRankCards(regName) {
+            const cardsGrid = document.getElementById('age-rank-cards-grid');
+            cardsGrid.innerHTML = '';
+
+            const regAgeData = ageCsvData[regName] || ageCsvData["강원특별자치도"];
+            const ageGroupKeys = ["20대", "30대", "40대", "50대", "60대"];
+
+            let localMaxRatio = 1;
+            ageGroupKeys.forEach(ageKey => {
+                const list = regAgeData[ageKey] || [];
+                list.forEach(item => {
+                    if (item.ratio > localMaxRatio) localMaxRatio = item.ratio;
+                });
+            });
+
+            ageGroupKeys.forEach(ageKey => {
+                const top3List = regAgeData[ageKey] || [];
+
+                let listHtml = '';
+                top3List.forEach(item => {
+                    const percentWidth = Math.max(25, Math.min(100, (item.ratio / localMaxRatio) * 100)).toFixed(0);
+                    
+                    let gradientBg = "from-palette-deep/20 via-palette-mid/30 to-palette-light/40";
+                    let textColor = "text-palette-deep";
+                    let badgeColor = "bg-palette-deep text-white";
+
+                    if (item.ratio >= 15) {
+                        gradientBg = "from-palette-deep via-palette-mid to-palette-yellow";
+                        textColor = "text-palette-deep font-black";
+                        badgeColor = "bg-palette-yellow text-palette-deep font-extrabold";
+                    } else if (item.ratio >= 9) {
+                        gradientBg = "from-palette-deep/70 via-palette-mid/80 to-palette-light";
+                        textColor = "text-palette-deep font-bold";
+                        badgeColor = "bg-palette-mid text-palette-yellow";
+                    }
+
+                    listHtml += `
+                        <div class="relative bg-white/70 rounded-xl p-2.5 border border-palette-deep/10 overflow-hidden shadow-xs">
+                            <div class="absolute inset-y-0 left-0 bg-gradient-to-r ${gradientBg} opacity-20 rounded-xl transition-all duration-500" style="width: ${percentWidth}%;"></div>
+                            
+                            <div class="relative z-10 flex items-center justify-between gap-2">
+                                <div class="flex items-center gap-2 min-w-0 flex-1">
+                                    <span class="text-[11px] font-extrabold px-1.5 py-0.5 rounded-md ${badgeColor} flex-shrink-0">${item.rank}</span>
+                                    <span class="text-xs font-bold text-palette-deep truncate whitespace-nowrap block" title="${item.name}">${item.name}</span>
+                                </div>
+                                <span class="text-[11px] font-extrabold ${textColor} flex-shrink-0 ml-1">${item.ratio}%</span>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                const colCardHtml = `
+                    <div class="bg-white/90 backdrop-blur rounded-3xl p-4 sm:p-5 border border-palette-deep/10 shadow-sm flex flex-col justify-between hover-lift">
+                        <div>
+                            <div class="flex items-center justify-between border-b border-palette-deep/10 pb-2.5 mb-3">
+                                <span class="text-base font-extrabold text-palette-deep font-display"><i class="fa-solid fa-users text-palette-mid mr-1"></i> ${ageKey}</span>
+                                <span class="text-[10px] font-bold text-palette-deep/60 bg-cream px-2 py-0.5 rounded-full">${regName}</span>
+                            </div>
+
+                            <div class="space-y-2">
+                                ${listHtml}
+                            </div>
+                        </div>
+
+                        <button onclick="selectRegion('${regName}')" class="mt-4 w-full py-2 bg-palette-deep hover:bg-palette-mid text-palette-yellow font-extrabold text-xs rounded-xl transition shadow">
+                            전체 코스 보기
+                        </button>
+                    </div>
+                `;
+
+                cardsGrid.innerHTML += colCardHtml;
+            });
+        }
+
+        // Carousel Scroll Function
+        function scrollCarousel(direction) {
+            const scrollAmount = container.clientWidth * 0.8;
+            container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
+        }
+
+        // Region Click Handling
+        function selectRegion(name, rank, count) {
+            if (name === "강원특별자치도") {
+                location.href = "test_p2.html";
+            } else {
+                alert(`[TravelMate] ${name}\n상세 데이터 및 추천 코스 페이지로 이동합니다!`);
+            }
+        }
+
+        // Accordion Toggle Function
+        function toggleFaq(id) {
+            const content = document.getElementById(`faq-${id}`);
+            const icon = document.getElementById(`icon-${id}`);
+            
+            if (content.classList.contains('hidden')) {
+                content.classList.remove('hidden');
+                icon.textContent = '-';
+            } else {
+                content.classList.add('hidden');
+                icon.textContent = '+';
+            }
+        }
+
+        // 초기화 실행
+        initRegionTabs();
+    </script>
+</body>
+</html>

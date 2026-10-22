@@ -1,0 +1,1178 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelMate - 강원특별자치도 인기 관광지 & 세대별 분석</title>
+    <!-- Google Fonts & Font Awesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Leaflet OpenStreetMap -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <style>
+        :root {
+            --bg-cream: #f7f3e8;
+            --cream-dark: #eee9d8;
+            --palette-deep: #1f06ac;
+            --palette-mid: #0f42c0;
+            --palette-light: #5882e8;
+            --palette-yellow: #e3ef4f;
+            --dark-text: #121629;
+            
+            --subtle-border: rgba(31, 6, 172, 0.15);
+            --card-bg: #ffffff;
+            --border-radius-lg: 32px;
+            --border-radius-md: 20px;
+            --transition: all 0.25s cubic-bezier(0.25, 0.8, 0.25, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Pretendard', sans-serif;
+            background-color: var(--bg-cream);
+            color: var(--dark-text);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+        }
+
+        /* Header Navigation */
+        header {
+            padding: 1.2rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: var(--bg-cream);
+            border-bottom: 1px solid var(--subtle-border);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.7rem;
+            background-color: var(--palette-deep);
+            color: #fff;
+            padding: 0.7rem 1.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .back-btn:hover {
+            background-color: var(--palette-mid);
+            color: #fff;
+            transform: translateX(-4px);
+        }
+
+        .brand-logo {
+            font-family: 'Fredoka', cursive;
+            font-size: 2.1rem;
+            font-weight: 700;
+            color: var(--palette-deep);
+            text-decoration: none;
+        }
+
+        .header-tag {
+            background-color: var(--palette-yellow);
+            color: var(--palette-deep);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            font-weight: 800;
+            font-size: 0.9rem;
+            border: 1px solid var(--subtle-border);
+        }
+
+        /* Layout Structure */
+        .layout-wrapper {
+            max-width: 1440px;
+            margin: 2rem auto 4rem auto;
+            width: 100%;
+            padding: 0 1.5rem;
+            display: flex;
+            gap: 1.8rem;
+            align-items: flex-start;
+        }
+
+        /* 1. Left Region Sidebar */
+        .region-sidebar {
+            width: 200px;
+            background-color: #ffffff;
+            border: 1px solid var(--subtle-border);
+            border-radius: var(--border-radius-md);
+            padding: 1rem 0.8rem;
+            box-shadow: 0 8px 20px rgba(31, 6, 172, 0.05);
+            display: flex;
+            flex-direction: column;
+            gap: 0.35rem;
+            position: sticky;
+            top: 90px;
+            flex-shrink: 0;
+        }
+
+        .region-nav-btn {
+            display: block;
+            width: 100%;
+            padding: 0.65rem 1rem;
+            border-radius: 12px;
+            border: none;
+            background-color: transparent;
+            color: var(--dark-text);
+            font-size: 0.9rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+        }
+
+        .region-nav-btn:hover {
+            background-color: var(--cream-dark);
+            color: var(--palette-deep);
+        }
+
+        .region-nav-btn.active {
+            background-color: var(--palette-deep);
+            color: var(--palette-yellow);
+            box-shadow: 0 4px 12px rgba(31, 6, 172, 0.2);
+            font-weight: 800;
+        }
+
+        /* Right Content Area */
+        .content-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+
+        /* SECTION: Split Box */
+        .split-box {
+            display: flex;
+            gap: 1.8rem;
+            align-items: stretch;
+        }
+
+        /* 2. Center Map Section */
+        .map-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .map-wrapper {
+            width: 100%;
+            height: 100%;
+            min-height: 680px;
+            border-radius: var(--border-radius-lg);
+            overflow: hidden;
+            border: 1px solid var(--subtle-border);
+            box-shadow: 0 12px 32px rgba(31, 6, 172, 0.08);
+            position: relative;
+        }
+
+        #map {
+            width: 100%;
+            height: 100%;
+            background-color: #e5e3df;
+        }
+
+        .map-overlay-info {
+            position: absolute;
+            top: 16px;
+            left: 16px;
+            right: 16px;
+            z-index: 1000;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(8px);
+            padding: 1rem 1.3rem;
+            border-radius: 18px;
+            border: 1px solid var(--subtle-border);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.06);
+        }
+
+        .map-overlay-info h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .map-overlay-info p {
+            font-size: 0.85rem;
+            color: #555;
+            margin-top: 2px;
+        }
+
+        /* 3. Right List Section */
+        .list-section {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            min-width: 0;
+        }
+
+        .list-header {
+            background-color: var(--palette-yellow);
+            color: var(--palette-deep);
+            padding: 1.2rem 1.6rem;
+            border-radius: var(--border-radius-md);
+            border: 1px solid var(--subtle-border);
+            box-shadow: 0 6px 18px rgba(31, 6, 172, 0.06);
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .list-header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+        }
+
+        .list-header h1 {
+            font-size: 1.45rem;
+            font-weight: 800;
+        }
+
+        .list-header p {
+            font-size: 0.88rem;
+            color: var(--palette-deep);
+            font-weight: 700;
+            opacity: 0.85;
+        }
+
+        /* 연령대 필터 버튼 바 */
+        .header-age-filter {
+            display: flex;
+            gap: 0.4rem;
+            background-color: rgba(255, 255, 255, 0.65);
+            padding: 0.3rem;
+            border-radius: 14px;
+            border: 1px solid var(--subtle-border);
+            overflow-x: auto;
+        }
+
+        .age-filter-btn {
+            flex: 1;
+            padding: 0.45rem 0.6rem;
+            border-radius: 10px;
+            border: none;
+            background: transparent;
+            color: var(--palette-deep);
+            font-size: 0.82rem;
+            font-weight: 800;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .age-filter-btn:hover {
+            background-color: rgba(31, 6, 172, 0.1);
+        }
+
+        .age-filter-btn.active {
+            background-color: var(--palette-deep);
+            color: var(--palette-yellow);
+            box-shadow: 0 2px 8px rgba(31, 6, 172, 0.2);
+        }
+
+        .cards-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.1rem;
+        }
+
+        .place-card {
+            background-color: var(--card-bg);
+            border: 1px solid var(--subtle-border);
+            border-radius: var(--border-radius-md);
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(31, 6, 172, 0.04);
+            text-decoration: none;
+            color: inherit;
+            position: relative;
+            height: 110px;
+            min-width: 0;
+        }
+
+        .place-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 24px rgba(31, 6, 172, 0.12);
+            border-color: var(--palette-light);
+            background-color: #ffffff;
+        }
+
+        .card-img-box {
+            position: relative;
+            width: 95px;
+            height: 90px;
+            border-radius: 14px;
+            overflow: hidden;
+            border: 1px solid var(--subtle-border);
+            flex-shrink: 0;
+        }
+
+        .card-img-box img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.4s ease;
+        }
+
+        .place-card:hover .card-img-box img {
+            transform: scale(1.1);
+        }
+
+        .rank-badge {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 25px;
+            height: 25px;
+            border-radius: 6px;
+            background-color: var(--palette-deep);
+            color: #fff;
+            font-family: 'Fredoka', cursive;
+            font-weight: 700;
+            font-size: 0.88rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .rank-1 .rank-badge { background-color: var(--palette-deep); color: var(--palette-yellow); }
+        .rank-2 .rank-badge { background-color: var(--palette-mid); color: #ffffff; }
+        .rank-3 .rank-badge { background-color: var(--palette-light); color: #ffffff; }
+
+        .card-info {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 90px;
+            padding: 0.1rem 0;
+            min-width: 0;
+            overflow: hidden;
+        }
+
+        .info-top h3 {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+            margin-bottom: 0.2rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: block;
+        }
+
+        .category-tag {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.15rem 0.45rem;
+            border-radius: 6px;
+            background-color: var(--cream-dark);
+            color: var(--palette-deep);
+            border: 1px solid rgba(31, 6, 172, 0.1);
+            display: inline-block;
+            margin-bottom: 0.2rem;
+            width: fit-content;
+        }
+
+        .place-location {
+            font-size: 0.8rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .info-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .search-count {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+            white-space: nowrap;
+        }
+
+        /* MODAL STYLING & CUSTOM SCROLLBAR */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(18, 22, 41, 0.65);
+            backdrop-filter: blur(6px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            padding: 1.5rem;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-card {
+            background-color: var(--bg-cream);
+            border: 1px solid var(--subtle-border);
+            border-radius: var(--border-radius-lg);
+            box-shadow: 0 20px 48px rgba(0, 0, 0, 0.25);
+            width: 100%;
+            max-width: 680px;
+            max-height: 90vh;
+            overflow-y: auto;
+            position: relative;
+            transform: translateY(15px) scale(0.97);
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: flex;
+            flex-direction: column;
+            scroll-behavior: smooth;
+        }
+
+        /* 팝업창 감각적인 커스텀 스크롤바 디자인 */
+        .modal-card::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-card::-webkit-scrollbar-track {
+            background: var(--bg-cream);
+            border-radius: 0 32px 32px 0;
+        }
+
+        .modal-card::-webkit-scrollbar-thumb {
+            background-color: var(--palette-light);
+            border-radius: 10px;
+            border: 2px solid var(--bg-cream);
+        }
+
+        .modal-card::-webkit-scrollbar-thumb:hover {
+            background-color: var(--palette-deep);
+        }
+
+        .modal-overlay.active .modal-card {
+            transform: translateY(0) scale(1);
+        }
+
+        .modal-close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background-color: var(--palette-deep);
+            color: var(--palette-yellow);
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+            cursor: pointer;
+            z-index: 10;
+            transition: var(--transition);
+        }
+
+        .modal-close-btn:hover {
+            background-color: var(--palette-mid);
+            color: #ffffff;
+            transform: rotate(90deg);
+        }
+
+        .modal-hero-img {
+            width: 100%;
+            height: 250px;
+            object-fit: cover;
+            border-bottom: 1px solid var(--subtle-border);
+        }
+
+        .modal-body {
+            padding: 1.8rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1.4rem;
+        }
+
+        .modal-title-box {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            flex-wrap: wrap;
+            gap: 0.8rem;
+        }
+
+        .modal-title {
+            font-size: 1.65rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+        }
+
+        .modal-rank-tag {
+            background-color: var(--palette-yellow);
+            color: var(--palette-deep);
+            font-family: 'Fredoka', cursive;
+            font-weight: 700;
+            padding: 0.35rem 0.95rem;
+            border-radius: 50px;
+            font-size: 0.88rem;
+            border: 1px solid var(--subtle-border);
+        }
+
+        .modal-location {
+            font-size: 0.9rem;
+            color: #666;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            margin-top: 0.2rem;
+        }
+
+        .modal-description {
+            background-color: #ffffff;
+            border: 1px solid var(--subtle-border);
+            border-radius: var(--border-radius-md);
+            padding: 1.2rem 1.4rem;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            color: #333;
+            box-shadow: 0 4px 12px rgba(31, 6, 172, 0.03);
+        }
+
+        .modal-map-links {
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+        }
+
+        .map-link-btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.2rem;
+            border-radius: 14px;
+            border: 1px solid var(--subtle-border);
+            font-weight: 800;
+            font-size: 0.92rem;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 3px 8px rgba(0,0,0,0.05);
+        }
+
+        .map-link-btn.kakao { background-color: #fee500; color: #191919; }
+        .map-link-btn.naver { background-color: #03c75a; color: #ffffff; }
+
+        .map-link-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0,0,0,0.1);
+        }
+
+        .sns-tips-section {
+            background-color: #ffffff;
+            border: 1px solid var(--subtle-border);
+            border-radius: var(--border-radius-md);
+            padding: 1.3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 4px 14px rgba(31, 6, 172, 0.04);
+        }
+
+        .sns-tips-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .hashtag-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .hashtag-chip {
+            background-color: var(--bg-cream);
+            color: var(--palette-deep);
+            border: 1px solid var(--subtle-border);
+            padding: 0.35rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.82rem;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .tip-card-box {
+            background-color: var(--bg-cream);
+            border-left: 4px solid var(--palette-deep);
+            padding: 0.85rem 1.1rem;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            color: #444;
+            line-height: 1.5;
+        }
+
+        .tip-card-box strong {
+            color: var(--palette-deep);
+            display: block;
+            margin-bottom: 0.2rem;
+        }
+
+        .modal-video-section {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+
+        .modal-video-title {
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: var(--palette-deep);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .video-container {
+            position: relative;
+            width: 100%;
+            padding-bottom: 56.25%;
+            border-radius: var(--border-radius-md);
+            overflow: hidden;
+            border: 1px solid var(--subtle-border);
+            background-color: #000;
+        }
+
+        .video-container iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 0;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2.2rem;
+            background-color: var(--palette-deep);
+            color: #ffffff;
+            font-size: 0.88rem;
+            margin-top: auto;
+        }
+
+        @media (max-width: 1024px) {
+            .layout-wrapper { flex-direction: column; }
+            .region-sidebar { width: 100%; flex-direction: row; overflow-x: auto; position: static; }
+            .split-box { flex-direction: column; }
+            .map-section { width: 100%; height: 420px; }
+            .cards-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Header Navigation -->
+    <header>
+        <a href="test2_p1.html" class="back-btn">
+            <i class="fa-solid fa-arrow-left"></i> 메인페이지로 이동
+        </a>
+        <a href="#" class="brand-logo">TravelMate</a>
+        <span class="header-tag"><i class="fa-solid fa-calendar-days"></i> 10월 인기 데이터</span>
+    </header>
+
+    <!-- Main Container Layout: Left Sidebar + Main Content -->
+    <div class="layout-wrapper">
+
+        <!-- 1. 좌측 광역지자체 사이드바 -->
+        <aside class="region-sidebar">
+            <button class="region-nav-btn" onclick="switchRegion('경기도')">경기도</button>
+            <button class="region-nav-btn" onclick="switchRegion('서울특별시')">서울특별시</button>
+            <button class="region-nav-btn" onclick="switchRegion('인천광역시')">인천광역시</button>
+            <button class="region-nav-btn active" onclick="switchRegion('강원특별자치도')">강원특별자치도</button>
+            <button class="region-nav-btn" onclick="switchRegion('경상남도')">경상남도</button>
+            <button class="region-nav-btn" onclick="switchRegion('충청남도')">충청남도</button>
+            <button class="region-nav-btn" onclick="switchRegion('경상북도')">경상북도</button>
+            <button class="region-nav-btn" onclick="switchRegion('부산광역시')">부산광역시</button>
+            <button class="region-nav-btn" onclick="switchRegion('전라남도')">전라남도</button>
+            <button class="region-nav-btn" onclick="switchRegion('충청북도')">충청북도</button>
+            <button class="region-nav-btn" onclick="switchRegion('전북특별자치도')">전북특별자치도</button>
+            <button class="region-nav-btn" onclick="switchRegion('대구광역시')">대구광역시</button>
+            <button class="region-nav-btn" onclick="switchRegion('제주특별자치도')">제주특별자치도</button>
+            <button class="region-nav-btn" onclick="switchRegion('대전광역시')">대전광역시</button>
+            <button class="region-nav-btn" onclick="switchRegion('광주광역시')">광주광역시</button>
+            <button class="region-nav-btn" onclick="switchRegion('울산광역시')">울산광역시</button>
+            <button class="region-nav-btn" onclick="switchRegion('세종특별자치시')">세종특별자치시</button>
+        </aside>
+
+        <!-- Main Content Area -->
+        <main class="content-container">
+
+            <!-- SECTION: Map & Top 10 Cards Split Box -->
+            <div class="split-box">
+
+                <!-- 2. Center 50%: Map -->
+                <section class="map-section">
+                    <div class="map-wrapper">
+                        <div class="map-overlay-info">
+                            <h2><i class="fa-solid fa-map-pin"></i> 강원특별자치도 인기 명소</h2>
+                            <p>우측 카드를 클릭하면 상세 팝업 및 지도 위치로 연결됩니다.</p>
+                        </div>
+                        <div id="map"></div>
+                    </div>
+                </section>
+
+                <!-- 3. Right 50%: Top 10 Cards Grid -->
+                <section class="list-section">
+                    
+                    <div class="list-header">
+                        <div class="list-header-top">
+                            <h1 id="headerTitleText">강원도 인기 관광지 TOP 10</h1>
+                            <p>카드를 클릭하면 상세 팝업창이 열립니다</p>
+                        </div>
+
+                        <!-- 20~60대 연령대 버튼 (한 줄) -->
+                        <div class="header-age-filter">
+                            <button class="age-filter-btn active" onclick="filterByAge('all', this)">전체</button>
+                            <button class="age-filter-btn" onclick="filterByAge('20s', this)">20대</button>
+                            <button class="age-filter-btn" onclick="filterByAge('30s', this)">30대</button>
+                            <button class="age-filter-btn" onclick="filterByAge('40s', this)">40대</button>
+                            <button class="age-filter-btn" onclick="filterByAge('50s', this)">50대</button>
+                            <button class="age-filter-btn" onclick="filterByAge('60s', this)">60대+</button>
+                        </div>
+                    </div>
+
+                    <div id="cardsGridContainer" class="cards-grid">
+                        <!-- Dynamic Rendering -->
+                    </div>
+                </section>
+
+            </div>
+
+        </main>
+
+    </div>
+
+    <!-- DYNAMIC MODAL DIALOG -->
+    <div class="modal-overlay" id="placeModal" onclick="closeModalOnOverlay(event)">
+        <div class="modal-card">
+            <button class="modal-close-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+            
+            <img id="modalImg" class="modal-hero-img" src="" alt="관광지 이미지">
+            
+            <div class="modal-body">
+                <div class="modal-title-box">
+                    <div>
+                        <div id="modalTitle" class="modal-title">관광지명</div>
+                        <div id="modalLocation" class="modal-location"><i class="fa-solid fa-location-dot"></i> 강원특별자치도</div>
+                    </div>
+                    <span id="modalRank" class="modal-rank-tag">검색 순위 1위</span>
+                </div>
+
+                <div id="modalDesc" class="modal-description">
+                    장소 설명 텍스트
+                </div>
+
+                <!-- 길찾기 버튼 -->
+                <div class="modal-map-links">
+                    <a id="kakaoLink" href="#" target="_blank" class="map-link-btn kakao">
+                        <i class="fa-solid fa-comment"></i> 카카오맵 길안내
+                    </a>
+                    <a id="naverLink" href="#" target="_blank" class="map-link-btn naver">
+                        <i class="fa-solid fa-location-arrow"></i> 네이버 지도 길안내
+                    </a>
+                </div>
+
+                <!-- SNS 여행 팁 & 해시태그 섹션 -->
+                <div class="sns-tips-section">
+                    <div class="sns-tips-title">
+                        <i class="fa-solid fa-hashtag"></i> SNS 실시간 여행 팁 & 인기 해시태그
+                    </div>
+                    
+                    <div id="modalHashtags" class="hashtag-container">
+                        <!-- Dynamic Hashtags -->
+                    </div>
+
+                    <div id="modalSnsTip" class="tip-card-box">
+                        <strong>💡 방문자 추천 꿀팁</strong>
+                        <span id="modalTipContent">주말 오전 방문을 추천합니다.</span>
+                    </div>
+                </div>
+
+                <div class="modal-video-section">
+                    <div class="modal-video-title">
+                        <i class="fa-solid fa-circle-play" style="color: var(--palette-deep);"></i> 홍보 및 소개 동영상
+                    </div>
+                    <div class="video-container">
+                        <iframe id="modalIframe" src="" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2026 TravelMate. All rights reserved.</p>
+    </footer>
+
+    <!-- Scripts -->
+    <script>
+        // 마스터 장소 DB
+        const placeData = {
+            p1: { 
+                rank: "1위", name: "속초관광수산시장", location: "강원특별자치도 속초시 중앙로147번길 16", lat: 38.2045, lng: 128.5905, img: "https://images.unsplash.com/photo-1533900298318-6b8da08a523e?auto=format&fit=crop&w=800&q=80", 
+                desc: "동해안의 신선한 수산물과 닭강정, 아바이순대 등 속초 대표 먹거리가 가득한 전통시장입니다.", 
+                kmap: "https://map.kakao.com/link/search/속초관광수산시장", nmap: "https://map.naver.com/v5/search/속초관광수산시장", yt: "https://www.youtube.com/embed/S2Csn9bW8c8?autoplay=1",
+                tags: ["#속초닭강정", "#아바이순대", "#속초먹거리", "#중앙시장맛집"],
+                tip: "주말 오후에는 주차장이 매우 혼잡하므로 공영주차장 이용 시 오전 일찍 방문하는 것을 추천합니다!"
+            },
+            p2: { 
+                rank: "2위", name: "설악케이블카", location: "강원특별자치도 속초시 설악산로 1085", lat: 38.1694, lng: 128.4883, img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?auto=format&fit=crop&w=800&q=80", 
+                desc: "설악산 소공원에서 권금성 탑승장까지 약 5분 만에 올라갈 수 있는 케이블카입니다.", 
+                kmap: "https://map.kakao.com/link/search/설악케이블카", nmap: "https://map.naver.com/v5/search/설악케이블카", yt: "https://www.youtube.com/embed/2X_2Idri090?autoplay=1",
+                tags: ["#설악산단풍", "#권금성", "#가을산행", "#설악산케이블카"],
+                tip: "가을 단풍 시즌에는 현장 예매 대기시간이 길 수 있으니 개장 시간(08:30) 맞춰 도착하시는 게 유리합니다."
+            },
+            p3: { 
+                rank: "3위", name: "강원랜드카지노", location: "강원특별자치도 정선군 사북읍 하이원길 265", lat: 37.2078, lng: 128.8286, img: "https://images.unsplash.com/photo-1518609878373-06d740f60d8b?auto=format&fit=crop&w=800&q=80", 
+                desc: "하이원 리조트 내에 위치한 대한민국 유일의 내국인 출입 가능 카지노입니다.", 
+                kmap: "https://map.kakao.com/link/search/강원랜드카지노", nmap: "https://map.naver.com/v5/search/강원랜드카지노", yt: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1",
+                tags: ["#하이원리조트", "#정선여행", "#강원랜드", "#정선마운틴뷰"],
+                tip: "입장 시 신분증 지참이 필수이며, 하이원 리조트 산책로와 함께 둘러보기 좋습니다."
+            },
+            p4: { 
+                rank: "4위", name: "낙산사", location: "강원특별자치도 양양군 강현면 낙산사로 100", lat: 38.1251, lng: 128.6280, img: "https://images.unsplash.com/photo-1548013146-72479768bada?auto=format&fit=crop&w=800&q=80", 
+                desc: "신라 의상대사가 창건한 천년 고찰로 동해 바다가 한눈에 내려다보이는 절경으로 유명합니다.", 
+                kmap: "https://map.kakao.com/link/search/낙산사", nmap: "https://map.naver.com/v5/search/낙산사", yt: "https://www.youtube.com/embed/3JZ_D3ELwOQ?autoplay=1",
+                tags: ["#양양낙산사", "#의상대", "#해수관음상", "#동해일출"],
+                tip: "의상대에서 바라보는 동해 바다 뷰가 최고 명소입니다. 편안한 운동화를 착용하세요."
+            },
+            p5: { 
+                rank: "5위", name: "철원고석정꽃밭", location: "강원특별자치도 철원군 동송읍 장흥리 10-2", lat: 38.1923, lng: 127.3061, img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=80", 
+                desc: "핑크뮬리와 가을 꽃밭이 축구장 수십 개 규모로 드넓게 펼쳐지는 꽃밭 명소입니다.", 
+                kmap: "https://map.kakao.com/link/search/철원고석정꽃밭", nmap: "https://map.naver.com/v5/search/철원고석정꽃밭", yt: "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1",
+                tags: ["#철원여행", "#고석정꽃밭", "#핑크뮬리", "#인생샷명소"],
+                tip: "햇살이 좋은 오후 3~4시경 방문하시면 핑크뮬리와 일몰 인생샷을 남기실 수 있습니다."
+            },
+            p6: { 
+                rank: "6위", name: "속초해변", location: "강원특별자치도 속초시 조양동 해오름로 186", lat: 38.1906, lng: 128.6034, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80", 
+                desc: "고운 모래사장과 대관람차 '속초아이'가 어우러진 속초 대표 해변입니다.", 
+                kmap: "https://map.kakao.com/link/search/속초해변", nmap: "https://map.naver.com/v5/search/속초해변", yt: "https://www.youtube.com/embed/2X_2Idri090?autoplay=1",
+                tags: ["#속초아이", "#속초바다", "#해변산책", "#동해안드라이브"],
+                tip: "대관람차 속초아이 탑승은 노을이 시작되는 시간대에 타면 가장 멋진 풍경을 선사합니다."
+            },
+            p7: { 
+                rank: "7위", name: "월정사", location: "강원특별자치도 평창군 진부면 오대산로 374-8", lat: 37.7303, lng: 128.5928, img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80", 
+                desc: "오대산 산자락에 위치한 천년 고찰로 전나무 숲길 산책로가 인기 높습니다.", 
+                kmap: "https://map.kakao.com/link/search/월정사", nmap: "https://map.naver.com/v5/search/월정사", yt: "https://www.youtube.com/embed/3JZ_D3ELwOQ?autoplay=1",
+                tags: ["#오대산월정사", "#전나무숲길", "#평창단풍", "#템플스테이"],
+                tip: "월정사 입구부터 펼쳐지는 전나무 숲길은 피톤치드를 마시며 천천히 걸어보는 걸 강추합니다."
+            },
+            p8: { 
+                rank: "8위", name: "레고랜드코리아리조트", location: "강원특별자치도 춘천시 하중도길 128", lat: 37.8821, lng: 127.6968, img: "https://images.unsplash.com/photo-1513151233558-d860c5398176?auto=format&fit=crop&w=800&q=80", 
+                desc: "춘천 하중도에 위치한 국내 최초 레고 테마파크입니다.", 
+                kmap: "https://map.kakao.com/link/search/레고랜드코리아리조트", nmap: "https://map.naver.com/v5/search/레고랜드코리아리조트", yt: "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1",
+                tags: ["#춘천레고랜드", "#아이와가볼만한곳", "#춘천여행", "#테마파크"],
+                tip: "어린이 동반 가족 여행객이라면 사전 온라인 예매 할인 혜택을 미리 확인하고 방문하세요."
+            },
+            p9: { 
+                rank: "9위", name: "원주종합버스터미널", location: "강원특별자치도 원주시 서원대로 181", lat: 37.3421, lng: 127.9304, img: "https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80", 
+                desc: "강원 남부권 교통의 요충지이자 원주시의 중심 관문입니다.", 
+                kmap: "https://map.kakao.com/link/search/원주종합버스터미널", nmap: "https://map.naver.com/v5/search/원주종합버스터미널", yt: "https://www.youtube.com/embed/S2Csn9bW8c8?autoplay=1",
+                tags: ["#원주여행", "#원주터미널", "#소금산그랜드밸리", "#강원도교통"],
+                tip: "터미널 인근 시내버스 노선이 잘 되어있어 원주 소금산 출렁다리로 바로 이동하기 편리합니다."
+            },
+            p10: { 
+                rank: "10위", name: "강릉중앙시장", location: "강원특별자치도 강릉시 금성로 21", lat: 37.7540, lng: 128.8986, img: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80", 
+                desc: "강릉 도심에 위치한 전통시장으로 닭강정과 수산물이 유명합니다.", 
+                kmap: "https://map.kakao.com/link/search/강릉중앙시장", nmap: "https://map.naver.com/v5/search/강릉중앙시장", yt: "https://www.youtube.com/embed/S2Csn9bW8c8?autoplay=1",
+                tags: ["#강릉중앙시장", "#육쪽마늘빵", "#배니닭강정", "#강릉맛집투어"],
+                tip: "유명 빵집 및 닭강정 가게는 대기 줄이 길 수 있으니 시장 도착 직후 먼저 대기표를 뽑으세요."
+            },
+            p_anmok: {
+                rank: "2위(20대)", name: "안목해변", location: "강원특별자치도 강릉시 창해로14번길 20", lat: 37.7648, lng: 128.9467, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+                desc: "강릉 안목해변 커피거리로 유명한 대표 동해안 해변 명소입니다.",
+                kmap: "https://map.kakao.com/link/search/안목해변", nmap: "https://map.naver.com/v5/search/안목해변", yt: "https://www.youtube.com/embed/2X_2Idri090?autoplay=1",
+                tags: ["#강릉커피거리", "#안목해변", "#강릉카페", "#동해바다"],
+                tip: "해변을 바라보는 오션뷰 카페 테라스 창가 자리를 먼저 선점해보세요!"
+            },
+            p_gyeongpo: {
+                rank: "3위(20대)", name: "경포해변", location: "강원특별자치도 강릉시 안현동 산1-1", lat: 37.7949, lng: 128.9048, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+                desc: "동해안 최대 해변 중 하나로 경포호수 산책로와 솔밭길이 조화를 이룹니다.",
+                kmap: "https://map.kakao.com/link/search/경포해변", nmap: "https://map.naver.com/v5/search/경포해변", yt: "https://www.youtube.com/embed/2X_2Idri090?autoplay=1",
+                tags: ["#경포대", "#경포해변", "#강릉여행", "#솔밭산책로"],
+                tip: "자전거를 대여해 경포호수를 한 바퀴 돌며 산책하는 코스를 적극 추천합니다."
+            },
+            p_gangmun: {
+                rank: "4위(20대)", name: "강문해변", location: "강원특별자치도 강릉시 강문동 182-1", lat: 37.7852, lng: 128.9178, img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80",
+                desc: "포토존 액자와 다양한 구조물들이 모여있는 MZ 세대 대표 포토 스폿 해변입니다.",
+                kmap: "https://map.kakao.com/link/search/강문해변", nmap: "https://map.naver.com/v5/search/강문해변", yt: "https://www.youtube.com/embed/2X_2Idri090?autoplay=1",
+                tags: ["#강문해변", "#강릉포토존", "#인생샷스폿", "#강문교"],
+                tip: "해변 포토존에서 수평선을 백그라운드로 삼아 멋진 인생샷을 찍어보세요."
+            },
+            p_inje: {
+                rank: "5위(20대)", name: "인제스피디움", location: "강원특별자치도 인제군 기린면 상하답로 130", lat: 37.9942, lng: 128.2715, img: "https://images.unsplash.com/photo-1568605117036-5fe5e7bab0b7?auto=format&fit=crop&w=800&q=80",
+                desc: "국제 규격 서킷 레이싱장과 리조트, 카트 레이싱을 함께 즐기는 서킷 테마파크입니다.",
+                kmap: "https://map.kakao.com/link/search/인제스피디움", nmap: "https://map.naver.com/v5/search/인제스피디움", yt: "https://www.youtube.com/embed/5qap5aO4i9A?autoplay=1",
+                tags: ["#인제스피디움", "#서킷체험", "#카트레이싱", "#익스트림스포츠"],
+                tip: "직접 서킷 카트를 운전할 수 있는 카트장 체험을 놓치지 마세요."
+            },
+            p_goseok: {
+                rank: "2위(60대)", name: "고석정국민관광지", location: "강원특별자치도 철원군 동송읍 태봉로 1825", lat: 38.1923, lng: 127.3061, img: "https://images.unsplash.com/photo-1490750967868-88aa4486c946?auto=format&fit=crop&w=800&q=80",
+                desc: "한탄강 기암괴석 절경과 고석정이 조화를 이루는 강원도 대표 명승지입니다.",
+                kmap: "https://map.kakao.com/link/search/고석정", nmap: "https://map.naver.com/v5/search/고석정", yt: "https://www.youtube.com/embed/tgbNymZ7vqY?autoplay=1",
+                tags: ["#철원고석정", "#한탄강", "#명승지", "#철원관광"],
+                tip: "한탄강 통룻배 체험을 통해 수직 절벽과 기암괴석을 가장 가까이서 감상해보세요."
+            },
+            p_baekdam: {
+                rank: "3위(60대)", name: "백담사", location: "강원특별자치도 인제군 북면 백담로 796", lat: 38.1601, lng: 128.3732, img: "https://images.unsplash.com/photo-1441974231531-c6227db76b6e?auto=format&fit=crop&w=800&q=80",
+                desc: "설악산 수려한 계곡을 품고 있는 사찰로 냇가의 수많은 돌탑 풍경으로 유명합니다.",
+                kmap: "https://map.kakao.com/link/search/백담사", nmap: "https://map.naver.com/v5/search/백담사", yt: "https://www.youtube.com/embed/3JZ_D3ELwOQ?autoplay=1",
+                tags: ["#인제백담사", "#설악산사찰", "#백담계곡", "#만해한용운"],
+                tip: "용대리 주차장에서 백담사행 셔틀버스를 탑승하고 이동하시는 것이 훨씬 편합니다."
+            }
+        };
+
+        // 연령대별 TOP 10 데이터 세트
+        const ageFilterDataSets = {
+            all: [
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '91,358 건', rank: 1 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '32,939 건', rank: 2 },
+                { id: 'p3', name: '강원랜드카지노', category: '문화관광', location: '강원 정선군', count: '30,942 건', rank: 3 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '30,285 건', rank: 4 },
+                { id: 'p5', name: '철원고석정꽃밭', category: '기타관광', location: '강원 철원군', count: '29,217 건', rank: 5 },
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '27,523 건', rank: 6 },
+                { id: 'p7', name: '월정사', category: '역사/종교', location: '강원 평창군', count: '25,325 건', rank: 7 },
+                { id: 'p8', name: '레고랜드코리아리조트', category: '테마공원', location: '강원 춘천시', count: '25,044 건', rank: 8 },
+                { id: 'p9', name: '원주종합버스터미널', category: '교통시설', location: '강원 원주시', count: '23,710 건', rank: 9 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '23,433 건', rank: 10 }
+            ],
+            '20s': [
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '11.2 %', rank: 1 },
+                { id: 'p_anmok', name: '안목해변', category: '자연/해양', location: '강원 강릉시', count: '9.3 %', rank: 2 },
+                { id: 'p_gyeongpo', name: '경포해변', category: '자연/해양', location: '강원 강릉시', count: '9.1 %', rank: 3 },
+                { id: 'p_gangmun', name: '강문해변', category: '자연/해양', location: '강원 강릉시', count: '6.7 %', rank: 4 },
+                { id: 'p_inje', name: '인제스피디움', category: '레저/스포츠', location: '강원 인제군', count: '6.3 %', rank: 5 },
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '5.8 %', rank: 6 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '5.2 %', rank: 7 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '4.9 %', rank: 8 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '4.5 %', rank: 9 },
+                { id: 'p8', name: '레고랜드코리아리조트', category: '테마공원', location: '강원 춘천시', count: '4.1 %', rank: 10 }
+            ],
+            '30s': [
+                { id: 'p8', name: '레고랜드코리아리조트', category: '테마공원', location: '강원 춘천시', count: '10.9 %', rank: 1 },
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '9.7 %', rank: 2 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '6.6 %', rank: 3 },
+                { id: 'p_anmok', name: '안목해변', category: '자연/해양', location: '강원 강릉시', count: '6.6 %', rank: 4 },
+                { id: 'p_gyeongpo', name: '경포해변', category: '자연/해양', location: '강원 강릉시', count: '4.6 %', rank: 5 },
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '4.5 %', rank: 6 },
+                { id: 'p5', name: '철원고석정꽃밭', category: '기타관광', location: '강원 철원군', count: '4.2 %', rank: 7 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '3.9 %', rank: 8 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '3.5 %', rank: 9 },
+                { id: 'p3', name: '강원랜드카지노', category: '문화관광', location: '강원 정선군', count: '3.1 %', rank: 10 }
+            ],
+            '40s': [
+                { id: 'p8', name: '레고랜드코리아리조트', category: '테마공원', location: '강원 춘천시', count: '13.2 %', rank: 1 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '7.4 %', rank: 2 },
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '7.0 %', rank: 3 },
+                { id: 'p3', name: '강원랜드카지노', category: '문화관광', location: '강원 정선군', count: '5.0 %', rank: 4 },
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '4.8 %', rank: 5 },
+                { id: 'p5', name: '철원고석정꽃밭', category: '기타관광', location: '강원 철원군', count: '4.5 %', rank: 6 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '4.1 %', rank: 7 },
+                { id: 'p7', name: '월정사', category: '역사/종교', location: '강원 평창군', count: '3.8 %', rank: 8 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '3.2 %', rank: 9 },
+                { id: 'p9', name: '원주종합버스터미널', category: '교통시설', location: '강원 원주시', count: '2.9 %', rank: 10 }
+            ],
+            '50s': [
+                { id: 'p3', name: '강원랜드카지노', category: '문화관광', location: '강원 정선군', count: '7.2 %', rank: 1 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '7.2 %', rank: 2 },
+                { id: 'p7', name: '월정사', category: '역사/종교', location: '강원 평창군', count: '5.9 %', rank: 3 },
+                { id: 'p_goseok', name: '고석정국민관광지', category: '기타관광', location: '강원 철원군', count: '5.0 %', rank: 4 },
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '4.8 %', rank: 5 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '4.5 %', rank: 6 },
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '4.1 %', rank: 7 },
+                { id: 'p5', name: '철원고석정꽃밭', category: '기타관광', location: '강원 철원군', count: '3.9 %', rank: 8 },
+                { id: 'p_baekdam', name: '백담사', category: '역사/종교', location: '강원 인제군', count: '3.6 %', rank: 9 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '3.1 %', rank: 10 }
+            ],
+            '60s': [
+                { id: 'p7', name: '월정사', category: '역사/종교', location: '강원 평창군', count: '8.6 %', rank: 1 },
+                { id: 'p_goseok', name: '고석정국민관광지', category: '기타관광', location: '강원 철원군', count: '8.1 %', rank: 2 },
+                { id: 'p_baekdam', name: '백담사', category: '역사/종교', location: '강원 인제군', count: '6.9 %', rank: 3 },
+                { id: 'p3', name: '강원랜드카지노', category: '문화관광', location: '강원 정선군', count: '5.6 %', rank: 4 },
+                { id: 'p4', name: '낙산사', category: '역사/종교', location: '강원 양양군', count: '5.5 %', rank: 5 },
+                { id: 'p2', name: '설악케이블카', category: '기타관광', location: '강원 속초시', count: '4.8 %', rank: 6 },
+                { id: 'p5', name: '철원고석정꽃밭', category: '기타관광', location: '강원 철원군', count: '4.2 %', rank: 7 },
+                { id: 'p1', name: '속초관광수산시장', category: '쇼핑/시장', location: '강원 속초시', count: '3.9 %', rank: 8 },
+                { id: 'p6', name: '속초해변', category: '자연/해양', location: '강원 속초시', count: '3.5 %', rank: 9 },
+                { id: 'p10', name: '강릉중앙시장', category: '쇼핑/시장', location: '강원 강릉시', count: '2.8 %', rank: 10 }
+            ]
+        };
+
+        // 1. 지도 생성
+        const map = L.map('map', { zoomControl: false }).setView([37.8000, 128.2000], 8);
+        L.control.zoom({ position: 'bottomleft' }).addTo(map);
+
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '&copy; OpenStreetMap'
+        }).addTo(map);
+
+        const markers = {};
+
+        // 지도 핀 세팅
+        Object.keys(placeData).forEach(key => {
+            const item = placeData[key];
+            const marker = L.marker([item.lat, item.lng]).addTo(map);
+            marker.bindPopup(`<b>${item.name}</b>`);
+            marker.on('click', () => openModal(key));
+            markers[key] = marker;
+        });
+
+        // 2. 우측 상단 연령대 필터링 함수
+        function filterByAge(ageKey, btnElem) {
+            document.querySelectorAll('.age-filter-btn').forEach(b => b.classList.remove('active'));
+            if (btnElem) btnElem.classList.add('active');
+
+            const titleMap = {
+                all: "강원도 인기 관광지 TOP 10",
+                '20s': "강원도 20대 인기 관광지 TOP 10",
+                '30s': "강원도 30대 인기 관광지 TOP 10",
+                '40s': "강원도 40대 인기 관광지 TOP 10",
+                '50s': "강원도 50대 인기 관광지 TOP 10",
+                '60s': "강원도 60대+ 인기 관광지 TOP 10"
+            };
+
+            document.getElementById('headerTitleText').innerText = titleMap[ageKey];
+
+            const listData = ageFilterDataSets[ageKey] || ageFilterDataSets.all;
+            const container = document.getElementById('cardsGridContainer');
+            container.innerHTML = '';
+
+            listData.forEach(item => {
+                const detail = placeData[item.id] || placeData.p1;
+                const rankClass = item.rank <= 3 ? `rank-${item.rank}` : '';
+
+                const cardHtml = `
+                    <div class="place-card ${rankClass}" onclick="openModal('${item.id}')">
+                        <div class="card-img-box">
+                            <img src="${detail.img}" alt="${item.name}">
+                            <div class="rank-badge">${item.rank}</div>
+                        </div>
+                        <div class="card-info">
+                            <div class="info-top">
+                                <h3 title="${item.name}">${item.name}</h3>
+                                <span class="category-tag">${item.category}</span>
+                                <div class="place-location"><i class="fa-solid fa-location-dot"></i> ${item.location}</div>
+                            </div>
+                            <div class="info-bottom">
+                                <div class="search-count">${item.count}</div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        // 초기 필터 적용
+        filterByAge('all', document.querySelector('.age-filter-btn.active'));
+
+        function switchRegion(regionName) {
+            if (regionName === "강원특별자치도") {
+                return;
+            }
+            alert(`[TravelMate] ${regionName} 페이지 데이터 연동 준비 중입니다.\n현재는 강원특별자치도 상세 데이터가 수록되어 있습니다.`);
+        }
+
+        function openModal(placeId) {
+            const data = placeData[placeId] || placeData.p1;
+
+            document.getElementById('modalImg').src = data.img;
+            document.getElementById('modalTitle').innerText = data.name;
+            document.getElementById('modalLocation').innerHTML = `<i class="fa-solid fa-location-dot"></i> ${data.location}`;
+            document.getElementById('modalRank').innerText = `검색 순위 ${data.rank}`;
+            document.getElementById('modalDesc').innerText = data.desc;
+            document.getElementById('kakaoLink').href = data.kmap;
+            document.getElementById('naverLink').href = data.nmap;
+            document.getElementById('modalIframe').src = data.yt;
+
+            const hashtagBox = document.getElementById('modalHashtags');
+            hashtagBox.innerHTML = '';
+            if (data.tags) {
+                data.tags.forEach(tag => {
+                    hashtagBox.innerHTML += `<span class="hashtag-chip">${tag}</span>`;
+                });
+            }
+            document.getElementById('modalTipContent').innerText = data.tip || "시즌별 운영 시간과 주차 가능 여부를 방문 전 체크해보세요!";
+
+            document.getElementById('placeModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            map.flyTo([data.lat, data.lng], 12, { duration: 1 });
+            if (markers[placeId]) {
+                setTimeout(() => markers[placeId].openPopup(), 800);
+            }
+        }
+
+        function closeModal() {
+            document.getElementById('placeModal').classList.remove('active');
+            document.getElementById('modalIframe').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target.id === 'placeModal') {
+                closeModal();
+            }
+        }
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+    </script>
+</body>
+</html>
