@@ -1,0 +1,207 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>여행메이트 - 샘플 페이지</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Malgun Gothic', sans-serif; color: #333; line-height: 1.6; }
+        section, header { border-bottom: none; dashed #ccc; padding: 30px 5%; }
+
+        /* 1단: 상단 제목 & 카테고리 & 로그인 */
+        .top-bar { position: relative; text-align: center; padding-bottom: 15px; }
+        .logo { font-size: 32px; font-weight: bold; color: #0066cc; }
+        .auth-links { position: absolute; right: 0; top: 10px; font-size: 14px; }
+        .auth-links a { text-decoration: none; color: #555; margin-left: 10px; }
+        .nav-menu { display: flex; justify-content: center; gap: 25px; background: #f8f9fa; padding: 12px; border-radius: 8px; font-weight: bold; }
+        .nav-menu a { text-decoration: none; color: #333; }
+        .nav-menu a:hover { color: #0066cc; }
+
+        /* 2단: 문구 + 사진 배너 */
+        .hero-banner { 
+            position: relative; /* 글자를 사진 위에 얹기 위한 기준점 */
+            width: 100%;
+            height: 350px; /* 배너의 전체 높이 (원하시면 300px~400px 사이로 조절 가능) */
+            display: flex; 
+            align-items: center; 
+            justify-content: center; /* 문구를 가로 정중앙으로 */
+            overflow: hidden; 
+            background: #000; /* 사진이 로딩되기 전 배경색 */
+            padding: 0;
+            }
+
+            /* 슬라이드 사진이 배경 전체를 꽉 채우도록 설정 */
+            .hero-photo { 
+                position: absolute; 
+                top: 0; 
+                left: 0; 
+                width: 100%; 
+                height: 100%; 
+                z-index: 1; /* 사진을 뒤쪽에 깔기 */
+            }
+            .hero-photo img { 
+                position: absolute; 
+                width: 100%; 
+                height: 100%; 
+                object-fit: cover; 
+                opacity: 0; 
+                transition: opacity 1.5s ease-in-out; 
+            }
+
+            /* 문구를 사진 위에 정중앙으로 오게 하고, 글자가 잘 보이도록 어두운 그림자 효과 추가 */
+            .hero-text { 
+                position: relative; 
+                z-index: 2; /* 사진보다 위에 오도록 설정 */
+                text-align: center; /* 글자도 가운데 정렬 */
+                color: #fff; /* 사진 위에서 잘 보이도록 글자색을 하얗게 변경 */
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7); /* 글자 가독성을 높여주는 그림자 */
+                padding: 20px;
+            }
+            .hero-text h2 { 
+                font-size: 36px; 
+                margin-bottom: 15px; 
+            }
+            .hero-text p {
+                font-size: 18px;
+            }
+
+        /* 3단: 전국 17개 지역 파노라마 (4개씩 배치) */
+        .section-header { display: flex; justify-content: space-between; align-items: center; 
+            margin-bottom: 20px; }
+        .panorama-grid { display: flex; gap: 20px; overflow: hidden; }
+        .region-card { min-width: calc(25% - 15px); border: 1px solid #ddd; border-radius: 10px; 
+            padding: 15px; text-align: center; background: #fff; }
+        .region-img-box { height: 120px; border-radius: 8px; margin-bottom: 10px; overflow: hidden; 
+            background: #eee; }
+
+        /* 4단: 세대맞춤 인기여행지 통계 */
+        .stats-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 15px; }
+        .stat-card { background: #f9f9f9; border-left: 5px solid #0066cc; padding: 15px; 
+            border-radius: 6px; }
+        .stat-age { font-size: 18px; font-weight: bold; color: #0066cc; }
+        .stat-ratio { font-size: 20px; font-weight: bold; margin: 8px 0; }
+    </style>
+</head>
+<body>
+
+    <!-- [1단] 상단 헤더 -->
+    <header>
+        <div class="top-bar">
+            <div class="logo">✈️ 여행메이트</div>
+            <div class="auth-links">
+                <a href="#">로그인</a> | <a href="#">회원가입</a>
+            </div>
+        </div>
+        <nav class="nav-menu">
+            <a href="#">연령대별 지역인기관광지 TOP10</a>
+            <a href="#">맞춤추천 AI</a>
+            <a href="#">숙박·교통 바로가기</a>
+            <a href="#">이전자료</a>
+            <a href="#">게시판</a>
+        </nav>
+    </header>
+
+    <!-- [2단] 메인 배너 (사진이 점선 안을 꽉 채우고 문구가 정중앙에 오는 구조) -->
+    <section class="hero-banner">
+        <!-- 배경 슬라이드 사진 영역 -->
+        <div class="hero-photo">
+            {% for b_img in banner_imgs %}
+            <img src="{% static 'images/' %}{{ b_img }}" class="slide-img" style="{% if forloop.first %}opacity: 1;{% endif %}" alt="메인 배너 사진">
+            {% endfor %}
+        </div>
+
+        <!-- 정중앙에 위치할 문구 영역 -->
+        <div class="hero-text">
+            <h2>마음이 머무는 그 곳, 우리들의 여행 기록</h2>
+            <p>수많은 발걸음이 모여 만든 빅데이터로, 당신만의 특별한 여행을 발견하세요.</p>
+        </div>
+    </section>
+
+    <!-- [3단] 전국 17개 지역 파노라마 (4개씩 넘기기) -->
+    <section>
+        <div class="section-header">
+            <h2>🗺️ 전국 17개 지역 파노라마 (4개씩 보기)</h2>
+            <div>
+                <button onclick="prevSlide()" style="padding: 6px 14px; cursor: pointer; border: 1px solid #ccc; background: #fff; border-radius: 4px; font-weight: bold;">◀ 이전</button>
+                <button onclick="nextSlide()" style="padding: 6px 14px; cursor: pointer; background: #0066cc; color: white; border: none; border-radius: 4px; font-weight: bold;">다음 ▶</button>
+            </div>
+        </div>
+
+        <div class="panorama-grid">
+            {% for r in regions %}
+            <div class="region-card item-card">
+                <!-- ★ 전체를 a 태그로 감싸서 클릭할 수 있게 만듭니다 -->
+                <a href="{% url 'detail' %}?region={{ r.name }}" style="text-decoration: none; color: inherit;">
+                    <div class="region-img-box">
+                        <img src="{% static 'images/' %}{{ r.img }}" style="width: 100%; height: 100%; object-fit: cover;" alt="지역 사진">
+                    </div>
+                    <h3>{{ r.name }}</h3>
+                    <p>{{ r.desc }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- [4단] 세대맞춤 인기여행지 통계치 -->
+    <section>
+        <div class="section-header">
+            <h2>📊 세대맞춤 인기여행지 (전국 세대별 통계치)</h2>
+        </div>
+
+        <div class="stats-grid">
+            {% for stat in age_stats %}
+            <div class="stat-card">
+                <div class="stat-age">{{ stat.age }} 인기 1위</div>
+                <h4>📍 {{ stat.top_place }}</h4>
+                <div class="stat-ratio">선호도 {{ stat.ratio }}</div>
+                <p>키워드: {{ stat.keyword }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 자바스크립트 모음 -->
+    <script>
+        // 1. 2단 메인 배너 자동 슬라이드
+        let currentSlideIndex = 0;
+        const slides = document.querySelectorAll('.slide-img');
+        function changeSlide() {
+            if (slides.length === 0) return;
+            slides[currentSlideIndex].style.opacity = 0;
+            currentSlideIndex = (currentSlideIndex + 1) % slides.length;
+            slides[currentSlideIndex].style.opacity = 1;
+        }
+        setInterval(changeSlide, 5000);
+
+        // 2. 3단 파노라마 카드 4개씩 끊어서 넘기기
+        let currentCardIndex = 0;
+        const cards = document.querySelectorAll('.item-card');
+        const itemsPerPage = 4;
+
+        function showCards() {
+            cards.forEach(card => card.style.display = 'none');
+            for (let i = currentCardIndex; i < currentCardIndex + itemsPerPage; i++) {
+                if (cards[i]) { cards[i].style.display = 'block'; }
+            }
+        }
+
+        function nextSlide() {
+            if (currentCardIndex + itemsPerPage < cards.length) {
+                currentCardIndex += itemsPerPage;
+                showCards();
+            }
+        }
+
+        function prevSlide() {
+            if (currentCardIndex - itemsPerPage >= 0) {
+                currentCardIndex -= itemsPerPage;
+                showCards();
+            }
+        }
+
+        showCards();
+    </script>
+
+</body>
+</html>

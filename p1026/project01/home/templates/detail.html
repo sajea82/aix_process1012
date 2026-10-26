@@ -1,0 +1,14 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <title>지역 상세 페이지</title>
+</head>
+<body style="padding: 50px; text-align: center;">
+    <h1>📍 {{ region_name }} 상세 정보 페이지</h1>
+    <p>선택하신 지역의 상세 관광지와 통계 데이터가 여기에 표시됩니다.</p>
+    <br>
+    <a href="{% url 'sample' %}" style="background: #0066cc; color: white; padding: 10px 20px; text-decoration: none; border-radius: 5px;">메인으로 돌아가기</a>
+</body>
+</html>
