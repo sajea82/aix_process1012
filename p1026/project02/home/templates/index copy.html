@@ -1,0 +1,346 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>여행메이트 (TravelMate) - 대한민국 17개 시도 맞춤 여행 포털</title>
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Noto+Sans+KR:wght@400;500;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { font-family: 'Noto Sans KR', 'Inter', sans-serif; box-sizing: border-box; }
+    body { background-color: #f8fafc; color: #0f172a; overflow-x: hidden; }
+    .hero-slider {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    }
+
+    /* 슬라이더 이미지 기본 스타일 */
+    .slide-img {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      opacity: 0;
+      /* 투명도(opacity)와 크기(transform)를 2.5초 동안 아주 부드럽게 전환 */
+      transition: opacity 2.5s cubic-bezier(0.4, 0, 0.2, 1), transform 3s cubic-bezier(0.4, 0, 0.2, 1);
+      transform: scale(1.05); /* 살짝 확대된 상태에서 시작 */
+      z-index: 1;
+    }
+
+    /* 현재 보이는 이미지 스타일 */
+    .slide-img.active {
+      opacity: 1;
+      transform: scale(1); /* 제 사이즈로 돌아오며 부드럽게 노출 */
+      z-index: 2;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+
+  <!-- =====================================================================
+       헤더 (로고 + 6대 메뉴 + 로그인)
+       ===================================================================== -->
+  <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md shadow-sm border-b border-stone-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-4 pb-3">
+      
+      <!-- 1단 로고 -->
+      <div class="flex items-center justify-center pb-3 border-b border-stone-100">
+        <a href="#heroPanoramaSection" class="text-center">
+          <span class="text-3xl sm:text-4xl font-black tracking-tight text-[#843219]">TravelMate</span>
+        </a>
+      </div>
+
+      <!-- 2단 메인 메뉴 -->
+      <div class="pt-3 flex flex-wrap items-center justify-between gap-4">
+        <nav class="flex flex-wrap items-center justify-center gap-5 sm:gap-8 mx-auto">
+          <button type="button" onclick="openSearchModal()" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            여행지 검색
+          </button>
+          <a href="#region17PanoramaSection" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            지역별 여행지
+          </a>
+          <a href="#generationStatsSection" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            세대별 인기여행지
+          </a>
+          <button type="button" onclick="openStayTransportModal()" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            숙박,교통수단
+          </button>
+          <button type="button" onclick="openArchiveModal()" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            이전 자료 모음
+          </button>
+          <button type="button" onclick="openBoardModal()" class="text-xs sm:text-[15px] font-bold text-stone-800 hover:text-[#843219] transition py-1">
+            게시판 보기
+          </button>
+        </nav>
+
+        <div class="flex items-center">
+          <button type="button" onclick="openAuthModal()" class="px-5 py-2 rounded-full bg-[#541e0d] hover:bg-[#3d1509] text-white font-bold text-xs sm:text-sm shadow-sm flex items-center gap-1.5 transition">
+            <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 12c2.7 0 4.8-2.1 4.8-4.8S14.7 2.4 12 2.4 7.2 4.5 7.2 7.2 9.3 12 12 12zm0 2.4c-3.2 0-9.6 1.6-9.6 4.8v2.4h19.2v-2.4c0-3.2-6.4-4.8-9.6-4.8z"/></svg>
+            <span>로그인</span>
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </header>
+
+ <!-- =====================================================================
+        메인 콘텐츠
+        ===================================================================== -->
+  <main class="flex-1">
+
+    <!-- 배너 -->
+    <section id="heroPanoramaSection" class="relative w-full overflow-hidden bg-slate-950 border-b border-stone-200">
+      <div class="relative min-h-[500px] w-full flex items-center justify-center">
+        
+        <!-- 슬라이드될 이미지들 (여기에 이미지 경로 5~6장을 넣어주세요) -->
+        <div class="absolute inset-0 w-full h-full hero-slider">
+          <img src="/static/images/main_img/main1.jpg" alt="main1" class="slide-img active" />
+          <img src="/static/images/main_img/main4.jpg" alt="main4" class="slide-img" />
+          <img src="/static/images/main_img/main6.jpg" alt="main6" class="slide-img" />
+          <img src="/static/images/main_img/main14.jpg" alt="main14" class="slide-img" />
+          <img src="/static/images/main_img/main15.jpg" alt="main15" class="slide-img" />
+        </div>
+
+        <!-- 어두운 그라데이션 오버레이 (이미지 위에 얹혀짐) -->
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-950/50 to-slate-950/80 z-10"></div>
+        
+        <!-- 텍스트 영역 (z-20을 주어 이미지와 그라데이션보다 항상 위에 보이게 설정) -->
+        <div class="relative z-20 max-w-4xl w-full mx-auto px-6 py-12 flex flex-col items-center justify-center text-center">
+          <h2 class="text-2xl sm:text-4xl lg:text-5xl font-black text-white leading-tight mb-5 drop-shadow">
+            "지금 가장 아름다운 가을 속으로"
+          </h2>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         전국 17개 광역시도 여행지 (4개씩 슬라이드)
+         ===================================================================== -->
+    <section id="region17PanoramaSection" class="py-10 bg-[#faf8f5] border-b border-stone-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
+          <div>
+            <div class="flex items-center gap-2 text-xs sm:text-sm font-bold text-stone-600 mb-1">
+              <span class="text-orange-500">👥</span>
+              <span>17개 지역의 매력적인 여행지를 만나보세요</span>
+            </div>
+            <h2 class="text-2xl sm:text-3xl font-black text-[#2a1208]">전국 17개 광역시도 여행지</h2>
+          </div>
+
+          <!-- 이전 / 다음 버튼 -->
+          <div class="flex items-center gap-2 self-start sm:self-auto">
+            <span id="pageIndicator" class="text-xs font-bold text-stone-600 bg-white px-3 py-2 rounded-full border border-stone-200 shadow-sm">
+              1 - 4 / 총 17개 지역
+            </span>
+            <button type="button" onclick="movePage(-1)" class="w-10 h-10 rounded-full bg-white hover:bg-orange-50 text-stone-800 border border-stone-200 shadow-sm flex items-center justify-center font-bold text-base transition">
+              &#10094;
+            </button>
+            <button type="button" onclick="movePage(1)" class="w-10 h-10 rounded-full bg-white hover:bg-orange-50 text-stone-800 border border-stone-200 shadow-sm flex items-center justify-center font-bold text-base transition">
+              &#10095;
+            </button>
+          </div>
+        </div>
+
+        <div class="bg-slate-50 p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm">
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4" id="regionCardContainer">
+            {% for region in regions %}
+            <a href="/region/{{ region.code }}/" id="card-{{ region.code }}" class="region-card group cursor-pointer bg-white rounded-2xl overflow-hidden border border-stone-200 shadow-sm hover:shadow-md hover:border-orange-500 transition block">
+              <div class="h-36 overflow-hidden bg-slate-200 relative">
+                {% if region.thumb %}
+                  <img src="{% static region.thumb %}" alt="{{ region.name }}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                {% else %}
+                  <div class="w-full h-full flex items-center justify-center text-slate-400 text-xs font-bold">{{ region.name }}</div>
+                {% endif %}
+                <span class="absolute top-2 right-2 bg-slate-900/70 text-white text-[10px] font-bold px-2 py-0.5 rounded-full">
+                  상세보기 &rarr;
+                </span>
+              </div>
+              <div class="p-3.5">
+                <h4 class="font-bold text-sm text-slate-800 group-hover:text-orange-600 transition">{{ region.name }}</h4>
+                <p class="text-xs text-slate-500 truncate mt-1">{{ region.desc }}</p>
+              </div>
+            </a>
+            {% endfor %}
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- =====================================================================
+         전국 통합 세대별 맞춤 인기 여행지 TOP 5 (연두색 풀와이드 패널)
+         ===================================================================== -->
+    <section id="generationStatsSection" class="py-12 bg-slate-100">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+        
+        <div class="w-full bg-[#d2e054] rounded-[2.5rem] p-6 sm:p-10 shadow-md">
+          
+          <!-- 헤더 텍스트 -->
+          <div class="text-center mb-8">
+            <span class="inline-block text-xs font-bold text-emerald-900 bg-white/70 px-4 py-1 rounded-full mb-2 shadow-sm">
+              ✦ 전국 통합 세대별 인기 TOP 5 ✦
+            </span>
+            <h2 class="text-2xl sm:text-3xl lg:text-4xl font-black text-slate-900 tracking-tight">
+              세대 맞춤 인기 여행지
+            </h2>
+            <p class="text-xs sm:text-sm font-medium text-slate-800 mt-1.5">
+              전체 지역 방문 통계를 기반으로 각 세대가 가장 많이 찾은 인기 명소 TOP 5와 방문 비율입니다.
+            </p>
+          </div>
+
+          <!-- 20대부터 60대까지 5개 세대 카드 나란히 배치 -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 sm:gap-5">
+            {% for age, spots in nationwide_age_stats.items %}
+            <div class="bg-white rounded-3xl p-5 shadow-sm hover:shadow-md transition">
+              
+              <!-- 카드 상단: 연령대 라벨 -->
+              <div class="flex items-center justify-between border-b border-slate-100 pb-3 mb-3">
+                <div class="flex items-center gap-1.5">
+                  <span class="text-base">👥</span>
+                  <span class="font-black text-base text-slate-900">{{ age }}대</span>
+                </div>
+                <span class="text-[11px] font-bold text-orange-600 bg-orange-50 px-2 py-0.5 rounded-full">
+                  전국 통합
+                </span>
+              </div>
+
+              <!-- 1위부터 5위까지 순위 리스트 (명소명 + 비율 정확한 표시) -->
+              <div class="space-y-2.5">
+                {% for spot in spots %}
+                <div class="bg-[#f0f4f8] rounded-xl px-3 py-2.5 flex items-center justify-between gap-1 text-xs">
+                  <div class="flex items-center gap-2.5 overflow-hidden">
+                    <span class="w-5 h-5 rounded-full bg-[#3d4b64] text-white font-extrabold text-[11px] flex items-center justify-center shrink-0">
+                      {{ spot.rank }}
+                    </span>
+                    <span class="font-bold text-slate-800 truncate" title="{{ spot.name }}">
+                      {{ spot.name }}
+                    </span>
+                  </div>
+                  <span class="font-black text-[#2b3a55] shrink-0 text-xs pl-1">
+                    {{ spot.pct }}
+                  </span>
+                </div>
+                {% endfor %}
+              </div>
+
+            </div>
+            {% endfor %}
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- =====================================================================
+       푸터 & 모달
+       ===================================================================== -->
+  <footer class="bg-slate-950 text-slate-400 py-8 px-4 text-xs text-center">
+    <div class="max-w-7xl mx-auto">
+      <p class="text-white font-bold text-sm mb-1">TravelMate (여행메이트)</p>
+      <p>Django 백엔드 및 정적 데이터 기반 전국 17개 시도 포털</p>
+    </div>
+  </footer>
+
+  <div id="globalModalBackdrop" class="fixed inset-0 z-50 hidden bg-slate-950/70 backdrop-blur-sm flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-xl space-y-4">
+      <div class="flex justify-between items-center border-b pb-2">
+        <h4 id="modalTitle" class="font-bold text-base">알림</h4>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-black">✕</button>
+      </div>
+      <div id="modalBody" class="text-sm text-slate-600">내용</div>
+    </div>
+  </div>
+
+  <!-- =====================================================================
+       화면 제어 스크립트
+       ===================================================================== -->
+  <script>
+    let currentPage = 0;
+    const itemsPerPage = 4;
+    const totalCards = document.querySelectorAll('.region-card').length;
+
+    // 17개 시도 카드 4개씩 노출
+    function updateCardVisibility() {
+      const cards = document.querySelectorAll('.region-card');
+      const start = currentPage * itemsPerPage;
+      const end = start + itemsPerPage;
+
+      cards.forEach((card, idx) => {
+        if (idx >= start && idx < end) {
+          card.classList.remove('hidden');
+        } else {
+          card.classList.add('hidden');
+        }
+      });
+
+      const currentEnd = Math.min(end, totalCards);
+      const indicator = document.getElementById('pageIndicator');
+      if (indicator) {
+        indicator.innerText = `${start + 1} - ${currentEnd} / 총 ${totalCards}개 지역`;
+      }
+    }
+
+    // 카드 슬라이드 이동
+    function movePage(step) {
+      const maxPages = Math.ceil(totalCards / itemsPerPage);
+      currentPage = (currentPage + step + maxPages) % maxPages;
+      updateCardVisibility();
+    }
+
+    // 모달 제어
+    function openModal(title, msg) {
+      document.getElementById('modalTitle').innerText = title;
+      document.getElementById('modalBody').innerHTML = msg;
+      document.getElementById('globalModalBackdrop').classList.remove('hidden');
+    }
+    function closeModal() {
+      document.getElementById('globalModalBackdrop').classList.add('hidden');
+    }
+    function openSearchModal() { openModal("여행지 검색", "검색할 지역과 키워드를 입력하세요."); }
+    function openStayTransportModal() { openModal("숙박 및 교통", "지역별 KTX 및 고속버스, 숙소 예약 링크를 제공합니다."); }
+    function openArchiveModal() { openModal("이전 자료 모음", "과거 시즌별 통계 자료 아카이브입니다."); }
+    function openBoardModal() { openModal("게시판 보기", "여행자 후기와 팁을 확인하실 수 있습니다."); }
+    function openAuthModal() { openModal("로그인", "로그인 후 맞춤 추천 기능을 이용해 보세요."); }
+
+    // 초기 실행
+    document.addEventListener('DOMContentLoaded', () => {
+      updateCardVisibility();
+    });
+  </script>
+
+</body>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const slides = document.querySelectorAll(".hero-slider .slide-img");
+    if (slides.length === 0) return;
+    
+    let currentIndex = 0;
+    const intervalTime = 5000; // 5초마다 변경 (전환 시간 2.5초를 고려해 넉넉하게 설정)
+
+    function nextSlide() {
+      slides[currentIndex].classList.remove("active");
+      currentIndex = (currentIndex + 1) % slides.length;
+      slides[currentIndex].classList.add("active");
+    }
+
+    if (slides.length > 1) {
+      setInterval(nextSlide, intervalTime);
+    }
+  });
+</script>
+</html>
