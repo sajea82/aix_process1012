@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}문의 상세 | 여행메이트{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/tm-qna.css' %}">
+{% endblock %}
+
+{% block content %}
+
+<section class="qa-wrap">
+
+    <div class="qa-heading">
+        <span class="qa-kicker">TRAVELMATE Q&A</span>
+        <h2>1:1 문의 상세</h2>
+        <p>문의 내용과 답변을 확인할 수 있습니다.</p>
+    </div>
+
+    <div class="qa-detail">
+
+        <div class="qa-detail-title">
+            <h2>{{ question.title }}</h2>
+
+            <p>
+                작성자 : {{ question.author }}
+                &nbsp; | &nbsp;
+                작성일 : {{ question.created_at|date:'Y.m.d' }}
+            </p>
+        </div>
+
+        <div class="qa-detail-content">
+            {{ question.content|linebreaksbr }}
+        </div>
+
+        <div class="qa-detail-answer">
+
+            <h3>관리자 답변</h3>
+
+            {% if question.answer %}
+
+                <p>{{ question.answer|linebreaksbr }}</p>
+
+            {% else %}
+
+                <p>아직 답변이 등록되지 않았습니다.</p>
+
+            {% endif %}
+
+        </div>
+
+        <div style="text-align:center; margin-top:35px;">
+
+            <a href="{% url 'qna:index' %}#question-panel"
+               class="qa-primary"
+               style="display:inline-block; text-decoration:none;">
+                목록으로 돌아가기
+            </a>
+
+        </div>
+
+    </div>
+
+</section>
+
+{% endblock %}

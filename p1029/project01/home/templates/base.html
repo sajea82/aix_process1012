@@ -1,0 +1,58 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}여행메이트{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/travel.css' %}">
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    {% block head %}{% endblock %}
+</head>
+<body>
+
+<!-- ===== 헤더 (모든 페이지 공통) ===== -->
+<header class="tm-header">
+        <h1 class="tm-logo"><a href="{% url 'index' %}">TravelMate</a></h1>
+
+    <div class="tm-bar">
+        <!-- 카테고리 메뉴 (가운데) -->
+        <nav class="tm-nav">
+            <ul>
+                <li><a href="{% url 'tour:tlist' %}">연령대별 인기관광지 TOP10</a></li>
+                <li><a href="#">숙박·교통 바로가기</a></li>
+                <li><a href="#">이전자료</a></li>
+                <li><a href="{% url 'customer:clist' %}">게시판</a></li>
+            </ul>
+        </nav>
+
+        <!-- 로그인/회원가입 (오른쪽) -->
+               <div class="tm-member">
+            {% if request.session.session_id %}
+                <b>{{ request.session.session_nickname }}</b>님
+                <span>|</span>
+                <a href="{% url 'member:logout' %}">로그아웃</a>
+            {% else %}
+                <a href="{% url 'member:login' %}">로그인</a>
+                <span>|</span>
+                <a href="{% url 'member:join' %}">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<!-- ===== 페이지마다 바뀌는 내용 ===== -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ===== 푸터 ===== -->
+<footer class="tm-footer">
+    © 2026 여행메이트
+</footer>
+
+{% block script %}{% endblock %}
+</body>
+</html>

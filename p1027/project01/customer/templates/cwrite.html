@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block title %}글쓰기 - TravelMate{% endblock %}
+
+{% block content %}
+<section class="sec">
+    <div class="write-box">
+        <div class="sec-head">
+            <div><h2>글쓰기</h2></div>
+        </div>
+
+        <form method="post" action="{% url 'customer:cwrite' %}">
+            {% csrf_token %}
+            <div class="form-row">
+                <label for="btitle">제목</label>
+                <input type="text" name="btitle" id="btitle" maxlength="200" required>
+            </div>
+            <div class="form-row">
+                <label for="bcontent">내용</label>
+                <textarea name="bcontent" id="bcontent" required></textarea>
+            </div>
+            <div class="write-btns">
+                <a href="{% url 'customer:clist' %}" class="btn-line">취소</a>
+                <button type="submit" class="btn-sm">등록</button>
+            </div>
+        </form>
+    </div>
+</section>
+{% endblock %}

@@ -1,0 +1,199 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}여행메이트 - 메인{% endblock %}
+
+{% block head %}
+<!-- 8단계: 그래프 라이브러리 -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<!-- ===== 6단계: 메인 상단 사진 + 문구 ===== -->
+<section class="hero">
+    <div class="hero-slide active" style="background-image:url('{% static 'images/hero/hero1.jpg' %}')"></div>
+    <div class="hero-slide" style="background-image:url('{% static 'images/hero/hero2.jpg' %}')"></div>
+    <div class="hero-slide" style="background-image:url('{% static 'images/hero/hero3.jpg' %}')"></div>
+    <div class="hero-slide" style="background-image:url('{% static 'images/hero/hero4.jpg' %}')"></div>
+
+    <div class="hero-text">
+        <p class="hero-sub">빅데이터로 찾은 세대별 인기 여행지</p>
+        <h2>우리 세대가 사랑한<br>대한민국 여행지</h2>
+        <a href="#region" class="hero-btn">전국 여행지 보기</a>
+    </div>
+
+    <div class="hero-dots">
+        <button class="active"></button>
+        <button></button>
+        <button></button>
+        <button></button>
+    </div>
+</section>
+
+<!-- ===== 7단계: 전국 17개 지역 파노라마 ===== -->
+<section class="sec" id="region">
+    <div class="sec-head">
+        <div>
+            <h2>전국 17개 지역 여행지</h2>
+            <p>지역을 누르면 연령대별 인기관광지 TOP10을 볼 수 있어요.</p>
+        </div>
+        <div class="slider-ctrl">
+            <button id="region-prev">‹</button>
+            <span><b id="page-now">1</b> / <span id="page-total">5</span></span>
+            <button id="region-next">›</button>
+        </div>
+    </div>
+
+    <div class="region-track">
+        {% for r in regions %}
+        <a class="region-card" href="{% url 'tour:region' r.code %}">
+            <img src="{% static r.img %}" alt="{{ r.name }}">
+            <div class="info">
+                <strong>{{ r.name }}</strong>
+                <span>대표 여행지 · {{ r.spot }}</span>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+</section>
+
+<!-- ===== 8단계: 세대맞춤 인기여행지 ===== -->
+<section class="sec" id="generation">
+    <div class="sec-head">
+        <div>
+            <h2>세대맞춤 인기여행지</h2>
+            <p>전국 17개 지역의 연령대별 인기관광지 통계로 우리 세대의 여행 취향을 알아보세요.</p>
+        </div>
+    </div>
+
+    <div class="gen-tabs">
+        <button class="on" data-age="20">20대</button>
+        <button data-age="30">30대</button>
+        <button data-age="40">40대</button>
+        <button data-age="50">50대</button>
+        <button data-age="60">60대 이상</button>
+    </div>
+
+    <p class="gen-insight" id="gen-insight">불러오는 중...</p>
+
+    <div class="gen-wrap">
+        <div class="gen-chart">
+            <h3>인기관광지 유형별 비중 (17개 지역 평균, %)</h3>
+            <div class="gen-chart-box"><canvas id="genChart"></canvas></div>
+        </div>
+        <div class="gen-list">
+            <h3 id="gen-list-title">20대가 특히 많이 찾은 곳</h3>
+            <div class="gen-cards" id="gen-cards"></div>
+        </div>
+    </div>
+</section>
+
+{% endblock %}
+
+
+{% block script %}
+<script>
+$(function(){
+    /* ----- 6단계: 상단 사진 자동 넘김 ----- */
+    let idx = 0;
+    const slides = $('.hero-slide');
+    const dots   = $('.hero-dots button');
+    let timer;
+
+    function show(n){
+        slides.removeClass('active').eq(n).addClass('active');
+        dots.removeClass('active').eq(n).addClass('active');
+        idx = n;
+    }
+    function start(){
+        timer = setInterval(function(){ show((idx + 1) % slides.length); }, 4000);
+    }
+    dots.click(function(){
+        clearInterval(timer);
+        show($(this).index());
+        start();
+    });
+    start();
+
+    /* ----- 7단계: 지역 파노라마 4개씩 넘기기 ----- */
+    const track = $('.region-track')[0];
+
+    function step(){
+        return track.clientWidth + 16;
+    }
+    function updatePage(){
+        const total = Math.ceil(track.scrollWidth / step());
+        let now = Math.round(track.scrollLeft / step()) + 1;
+        if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 5) now = total;
+        $('#page-now').text(now);
+        $('#page-total').text(total);
+    }
+    $('#region-prev').click(function(){ track.scrollBy({ left: -step() }); });
+    $('#region-next').click(function(){ track.scrollBy({ left:  step() }); });
+    $(track).bind('scroll', updatePage);
+    updatePage();
+
+    /* ----- 8단계: 세대맞춤 인기여행지 ----- */
+    let chart = null;
+
+    function ageText(age){                     // 60 → '60대 이상'
+        return age == 60 ? '60대 이상' : age + '대';
+    }
+
+    function loadGen(age){
+        $.getJSON('{% url "tour:generation" %}', { age: age }, function(data){
+
+            // 1) 한 줄 요약
+            let msg = ageText(age) + '는 ' + data.labels[0] + ' 다음으로 '
+                    + '<b>' + data.labels[1] + '</b> 비중이 높아요.';
+            $('#gen-insight').html(msg);
+
+            // 2) 그래프 (이전 그래프는 지우고 새로 그림)
+            if (chart) chart.destroy();
+            chart = new Chart(document.getElementById('genChart'), {
+                type: 'bar',
+                data: {
+                    labels: data.labels,
+                    datasets: [{
+                        data: data.values,
+                        backgroundColor: '#b8642e',
+                        borderRadius: 6
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',                    // 가로 막대
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: { x: { beginAtZero: true,
+                                   ticks: { callback: function(v){ return v + '%'; } } } }
+                }
+            });
+
+            // 3) 관광지 카드 8장
+            let html = '';
+            $.each(data.top, function(i, t){
+                html += '<a class="gen-card" href="/tour/region/' + t.code + '/?age=' + age + '">'
+                      +   '<img src="' + t.img + '" alt="' + t.name + '">'
+                      +   '<div>'
+                      +     '<strong>' + t.name + '</strong>'
+                            +     '<span>' + t.region + ' ' + t.sigungu + '<em>' + t.ratio + '%</em></span>'
+                      +   '</div>'
+                      + '</a>';
+            });
+            $('#gen-cards').html(html);
+            $('#gen-list-title').text(ageText(age) + '가 특히 많이 찾은 곳');
+        });
+    }
+
+    // 연령대 버튼 클릭
+    $('.gen-tabs button').click(function(){
+        $('.gen-tabs button').removeClass('on');
+        $(this).addClass('on');
+        loadGen($(this).attr('data-age'));
+    });
+
+    loadGen(20);   // 처음엔 20대
+});
+</script>
+{% endblock %}
