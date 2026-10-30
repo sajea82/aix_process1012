@@ -1,10 +1,22 @@
-{% extends 'base.html' %}
 {% load static %}
+{# 메인 페이지 : base.html 내용을 합쳐 한 파일로 만든 페이지 (다른 페이지는 base.html 사용) #}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>여행메이트 - 메인</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/travel.css' %}">
+    <!-- 토스 스타일 애니메이션 -->
+    <link rel="stylesheet" href="{% static 'css/motion.css' %}">
+    <script>document.documentElement.classList.add('motion-on');</script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/motion.js' %}"></script>
 
-{% block title %}여행메이트 - 메인{% endblock %}
-
-{% block head %}
-<!-- 레이아웃 유지 & 파일첩 감성 & 잔상 없는 맑은 슬라이더 -->
+    <!-- ===== 메인 페이지 전용 스타일 ===== -->
+<!-- 레이아웃 유지 & 파일첩(Folder Tab) 감성 스타일링 -->
 <style>
 /* ===== 0. 기본 톤 & 폰트 세팅 ===== */
 body {
@@ -14,64 +26,20 @@ body {
     letter-spacing: -0.3px;
 }
 
-/* ===== 1. 상단 히어로 배너 (잔상 제로! 0.85초 클린 페이드) ===== */
-.hero {
-    position: relative;
-    overflow: hidden;
-    background-color: #000000;
-}
-
-/* 모든 슬라이드: 잔상을 남기지 않는 0.85초 깔끔한 소프트 페이드 */
-.hero-slide, .hero-slider .slide-img {
-    display: block !important;
-    position: absolute !important;
-    inset: 0 !important;
-    width: 100% !important;
-    height: 100% !important;
-    background-size: cover !important;
-    background-position: center !important;
-    opacity: 0 !important;
-    z-index: 1 !important;
-    /* [핵심] 잔상(고스트 현상)을 완전히 없애는 황금 시간 0.85초 */
-    transition: opacity 1.5s ease-in-out !important;
-    pointer-events: none !important;
-}
-
-/* 활성화된 새 사진: z-index 2로 올라오며 잔상 없이 맑고 부드럽게 전환 */
-.hero-slide.active, .hero-slider .slide-img.active {
-    opacity: 1 !important;
-    z-index: 2 !important;
-    pointer-events: auto !important;
-}
-
-/* 문구 영역: 슬라이드 위 최상위 레이어에 완벽 고정 */
-.hero-text {
-    position: absolute !important;
-    left: 44px !important;
-    bottom: 50px !important;
-    z-index: 30 !important;
-    color: #ffffff !important;
-    opacity: 1 !important;
-    visibility: visible !important;
-    transform: none !important;
-    transition: none !important;
-    pointer-events: auto !important;
-}
-
+/* ===== 1. 상단 히어로 배너 & AI 창 (크기 1:1 완벽 유지) ===== */
 .hero-text h2 {
     font-size: 38px;
     font-weight: 800;
     line-height: 1.3;
     letter-spacing: -0.8px;
-    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.45);
-    margin: 0 0 24px;
+    text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
 }
 .hero-sub {
     font-size: 14.5px;
     font-weight: 600;
     color: #FFE6C8 !important;
-    margin: 0 0 10px;
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    margin-bottom: 10px;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 .hero-btn {
     display: inline-block;
@@ -82,41 +50,29 @@ body {
     font-weight: 700;
     border-radius: 30px;
     text-decoration: none;
-    box-shadow: 0 6px 18px rgba(138, 78, 41, 0.35);
+    box-shadow: 0 6px 18px rgba(138, 78, 41, 0.3);
     transition: all 0.3s ease;
 }
 .hero-btn:hover {
     background: #733E1D;
     transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(138, 78, 41, 0.45);
+    box-shadow: 0 10px 22px rgba(138, 78, 41, 0.42);
 }
 
-/* 인디케이터 점 버튼 고정 */
-.hero-dots {
-    position: absolute !important;
-    bottom: 24px !important;
-    left: 44px !important;
-    z-index: 30 !important;
-    display: flex;
-    gap: 8px;
-}
-.hero-dots button {
-    transition: all 0.3s ease;
-}
-
-/* ===== 2. 전국 17개 지역 '여행 서류철(파일첩)' 컨테이너 ===== */
+/* ===== 2. [핵심] 전국 17개 지역 '여행 서류철(파일첩)' 컨테이너 ===== */
 #region { 
     max-width: 1540px; 
     margin: 70px auto 0;
     padding: 40px 36px 36px;
-    background: #ffffff;
+    background: #ffffff; /* 파일첩 본체 */
     border: 1.5px solid #EAE1D5;
+    /* 좌상단 탭이 솟아오르는 부분과 어우러지도록 모서리 처리 */
     border-radius: 0 28px 28px 28px;
     position: relative;
     box-shadow: 0 18px 45px rgba(60, 40, 20, 0.06);
 }
 
-/* 좌측 상단 서류철 탭 (Folder Tab) */
+/* [그림 재현] 좌측 상단으로 솟아오른 서류철 탭 (Folder Tab) */
 #region::before {
     content: '📁 TRAVEL ARCHIVE';
     position: absolute;
@@ -126,7 +82,7 @@ body {
     height: 38px;
     background: #ffffff;
     border: 1.5px solid #EAE1D5;
-    border-bottom: 1.5px solid #ffffff;
+    border-bottom: 1.5px solid #ffffff; /* 본체와 자연스럽게 연결 */
     border-radius: 18px 18px 0 0;
     display: flex;
     align-items: center;
@@ -144,7 +100,7 @@ body {
     align-items: flex-end;
     margin-bottom: 24px;
     padding-bottom: 18px;
-    border-bottom: 1px dashed #EAE1D5;
+    border-bottom: 1px dashed #EAE1D5; /* 서류철 내부 절취선/인덱스 감성 */
 }
 .sec-head h2 {
     font-size: 26px;
@@ -159,7 +115,7 @@ body {
     margin: 0;
 }
 
-/* 슬라이더 컨트롤러 */
+/* 슬라이더 컨트롤러 (파일첩 인덱스 버튼) */
 .slider-ctrl {
     display: flex;
     align-items: center;
@@ -194,7 +150,7 @@ body {
     color: #8C7D70;
 }
 
-/* 지역 카드 */
+/* 파일첩 속 꽂혀 있는 여행 엽서 카드들 */
 .region-track {
     display: flex;
     gap: 20px;
@@ -230,7 +186,7 @@ body {
     flex-direction: column;
     justify-content: flex-end;
     padding: 22px;
-    background: linear-gradient(to top, rgba(20, 15, 10, 0.85) 0%, rgba(20, 15, 10, 0.35) 55%, transparent 100%);
+    background: linear-gradient(to top, rgba(20, 15, 10, 0.85) 0%, rgba(20, 15, 10, 0.3) 55%, transparent 100%);
     color: #ffffff;
 }
 .region-card .info strong {
@@ -244,7 +200,7 @@ body {
     margin-top: 4px;
 }
 
-/* ===== 3. 하단 여행 팁 섹션 ===== */
+/* ===== 3. 하단 여행 팁 섹션 (배경 레이어 분리 & 2번째 사진 스타일) ===== */
 .tips-sec { 
     width: 100%;
     background-color: #F4EFEB; 
@@ -363,10 +319,41 @@ body {
 }
 </style>
 <link rel="stylesheet" href="{% static 'css/chat.css' %}">
-{% endblock %}
+</head>
+<body>
 
-{% block content %}
+<!-- ===== 헤더 (모든 페이지 공통) ===== -->
+<header class="tm-header">
+        <h1 class="tm-logo"><a href="{% url 'index' %}">TravelMate</a></h1>
 
+    <div class="tm-bar">
+        <!-- 카테고리 메뉴 (가운데) -->
+        <nav class="tm-nav">
+            <ul>
+                <li><a href="{% url 'tour:tlist' %}">연령대별 인기관광지 TOP10</a></li>
+                <li><a href="#">숙박·교통 바로가기</a></li>
+                <li><a href="#">이전자료</a></li>
+                <li><a href="{% url 'customer:clist' %}">게시판</a></li>
+            </ul>
+        </nav>
+
+        <!-- 로그인/회원가입 (오른쪽) -->
+               <div class="tm-member">
+            {% if request.session.session_id %}
+                <b>{{ request.session.session_nickname }}</b>님
+                <span>|</span>
+                <a href="{% url 'member:logout' %}">로그아웃</a>
+            {% else %}
+                <a href="{% url 'member:login' %}">로그인</a>
+                <span>|</span>
+                <a href="{% url 'member:join' %}">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+</header>
+
+<!-- ===== 페이지마다 바뀌는 내용 ===== -->
+<main>
 <!-- ===== 6단계: 메인 상단 사진 + 문구 ===== -->
 <div class="hero-wrap">
     <section class="hero">
@@ -375,10 +362,12 @@ body {
         <div class="hero-slide" style="background-image:url('{% static 'images/hero/hero3.jpg' %}')"></div>
         <div class="hero-slide" style="background-image:url('{% static 'images/hero/hero4.jpg' %}')"></div>
 
-        <!-- 슬라이드 위로 완벽하게 고정된 문구 영역 -->
-        <div class="hero-text">
-            <p class="hero-sub">빅데이터로 찾은 세대별 인기 여행지</p>
-            <h2>우리 세대가 사랑한<br>대한민국 여행지</h2>
+        <div class="hero-text" data-reveal-lines>
+            <p class="hero-sub"><span class="m-line"><span style="--d:.45s">빅데이터로 찾은 세대별 인기 여행지</span></span></p>
+            <h2>
+                <span class="m-line"><span style="--d:.6s">우리 세대가 사랑한</span></span>
+                <span class="m-line"><span style="--d:.72s">대한민국 여행지</span></span>
+            </h2>
         </div>
 
         <div class="hero-dots">
@@ -393,23 +382,23 @@ body {
     {% include 'chat_box.html' %}
 </div>
 
-<!-- ===== 7단계: 전국 17개 지역 파노라마 (파일첩 디자인) ===== -->
-<section class="sec" id="region">
+<!-- ===== 7단계: 전국 17개 지역 파노라마 (파일첩 디자인 적용) ===== -->
+<section class="sec" id="region" data-scroll-scale>
     <div class="sec-head">
-        <div>
-            <h2>전국 17개 지역 여행지</h2>
-            <p>지역을 누르면 연령대별 인기관광지 TOP10을 볼 수 있어요.</p>
+        <div data-stagger="0.1">
+            <h2 data-reveal>전국 17개 지역 여행지</h2>
+            <p data-reveal>지역을 누르면 연령대별 인기관광지 TOP10을 볼 수 있어요.</p>
         </div>
-        <div class="slider-ctrl">
+        <div class="slider-ctrl" data-reveal="right" style="--d:.2s">
             <button id="region-prev">‹</button>
             <span><b id="page-now">1</b> / <span id="page-total">5</span></span>
             <button id="region-next">›</button>
         </div>
     </div>
 
-    <div class="region-track">
+    <div class="region-track" data-stagger="0.08" data-stagger-loop="4">
         {% for r in regions %}
-        <a class="region-card" href="{% url 'tour:region' r.code %}">
+        <a class="region-card" data-reveal="scale" href="{% url 'tour:region' r.code %}">
             <img src="{% static r.img %}" alt="{{ r.name }}">
             <div class="info">
                 <strong>{{ r.name }}</strong>
@@ -422,14 +411,14 @@ body {
 
 <!-- ===== 8단계: 여행을 더 즐겁게 만드는 방법 ===== -->
 <section class="tips-sec">
-    <div class="tips-box">
-        <span class="tips-badge">“ Real Travel Story</span>
-        <h2>여행을 더 즐겁게 만드는 방법</h2>
-        <p>TravelMate 서포터즈와 여행 크리에이터들이 전하는 가을 여행 꿀팁</p>
+    <div class="tips-box" data-reveal="scale">
+        <span class="tips-badge" data-reveal="blur" style="--d:.15s">“ Real Travel Story</span>
+        <h2 data-fill>여행을 더 즐겁게 만드는 방법</h2>
+        <p data-reveal style="--d:.25s">TravelMate 서포터즈와 여행 크리에이터들이 전하는 가을 여행 꿀팁</p>
 
-        <div class="tips-cards">
+        <div class="tips-cards" data-stagger="0.12">
             <!-- 1번 카드 -->
-            <div class="tips-card">
+            <div class="tips-card" data-reveal>
                 <div>
                     <div class="stars">★★★★★</div>
                     <p>"경기도와 강원도 단풍 코스는 10월 3~4주차가 가장 절정이에요. 주말 정체를 피해 오전 7시 이전에 출발하는 것을 강력 추천합니다!"</p>
@@ -444,7 +433,7 @@ body {
             </div>
 
             <!-- 2번 카드 -->
-            <div class="tips-card">
+            <div class="tips-card" data-reveal>
                 <div>
                     <div class="stars">★★★★★</div>
                     <p>"서울 남산 둘레길과 경복궁 향원정은 가을철 인생샷 명소입니다. 단풍 채광이 가장 예쁜 평일 오전 10시쯤 방문하면 한적해요."</p>
@@ -459,7 +448,7 @@ body {
             </div>
 
             <!-- 3번 카드 -->
-            <div class="tips-card">
+            <div class="tips-card" data-reveal>
                 <div>
                     <div class="stars">★★★★★</div>
                     <p>"제주도와 전남 해안 도로는 억새와 노을이 장관입니다. 렌터카 오픈탑이나 해안도로 드라이브 코스로 적극 추천드려요!"</p>
@@ -475,48 +464,38 @@ body {
         </div>
     </div>
 </section>
+</main>
 
-{% endblock %}
+<!-- ===== 푸터 ===== -->
+<footer class="tm-footer">
+    © 2026 여행메이트
+</footer>
 
-{% block script %}
+<!-- ===== 메인 페이지 전용 스크립트 ===== -->
 <script>
 $(function(){
-    /* ===== 잔상 없는 깔끔한 0.85초 크로스페이드 스크립트 ===== */
-    const slides = $('.hero-slide, .hero-slider .slide-img');
-    const dots   = $('.hero-dots button');
+    /* 상단 사진 자동 넘김 */
     let idx = 0;
-    const intervalTime = 5500; /* 사진 감상 시간 (5초) */
+    const slides = $('.hero-slide');
+    const dots   = $('.hero-dots button');
     let timer;
 
-    function showSlide(nextIdx){
-        if (slides.length <= 1) return;
-        
-        // 이전 사진의 active를 바로 빼서 0.85초 동안 자연스럽게 퇴장
-        slides.eq(idx).removeClass('active');
-        // 새 사진에 active를 부여하여 0.85초 동안 맑고 깔끔하게 등장 (잔상 제로)
-        slides.eq(nextIdx).addClass('active');
-        
-        // 인디케이터 점 연동
-        dots.removeClass('active').eq(nextIdx).addClass('active');
-        
-        idx = nextIdx;
+    function show(n){
+        slides.removeClass('active').eq(n).addClass('active');
+        dots.removeClass('active').eq(n).addClass('active');
+        idx = n;
     }
-
-    function startAutoSlide(){
-        timer = setInterval(function(){
-            showSlide((idx + 1) % slides.length);
-        }, intervalTime);
+    function start(){
+        timer = setInterval(function(){ show((idx + 1) % slides.length); }, 4000);
     }
-
     dots.click(function(){
         clearInterval(timer);
-        showSlide($(this).index());
-        startAutoSlide();
+        show($(this).index());
+        start();
     });
+    start();
 
-    startAutoSlide();
-
-    /* ===== 7단계: 지역 파노라마 4개씩 넘기기 ===== */
+    /* 지역 파노라마 4개씩 넘기기 */
     const track = $('.region-track')[0];
 
     function step(){
@@ -535,4 +514,5 @@ $(function(){
     updatePage();
 });
 </script>
-{% endblock %}
+</body>
+</html>
