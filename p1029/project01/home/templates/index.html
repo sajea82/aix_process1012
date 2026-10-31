@@ -1,5 +1,5 @@
 {% load static %}
-{# 메인 페이지 : base.html 내용을 합쳐 한 파일로 만든 페이지 (다른 페이지는 base.html 사용) #}
+{# 메인 페이지 : 한 줄 통합 헤더 + 사진 옆 AI 챗봇 + 상단 단풍잎 애니메이션 #}
 <!DOCTYPE html>
 <html lang="ko">
 <head>
@@ -14,65 +14,229 @@
     <script>document.documentElement.classList.add('motion-on');</script>
     <script src="{% static 'js/jquery.min.js' %}"></script>
     <script src="{% static 'js/motion.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 
     <!-- ===== 메인 페이지 전용 스타일 ===== -->
-<!-- 레이아웃 유지 & 파일첩(Folder Tab) 감성 스타일링 -->
 <style>
 /* ===== 0. 기본 톤 & 폰트 세팅 ===== */
 body {
-    background-color: #FAF7F2 !important;
+    /* 토스 공홈 스타일의 부드럽고 몽환적인 다중 가을빛 그라데이션 */
+    background:
+        radial-gradient(circle at 15% 20%, rgba(243, 168, 63, 0.35) 0%, transparent 45%), /* 왼쪽 위: 따스한 가을 햇살/노을빛 */
+        radial-gradient(circle at 85% 75%, rgba(251, 207, 185, 0.25) 0%, transparent 50%), /* 오른쪽 아래: 은은한 단풍 코랄빛 */
+        radial-gradient(circle at 50% 50%, rgba(245, 230, 215, 0.8) 0%, transparent 70%),  /* 중앙: 포근한 샌드 베이지 톤 */
+        linear-gradient(135deg, #FAF7F2 0%, #F3EDE4 100%) !important;                      /* 전체 베이스: 깨끗하고 부드러운 화이트/베이지 톤 */
+    background-attachment: fixed;
     color: #262626;
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif;
     letter-spacing: -0.3px;
 }
 
-/* ===== 1. 상단 히어로 배너 & AI 창 (크기 1:1 완벽 유지) ===== */
+/* ===== 상단 단일 통합 헤더 ===== */
+.site-header {
+    background-color:
+        radial-gradient(circle at 15% 20%, rgba(243, 168, 63, 0.35) 0%, transparent 45%), /* 왼쪽 위: 따스한 가을 햇살/노을빛 */
+        radial-gradient(circle at 85% 75%, rgba(251, 207, 185, 0.25) 0%, transparent 50%), /* 오른쪽 아래: 은은한 단풍 코랄빛 */
+        radial-gradient(circle at 50% 50%, rgba(245, 230, 215, 0.8) 0%, transparent 70%),  /* 중앙: 포근한 샌드 베이지 톤 */
+        linear-gradient(135deg, #FAF7F2 0%, #F3EDE4 100%) !important;                      /* 전체 베이스: 깨끗하고 부드러운 화이트/베이지 톤 */
+    border-bottom: 1px solid #EAE1D5;
+    position: sticky;
+    top: 0;
+    z-index: 40;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
+}
+.header-container {
+    max-width: 1540px;
+    margin: 0 auto;
+    padding: 0 36px;
+    height: 75px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 1. 로고 스타일 변경 (이미지 참고: 나뭇잎 아이콘 + 이탤릭체 감성 폰트) */
+.header-logo {
+    font-family: 'Playfair Display', serif;
+    font-size: 26px;
+    font-weight: 700;
+    font-style: italic;
+    color: #A85D32;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+    text-shadow: 0 2px 4px rgba(168, 93, 50, 0.15);
+}
+
+/* 2. 카테고리 메뉴 글자 크기 키우기 및 그림자(Shadow) 효과 추가 */
+.header-nav {
+    display: flex;
+    align-items: center;
+    gap: 26px;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.header-nav a {
+    text-decoration: none;
+    color: #3C3028;
+    font-size: 15px; /* 글자 크기 기존보다 확대 */
+    font-weight: 700; /* 폰트 두께감 부여 */
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 입체감 있는 섀도우 효과 */
+    transition: all 0.2s ease;
+    white-space: nowrap;
+}
+.header-nav a:hover {
+    color: #A85D32;
+    text-shadow: 0 2px 6px rgba(168, 93, 50, 0.25);
+}
+
+.header-auth {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: #6B5B52;
+}
+.header-auth a {
+    text-decoration: none;
+    color: #6B5B52;
+    transition: color 0.2s ease;
+}
+.header-auth a:hover {
+    color: #A85D32;
+}
+.header-auth span {
+    color: #D1C5BD;
+}
+
+/* 기존 base.html의 tm-header 숨김 */
+.tm-header {
+    display: none !important;
+}
+
+/* ===== 상단 단풍잎 전용 레이어 ===== */
+#header-leaf-layer {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 75px;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 999;
+}
+
+.falling-maple {
+    position: absolute;
+    top: -30px;
+    width: 22px;
+    height: 22px;
+    opacity: 0.9;
+    pointer-events: none;
+    z-index: 10;
+    animation: gentleSway 4s ease-in-out infinite alternate;
+}
+
+@keyframes gentleSway {
+    0% { transform: rotate(-18deg) translateX(-5px); }
+    100% { transform: rotate(18deg) translateX(5px); }
+}
+
+/* ===== 1. 상단 히어로 배너 & AI 창 (사진 옆 1:1 정렬 유지) ===== */
+.hero-wrap {
+    max-width: 1540px;
+    margin: 30px auto 0;
+    padding: 0 36px;
+    display: flex;
+    gap: 24px;
+    align-items: stretch;
+}
+
+.hero {
+    flex: 0 0 70%;
+    height: 500px;
+    position: relative;
+    border-radius: 28px;
+    overflow: hidden;
+    display: flex;
+    align-items: flex-end;
+    padding: 40px;
+}
+
+.hero-slide {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    opacity: 0;
+    transition: opacity 1.5s ease-in-out;
+    z-index: 1;
+}
+
+.hero-slide.active {
+    opacity: 1;
+    z-index: 2;
+}
+
+.hero::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.75) 0%, rgba(0, 0, 0, 0.2) 50%, transparent 100%);
+    z-index: 3;
+    pointer-events: none;
+}
+
+.hero-text {
+    position: relative;
+    z-index: 4;
+    text-align: left !important;
+}
+
 .hero-text h2 {
     font-size: 38px;
     font-weight: 800;
     line-height: 1.3;
     letter-spacing: -0.8px;
+    color: #FFFFFF;
     text-shadow: 0 3px 12px rgba(0, 0, 0, 0.35);
 }
 .hero-sub {
     font-size: 14.5px;
     font-weight: 600;
-    color: #FFE6C8 !important;
+    color: #fcc581 !important;
     margin-bottom: 10px;
     text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
-.hero-btn {
-    display: inline-block;
-    padding: 13px 28px;
-    background: #8A4E29;
-    color: #ffffff !important;
-    font-size: 14.5px;
-    font-weight: 700;
-    border-radius: 30px;
-    text-decoration: none;
-    box-shadow: 0 6px 18px rgba(138, 78, 41, 0.3);
-    transition: all 0.3s ease;
-}
-.hero-btn:hover {
-    background: #733E1D;
-    transform: translateY(-2px);
-    box-shadow: 0 10px 22px rgba(138, 78, 41, 0.42);
+
+/* 사진 바로 옆 AI 챗봇 박스 영역 */
+.hero-wrap > #chat-box, 
+.hero-wrap > div:not(.hero) {
+    flex: 1;
+    height: 500px;
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
 }
 
-/* ===== 2. [핵심] 전국 17개 지역 '여행 서류철(파일첩)' 컨테이너 ===== */
+/* ===== 2. 전국 17개 지역 '여행 서류철(파일첩)' 컨테이너 ===== */
 #region { 
     max-width: 1540px; 
     margin: 70px auto 0;
     padding: 40px 36px 36px;
-    background: #ffffff; /* 파일첩 본체 */
+    background: #ffffff;
     border: 1.5px solid #EAE1D5;
-    /* 좌상단 탭이 솟아오르는 부분과 어우러지도록 모서리 처리 */
     border-radius: 0 28px 28px 28px;
     position: relative;
     box-shadow: 0 18px 45px rgba(60, 40, 20, 0.06);
 }
 
-/* [그림 재현] 좌측 상단으로 솟아오른 서류철 탭 (Folder Tab) */
 #region::before {
     content: '📁 TRAVEL ARCHIVE';
     position: absolute;
@@ -82,7 +246,7 @@ body {
     height: 38px;
     background: #ffffff;
     border: 1.5px solid #EAE1D5;
-    border-bottom: 1.5px solid #ffffff; /* 본체와 자연스럽게 연결 */
+    border-bottom: 1.5px solid #ffffff;
     border-radius: 18px 18px 0 0;
     display: flex;
     align-items: center;
@@ -100,7 +264,7 @@ body {
     align-items: flex-end;
     margin-bottom: 24px;
     padding-bottom: 18px;
-    border-bottom: 1px dashed #EAE1D5; /* 서류철 내부 절취선/인덱스 감성 */
+    border-bottom: 1px dashed #EAE1D5;
 }
 .sec-head h2 {
     font-size: 26px;
@@ -115,7 +279,6 @@ body {
     margin: 0;
 }
 
-/* 슬라이더 컨트롤러 (파일첩 인덱스 버튼) */
 .slider-ctrl {
     display: flex;
     align-items: center;
@@ -150,7 +313,6 @@ body {
     color: #8C7D70;
 }
 
-/* 파일첩 속 꽂혀 있는 여행 엽서 카드들 */
 .region-track {
     display: flex;
     gap: 20px;
@@ -168,6 +330,7 @@ body {
     background: #1A1512;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
+    flex: 0 0 274px;
 }
 .region-card:hover {
     transform: translateY(-6px);
@@ -175,6 +338,9 @@ body {
 }
 .region-card img {
     transition: transform 0.4s ease;
+    width: 100%;
+    height: 180px;
+    object-fit: cover;
 }
 .region-card:hover img {
     transform: scale(1.06);
@@ -200,7 +366,7 @@ body {
     margin-top: 4px;
 }
 
-/* ===== 3. 하단 여행 팁 섹션 (배경 레이어 분리 & 2번째 사진 스타일) ===== */
+/* ===== 3. 하단 여행 팁 섹션 ===== */
 .tips-sec { 
     width: 100%;
     background-color: #F4EFEB; 
@@ -250,7 +416,6 @@ body {
     text-align: left;
     padding: 32px 28px;
     background: #FBFBFA;
-    border: none;
     border-radius: 20px;
     display: flex;
     flex-direction: column;
@@ -312,33 +477,46 @@ body {
     margin-top: 2px;
 }
 
+@media (max-width: 1200px) {
+    .header-nav { display: none; }
+}
+@media (max-width: 1024px) {
+    .hero-wrap { flex-direction: column; }
+    .hero, .hero-wrap > #chat-box, .hero-wrap > div:not(.hero) { width: 100%; flex: none; height: 450px; }
+}
 @media (max-width: 768px) { 
     .tips-cards { flex-direction: column; } 
     .tips-box { padding: 36px 20px; }
     #region::before { width: 220px; font-size: 10px; }
+    .header-container { padding: 0 16px; }
 }
 </style>
-<link rel="stylesheet" href="{% static 'css/chat.css' %}">
 </head>
 <body>
 
-<!-- ===== 헤더 (모든 페이지 공통) ===== -->
-<header class="tm-header">
-        <h1 class="tm-logo"><a href="{% url 'index' %}">TravelMate</a></h1>
+<!-- ===== 상단 단일 통합 헤더 ===== -->
+<header class="site-header">
+    <div class="header-container">
+        <!-- 좌측 로고 (나뭇잎 아이콘 + Korea Travel) -->
+        <a href="{% url 'index' %}" class="header-logo">
+            <i class="fa-solid fa-leaf"></i> 𝓣𝓻𝓪𝓿𝓮𝓵𝓜𝓪𝓽𝓮
+        </a>
 
-    <div class="tm-bar">
-        <!-- 카테고리 메뉴 (가운데) -->
-        <nav class="tm-nav">
-            <ul>
-                <li><a href="{% url 'tour:tlist' %}">연령대별 인기관광지 TOP10</a></li>
-                <li><a href="#">숙박·교통 바로가기</a></li>
-                <li><a href="#">이전자료</a></li>
+        <!-- 중앙 카테고리 메뉴 -->
+        <nav>
+            <ul class="header-nav">
+                <li><a href="{% url 'tour:tlist' %}">연령대별인기관광여행지TOP10</a></li>
+                <li><a href="#">상세페이지</a></li>
+                <li><a href="#">숙박·교통바로가기</a></li>
+                <li><a href="#">이전 자료</a></li>
+                <li><a href="#">네비게이션</a></li>
+                <li><a href="#">통계자료</a></li>
                 <li><a href="{% url 'customer:clist' %}">게시판</a></li>
             </ul>
         </nav>
 
-        <!-- 로그인/회원가입 (오른쪽) -->
-               <div class="tm-member">
+        <!-- 우측 끝 로그인 및 회원가입 -->
+        <div class="header-auth">
             {% if request.session.session_id %}
                 <b>{{ request.session.session_nickname }}</b>님
                 <span>|</span>
@@ -352,9 +530,12 @@ body {
     </div>
 </header>
 
+<!-- 상단 단풍잎 애니메이션 전용 레이어 -->
+<div id="header-leaf-layer"></div>
+
 <!-- ===== 페이지마다 바뀌는 내용 ===== -->
 <main>
-<!-- ===== 6단계: 메인 상단 사진 + 문구 ===== -->
+<!-- ===== 6단계: 메인 상단 사진 + AI 챗봇 나란히 배치 ===== -->
 <div class="hero-wrap">
     <section class="hero">
         <div class="hero-slide active" style="background-image:url('{% static 'images/hero/hero1.jpg' %}')"></div>
@@ -370,15 +551,9 @@ body {
             </h2>
         </div>
 
-        <div class="hero-dots">
-            <button class="active"></button>
-            <button></button>
-            <button></button>
-            <button></button>
-        </div>
     </section>
 
-    <!-- 맞춤추천 AI 챗봇 (크기 1:1 완벽 정렬 유지) -->
+    <!-- 맞춤추천 AI 챗봇 (사진 바로 옆 1:1 완벽 정렬) -->
     {% include 'chat_box.html' %}
 </div>
 
@@ -482,36 +657,81 @@ $(function(){
 
     function show(n){
         slides.removeClass('active').eq(n).addClass('active');
-        dots.removeClass('active').eq(n).addClass('active');
+        if(dots.length) { dots.removeClass('active').eq(n).addClass('active'); }
         idx = n;
     }
     function start(){
         timer = setInterval(function(){ show((idx + 1) % slides.length); }, 4000);
     }
-    dots.click(function(){
-        clearInterval(timer);
-        show($(this).index());
-        start();
-    });
+    if(dots.length) {
+        dots.click(function(){
+            clearInterval(timer);
+            show($(this).index());
+            start();
+        });
+    }
     start();
 
     /* 지역 파노라마 4개씩 넘기기 */
     const track = $('.region-track')[0];
 
     function step(){
-        return track.clientWidth + 16;
+        return track ? track.clientWidth + 16 : 300;
     }
     function updatePage(){
+        if(!track) return;
         const total = Math.ceil(track.scrollWidth / step());
         let now = Math.round(track.scrollLeft / step()) + 1;
         if (track.scrollLeft + track.clientWidth >= track.scrollWidth - 5) now = total;
         $('#page-now').text(now);
         $('#page-total').text(total);
     }
-    $('#region-prev').click(function(){ track.scrollBy({ left: -step() }); });
-    $('#region-next').click(function(){ track.scrollBy({ left:  step() }); });
-    $(track).bind('scroll', updatePage);
+    $('#region-prev').click(function(){ if(track) track.scrollBy({ left: -step() }); });
+    $('#region-next').click(function(){ if(track) track.scrollBy({ left:  step() }); });
+    if(track) { $(track).bind('scroll', updatePage); }
     updatePage();
+
+    /* 상단 단풍잎 떨어지는 애니메이션 스크립트 */
+    setInterval(function() {
+        const screenWidth = $(window).width();
+        const randomSize = 20 + Math.random() * 8; // 20px ~ 28px 크기
+
+        const mapleSvg = `
+            <div class="falling-maple" style="width:${randomSize}px; height:${randomSize}px;">
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M50 4 L43 20 L37 15 L36 37 L18 22 L21 35 L13 36 L24 49 L6 57 L24 62 L21 68 L35 66 L32 74 L48 64 L52 64 L68 74 L65 66 L79 68 L76 62 L94 57 L76 49 L87 36 L79 35 L82 22 L64 37 L63 15 L57 20 Z" fill="#EE5019"/>
+                    <path d="M50 4 L50 64 L52 64 L68 74 L65 66 L79 68 L76 62 L94 57 L76 49 L87 36 L79 35 L82 22 L64 37 L63 15 L57 20 Z" fill="#D63B0D"/>
+                    <path d="M50 18 L50 64 M50 48 L26 32 M50 48 L74 32 M50 58 L20 56 M50 58 L80 56" stroke="#B82D04" stroke-width="2" stroke-linecap="round"/>
+                    <path d="M50 63 Q51 82 47 93 C46 95 49 96 51 93 Q54 82 51 63 Z" fill="#D63B0D"/>
+                </svg>
+            </div>
+        `;
+        const $leaf = $(mapleSvg);
+        
+        let randomLeft;
+        if (Math.random() < 0.5) {
+            randomLeft = (screenWidth * 0.01) + (Math.random() * (screenWidth * 0.18));
+        } else {
+            randomLeft = (screenWidth * 0.86) + (Math.random() * (screenWidth * 0.12));
+        }
+
+        const fallDuration = 10 + Math.random() * 4; // 10초 ~ 14초
+        
+        $leaf.css({ left: randomLeft + 'px' });
+        $('#header-leaf-layer').append($leaf);
+
+        $leaf.animate({
+            top: '75px',
+            left: (randomLeft + (Math.random() * 20 - 10)) + 'px',
+            opacity: 0
+        }, {
+            duration: fallDuration * 1000,
+            easing: 'linear',
+            complete: function() {
+                $(this).remove();
+            }
+        });
+    }, 1800);
 });
 </script>
 </body>
