@@ -9,9 +9,10 @@ class Member(models.Model):
     nickname = models.CharField(max_length=60)
     tel = models.CharField(max_length=20) # 031-1203-1111
     gender = models.CharField(max_length=10) # 남자,여자
-    hobby = models.CharField(max_length=100) # 게임,골프,수영,조깅,독서
+    age_group = models.CharField(max_length=10, blank=True, default='')
+    living_region = models.CharField(max_length=20, blank=True, default='')
+    interest_region = models.CharField(max_length=20, blank=True, default='')
     mdate = models.DateTimeField(auto_now=True,blank=True)
 
     def __str__(self):
-        return f'{self.id},{self.name},{self.nickname},{self.hobby},{self.mdate}'
-
+        return f'{self.id},{self.name},{self.nickname},{self.mdate}'

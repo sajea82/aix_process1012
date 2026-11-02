@@ -20,7 +20,11 @@ class Tour(models.Model):
     @property
     def img(self):
         fname = self.name.replace(' ', '') + '.jpg'
-        path = settings.BASE_DIR / 'static' / 'images' / 'tour' / self.region / fname
-        if path.exists():
+        folder = settings.BASE_DIR / 'static' / 'images' / 'tour' / self.region
+        if (folder / fname).exists():
             return f'images/tour/{self.region}/{fname}'
+        # 압축을 풀 때 한글 파일명이 #Uxxxx 형태로 깨진 경우도 찾기
+        fname2 = ''.join(c if ord(c) < 128 else f'#U{ord(c):04x}' for c in fname)
+        if (folder / fname2).exists():
+            return f'images/tour/{self.region}/{fname2}'
         return 'images/tour/noimage.jpg'

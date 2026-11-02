@@ -8,7 +8,7 @@
 }
 
 /* 상단 */
-.tc-head { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: #fffaf3; }
+.tc-head { display: flex; align-items: center; gap: 12px; padding: 14px 20px; border-bottom: 1px solid var(--line); background: #f9efe5; }
 .tc-avatar {
     flex: 0 0 auto; width: 42px; height: 42px; border-radius: 50%;
     background: linear-gradient(135deg, var(--main), #c0773f); color: #fff;

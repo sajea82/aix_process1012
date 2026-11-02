@@ -12,7 +12,7 @@
     <!-- 토스 스타일 애니메이션 -->
     <link rel="stylesheet" href="{% static 'css/motion.css' %}">
     <script>document.documentElement.classList.add('motion-on');</script>
-    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
     <script src="{% static 'js/motion.js' %}"></script>
     <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 
@@ -30,16 +30,12 @@ body {
     color: #262626;
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif;
     letter-spacing: -0.3px;
+    margin: 0 !important;
 }
 
 /* ===== 상단 단일 통합 헤더 ===== */
 .site-header {
-    background-color:
-        radial-gradient(circle at 15% 20%, rgba(243, 168, 63, 0.35) 0%, transparent 45%), /* 왼쪽 위: 따스한 가을 햇살/노을빛 */
-        radial-gradient(circle at 85% 75%, rgba(251, 207, 185, 0.25) 0%, transparent 50%), /* 오른쪽 아래: 은은한 단풍 코랄빛 */
-        radial-gradient(circle at 50% 50%, rgba(245, 230, 215, 0.8) 0%, transparent 70%),  /* 중앙: 포근한 샌드 베이지 톤 */
-        linear-gradient(135deg, #FAF7F2 0%, #F3EDE4 100%) !important;                      /* 전체 베이스: 깨끗하고 부드러운 화이트/베이지 톤 */
-    border-bottom: none;
+    background-color:#f9efe5 !important;
     position: sticky;
     top: 0;
     z-index: 40;
@@ -55,19 +51,18 @@ body {
     justify-content: space-between;
 }
 
-/* 1. 로고 스타일 변경 (이미지 참고: 나뭇잎 아이콘 + 이탤릭체 감성 폰트) */
 .header-logo {
-    font-family: 'Playfair Display', serif;
-    font-size: 26px;
-    font-weight: 700;
-    font-style: italic;
-    color: #A85D32;
     text-decoration: none;
     display: flex;
     align-items: center;
-    gap: 8px;
     flex-shrink: 0;
-    text-shadow: 0 2px 4px rgba(168, 93, 50, 0.15);
+}
+
+.header-logo img {
+    height: 120px !important;       /* 헤더 높이에 딱 어울리는 실제 높이 설정 */
+    width: auto !important;
+    object-fit: contain;
+    transform: none !important;    /* 화면을 뚫고 나가는 과도한 scale 효과 제거 */
 }
 
 /* 2. 카테고리 메뉴 글자 크기 키우기 및 그림자(Shadow) 효과 추가 */
@@ -330,7 +325,7 @@ body {
     background: #1A1512;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-    flex: 0 0 274px;
+    flex: 0 0 290px;
 }
 .region-card:hover {
     transform: translateY(-6px);
@@ -497,21 +492,20 @@ body {
 <!-- ===== 상단 단일 통합 헤더 ===== -->
 <header class="site-header">
     <div class="header-container">
-        <!-- 좌측 로고 (나뭇잎 아이콘 + Korea Travel) -->
-        <a href="{% url 'index' %}" class="header-logo">
-            <i class="fa-solid fa-leaf"></i> 𝓣𝓻𝓪𝓿𝓮𝓵𝓜𝓪𝓽𝓮
-        </a>
+        <!-- 1. 로고 영역 -->
+        <h1 style="margin: 0;">
+            <a href="{% url 'index' %}" class="header-logo">
+                <img src="{% static 'images/txt/logo.png' %}" alt="TravelMate">
+            </a>
+        </h1>
 
         <!-- 중앙 카테고리 메뉴 -->
         <nav>
             <ul class="header-nav">
-                <li><a href="{% url 'tour:tlist' %}">연령대별인기관광여행지TOP10</a></li>
-                <li><a href="#">상세페이지</a></li>
-                <li><a href="#">숙박·교통바로가기</a></li>
-                <li><a href="#">이전 자료</a></li>
-                <li><a href="#">네비게이션</a></li>
-                <li><a href="#">통계자료</a></li>
-                <li><a href="{% url 'customer:clist' %}">게시판</a></li>
+                <li><a href="{% url 'tour:tlist' %}">인기여행지 TOP10</a></li>
+                <li><a href="{% url 'resv' %}">숙박·교통 바로가기</a></li>
+                <li><a href="{% url 'tour:graph_v1' %}">통계자료</a></li>
+                <li><a href="{% url 'qna:index' %}">Q&A</a></li>
             </ul>
         </nav>
 

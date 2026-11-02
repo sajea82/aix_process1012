@@ -25,3 +25,6 @@ def index(request):
         'ai_ready': ai.ai_ready(),
     }
     return render(request, 'index.html', context)
+
+def resv(request):
+    return render(request, 'resv.html')
