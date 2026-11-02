@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ board.btitle }} - TravelMate{% endblock %}
+
+{% block content %}
+<section class="sec board-view">
+    <h2>{{ board.btitle }}</h2>
+    <div class="view-meta">
+        {{ board.member.nickname|default:'-' }} · {{ board.bdate|date:'Y-m-d H:i' }} · 조회 {{ board.bhit }}
+    </div>
+
+    <div class="view-body">{{ board.bcontent|linebreaksbr }}</div>
+
+    <div class="view-btns">
+        <a href="{% url 'customer:clist' %}" class="btn-line">목록</a>
+        {% if request.session.session_id and board.member.id == request.session.session_id %}
+        <a href="{% url 'customer:cdelete' board.bno %}" class="btn-line danger"
+           onclick="return confirm('이 글을 삭제할까요?');">삭제</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

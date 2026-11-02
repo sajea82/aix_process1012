@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+
+{% block title %}게시판 - TravelMate{% endblock %}
+
+{% block content %}
+<section class="sec">
+    <div class="sec-head">
+        <div>
+            <h2>여행 이야기 게시판</h2>
+            <p>다녀온 여행지 후기와 정보를 나눠 주세요.</p>
+        </div>
+        <a href="{% url 'customer:cwrite' %}" class="btn-sm">글쓰기</a>
+    </div>
+
+    <table class="board-table">
+        <thead>
+            <tr>
+                <th class="w-no">번호</th>
+                <th>제목</th>
+                <th class="w-name">작성자</th>
+                <th class="w-date">작성일</th>
+                <th class="w-hit">조회</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for board in list %}
+            <tr>
+                <td class="w-no">{{ board.bno }}</td>
+                <td class="t-title">
+                    {% if board.bindent > 0 %}<span class="reply">↳</span>{% endif %}
+                    <a href="{% url 'customer:cview' board.bno %}">{{ board.btitle }}</a>
+                </td>
+                <td class="w-name">{{ board.member.nickname|default:'-' }}</td>
+                <td class="w-date">{{ board.bdate|date:'Y-m-d' }}</td>
+                <td class="w-hit">{{ board.bhit }}</td>
+            </tr>
+            {% empty %}
+            <tr><td colspan="5" class="empty">아직 글이 없습니다. 첫 글을 남겨 주세요.</td></tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <!-- 페이지 번호 -->
+    <div class="paging">
+        {% if list.has_previous %}
+        <a href="?page={{ list.previous_page_number }}">‹ 이전</a>
+        {% endif %}
+
+        {% for n in list.paginator.page_range %}
+        <a href="?page={{ n }}" {% if n == list.number %}class="on"{% endif %}>{{ n }}</a>
+        {% endfor %}
+
+        {% if list.has_next %}
+        <a href="?page={{ list.next_page_number }}">다음 ›</a>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
