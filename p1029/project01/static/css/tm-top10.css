@@ -549,3 +549,140 @@
     }
 
 }
+
+/* =========================================
+   팝업창 관광지 길찾기
+   ========================================= */
+
+.tour-route-bar {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+
+    width: 100%;
+    padding: 16px 20px;
+    margin: 16px 0;
+
+    background: #fffaf5;
+    border: 1px solid #d9a080;
+    border-radius: 16px;
+
+    box-sizing: border-box;
+}
+
+/* 길찾기 제목 */
+.tour-route-title {
+    font-size: 17px;
+    font-weight: 700;
+    color: #542b1d;
+    white-space: nowrap;
+
+    padding-right: 18px;
+    border-right: 1px solid #e4c7b3;
+}
+
+/* 출발지, 도착지 */
+.tour-route-field {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+.tour-route-label {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6a3928;
+    white-space: nowrap;
+}
+
+/* 현재 위치 버튼 */
+.tour-route-location {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+
+    border: 1px solid #dcc2af;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #44291e;
+
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* 도착지 */
+.tour-route-destination {
+    flex: 1;
+    min-width: 0;
+    padding: 12px;
+
+    border: 1px solid #dcc2af;
+    border-radius: 12px;
+
+    background: #ffffff;
+    color: #44291e;
+
+    font-size: 14px;
+    font-weight: 600;
+
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* 방향 화살표 */
+.tour-route-arrow {
+    font-size: 22px;
+    font-weight: bold;
+    color: #a15a3d;
+}
+
+/* 지도 버튼 */
+.tour-route-buttons {
+    display: flex;
+    gap: 8px;
+}
+
+.tour-route-naver,
+.tour-route-kakao {
+    border: none;
+    border-radius: 10px;
+
+    padding: 13px 16px;
+
+    font-size: 13px;
+    font-weight: 700;
+
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.tour-route-naver {
+    background: #03c75a;
+    color: white;
+}
+
+.tour-route-kakao {
+    background: #fee500;
+    color: #292929;
+}
+
+/* 화면이 좁아질 때 */
+@media (max-width: 1100px) {
+
+    .tour-route-bar {
+        flex-wrap: wrap;
+    }
+
+    .tour-route-title {
+        width: 100%;
+        border-right: none;
+    }
+
+    .tour-route-field {
+        min-width: 180px;
+    }
+}

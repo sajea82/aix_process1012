@@ -41,6 +41,31 @@ async function loadKeywordData() {
 }
 loadKeywordData();
 
+// 전역 시즌 데이터 저장소 (static/json/season_matching.json과 연동)
+let GLOBAL_SEASON_MATCHING = {};
+
+async function loadSeasonMatchingData() {
+    try {
+        const response = await fetch('/static/json/season_matching.json');
+
+        if (!response.ok) {
+            throw new Error(`HTTP 오류: ${response.status}`);
+        }
+
+        GLOBAL_SEASON_MATCHING = await response.json();
+
+        console.log(
+            "✅ 성공: static/json/season_matching.json 데이터 로드 완료",
+            GLOBAL_SEASON_MATCHING
+        );
+
+    } catch (e) {
+        console.warn("⚠️ season_matching.json 파일을 불러오지 못했습니다.", e);
+    }
+}
+
+const seasonMatchingReady = loadSeasonMatchingData();
+
 // JSON 데이터에서 현재 관광지명과 일치하는 연관어 배열을 가져오는 함수
 function getOrGeneratePlaceKeywords(tour) {
     const cleanName = (tour.name || "").trim();
@@ -251,7 +276,6 @@ function getOrGeneratePlaceKeywords(tour) {
                 </div>
                 <!-- 관광지 길찾기 끝 -->
 
-
                 <div class="tour-analysis-grid">
                     <div class="tour-detail-bubble-wrap">
                         <div class="tour-bubble-header">
@@ -262,10 +286,12 @@ function getOrGeneratePlaceKeywords(tour) {
                                 <span><i style="background:#2D5A43;"></i>중위권</span>
                             </div>
                         </div>
+
                         <div id="popupBubbleCanvas" class="tour-bubble-canvas">
                             <svg id="popupBubbleSvg"></svg>
                             <div id="popupBubbleTooltip" class="tour-bubble-tooltip"></div>
                         </div>
+
                         <div class="tour-bubble-footer">
                             <span>💡 버블이나 우측 순위표를 가리키면 상세 맥락이 연동됩니다.</span>
                             <span>1위 = 100.0 기준</span>
@@ -273,22 +299,30 @@ function getOrGeneratePlaceKeywords(tour) {
                     </div>
 
                     <div class="tour-analysis-side">
-                        <div class="tour-focus-card">
-                            <div class="tour-focus-eyebrow">🔍 KEYWORD CONTEXT FOCUS</div>
-                            <h5 class="tour-focus-subtitle">마우스를 올린 키워드 상세 맥락</h5>
-                            <div class="tour-focus-box">
-                                <div class="tour-focus-top">
-                                    <span id="popupFocusRankBadge" class="tour-focus-badge">RANK #1</span>
-                                    <span class="tour-focus-ratio-wrap">통일 가중치: <strong id="popupFocusRatio">100.0</strong></span>
-                                </div>
-                                <div id="popupFocusKeyword" class="tour-focus-keyword">-</div>
-                                <div class="tour-focus-ctx-wrap">
-                                    <div class="tour-focus-ctx-title">🔗 함께 언급된 맥락 연결어 TOP 3</div>
-                                    <div id="popupFocusContextList" class="tour-focus-ctx-tags"></div>
-                                </div>
+
+                        <!-- 시즌별 추천 정보 -->
+                        <div id="popupSeasonContext" class="tour-focus-card">
+                            <div class="tour-focus-eyebrow">🌸 SEASON RECOMMENDATION</div>
+
+                            <h5 class="tour-focus-subtitle">시즌별 방문 추천</h5>
+
+                            <div class="season-info">
+                                <strong>추천 시즌</strong>
+                                <p id="seasonRecommend">-</p>
+                            </div>
+
+                            <div class="season-info">
+                                <strong>날씨 팁</strong>
+                                <p id="seasonWeather">-</p>
+                            </div>
+
+                            <div class="season-info">
+                                <strong>대체 추천</strong>
+                                <p id="seasonAlternative">-</p>
                             </div>
                         </div>
 
+                        <!-- 기존 연관어 순위 카드 -->
                         <div class="tour-ranking-card">
                             <div class="tour-ranking-header">
                                 <h5>📊 연관어 순위 및 맥락 목록</h5>
@@ -296,9 +330,9 @@ function getOrGeneratePlaceKeywords(tour) {
                             </div>
                             <div id="popupKeywordRankingList" class="tour-ranking-list"></div>
                         </div>
+
                     </div>
                 </div>
-            </div>
         `;
 
         popup.appendChild(closeBtn);
@@ -489,11 +523,52 @@ function getOrGeneratePlaceKeywords(tour) {
         document.body.style.overflow = "hidden";
         closeBtn.focus();
 
+        // ★ 시즌별 추천 정보 표시
+        renderSeasonMatching(tour, overlay);
+
         setTimeout(() => {
             renderPopupBubbleChart(tour);
         }, 50);
     }
+        // 시즌별 추천 정보를 팝업에 표시
+        async function renderSeasonMatching(tour, overlay) {
+            console.log("🌸 시즌 추천 함수 실행됨", tour);
+            await seasonMatchingReady;
 
+            const category = tour.category;
+
+            console.log("현재 관광지:", tour.name);
+            console.log("관광지 카테고리:", category);
+
+            const seasonData = GLOBAL_SEASON_MATCHING[category];
+
+            const seasonBox = overlay.querySelector('#popupSeasonContext');
+
+            if (!seasonBox) {
+                console.warn("시즌 정보 표시 영역을 찾을 수 없습니다.");
+                return;
+            }
+
+            if (!seasonData) {
+                console.warn("해당 카테고리의 시즌 데이터가 없습니다:", category);
+
+                seasonBox.querySelector('#seasonRecommend').textContent =
+                    '등록된 추천 시즌이 없습니다.';
+
+                seasonBox.querySelector('#seasonWeather').textContent = '-';
+                seasonBox.querySelector('#seasonAlternative').textContent = '-';
+                return;
+            }
+
+            seasonBox.querySelector('#seasonRecommend').textContent =
+                seasonData['추천시즌'] || '-';
+
+            seasonBox.querySelector('#seasonWeather').textContent =
+                seasonData['날씨팁'] || '-';
+
+            seasonBox.querySelector('#seasonAlternative').textContent =
+                seasonData['대체추천'] || '-';
+        }
     function renderPopupBubbleChart(tour) {
         const container = document.getElementById("popupBubbleCanvas");
         if (!container || !window.d3) return;

@@ -1,22 +1,24 @@
+{% extends 'base.html' %}
 {% load static %}
-{# 메인 페이지 : 한 줄 통합 헤더 + 사진 옆 AI 챗봇 + 상단 단풍잎 애니메이션 #}
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>여행메이트 - 메인</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'css/travel.css' %}">
-    <!-- 토스 스타일 애니메이션 -->
-    <link rel="stylesheet" href="{% static 'css/motion.css' %}">
-    <script>document.documentElement.classList.add('motion-on');</script>
-    <script src="https://code.jquery.com/jquery-4.0.0.min.js"></script>
-    <script src="{% static 'js/motion.js' %}"></script>
-    <link rel="stylesheet" href="{% static 'css/chat.css' %}">
 
-    <!-- ===== 메인 페이지 전용 스타일 ===== -->
+{% block title %}여행메이트 - 메인{% endblock %}
+{% block header_auth %}
+<div class="header-auth">
+    {% if request.session.session_id %}
+        <b>{{ request.session.session_nickname }}</b>님
+        <span>|</span>
+        <a href="{% url 'member:logout' %}">로그아웃</a>
+    {% else %}
+        <a href="{% url 'member:login' %}">로그인</a>
+        <span>|</span>
+        <a href="{% url 'member:join' %}">회원가입</a>
+    {% endif %}
+</div>
+{% endblock %}
+{% block head %}
+<link rel="stylesheet" href="{% static 'css/chat.css' %}">
+
+<!-- ===== 메인 페이지 전용 스타일 ===== -->
 <style>
 /* ===== 0. 기본 톤 & 폰트 세팅 ===== */
 body {
@@ -31,87 +33,6 @@ body {
     font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif;
     letter-spacing: -0.3px;
     margin: 0 !important;
-}
-
-/* ===== 상단 단일 통합 헤더 ===== */
-.site-header {
-    background-color:#f9efe5 !important;
-    position: sticky;
-    top: 0;
-    z-index: 40;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.03);
-}
-.header-container {
-    max-width: 1540px;
-    margin: 0 auto;
-    padding: 0 36px;
-    height: 75px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-
-.header-logo {
-    text-decoration: none;
-    display: flex;
-    align-items: center;
-    flex-shrink: 0;
-}
-
-.header-logo img {
-    height: 120px !important;       /* 헤더 높이에 딱 어울리는 실제 높이 설정 */
-    width: auto !important;
-    object-fit: contain;
-    transform: none !important;    /* 화면을 뚫고 나가는 과도한 scale 효과 제거 */
-}
-
-/* 2. 카테고리 메뉴 글자 크기 키우기 및 그림자(Shadow) 효과 추가 */
-.header-nav {
-    display: flex;
-    align-items: center;
-    gap: 26px;
-    list-style: none;
-    margin: 0;
-    padding: 0;
-}
-.header-nav a {
-    text-decoration: none;
-    color: #3C3028;
-    font-size: 15px; /* 글자 크기 기존보다 확대 */
-    font-weight: 700; /* 폰트 두께감 부여 */
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); /* 입체감 있는 섀도우 효과 */
-    transition: all 0.2s ease;
-    white-space: nowrap;
-}
-.header-nav a:hover {
-    color: #A85D32;
-    text-shadow: 0 2px 6px rgba(168, 93, 50, 0.25);
-}
-
-.header-auth {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    flex-shrink: 0;
-    font-size: 13.5px;
-    font-weight: 600;
-    color: #6B5B52;
-}
-.header-auth a {
-    text-decoration: none;
-    color: #6B5B52;
-    transition: color 0.2s ease;
-}
-.header-auth a:hover {
-    color: #A85D32;
-}
-.header-auth span {
-    color: #D1C5BD;
-}
-
-/* 기존 base.html의 tm-header 숨김 */
-.tm-header {
-    display: none !important;
 }
 
 /* ===== 상단 단풍잎 전용 레이어 ===== */
@@ -145,7 +66,7 @@ body {
 /* ===== 1. 상단 히어로 배너 & AI 창 (사진 옆 1:1 정렬 유지) ===== */
 .hero-wrap {
     max-width: 1540px;
-    margin: 30px auto 0;
+    margin: 30px auto 0; /* 헤더 아래 여백 30px */
     padding: 0 36px;
     display: flex;
     gap: 24px;
@@ -169,7 +90,10 @@ body {
     background-size: cover;
     background-position: center;
     opacity: 0;
-    transition: opacity 1.5s ease-in-out;
+    /* 부드러운 전환 효과와 GPU 가속 활성화 */
+    transition: opacity 1.8s ease-in-out !important;
+    will-change: opacity;
+    transform: translateZ(0); /* 브라우저가 GPU를 쓰도록 강제하여 툭툭 끊기는 현상 방지 */
     z-index: 1;
 }
 
@@ -210,11 +134,14 @@ body {
 }
 
 /* 사진 바로 옆 AI 챗봇 박스 영역 */
-.hero-wrap > #chat-box, 
+.hero-wrap > #chat-box,
 .hero-wrap > div:not(.hero) {
     flex: 1;
-    height: 500px;
-    background: #ffffff;
+    height: auto !important;
+    min-height: 0 !important;
+    contain: size;
+    margin: 0 !important;
+    background: #FFFFFF;
     border-radius: 28px;
     box-shadow: 0 12px 36px rgba(0, 0, 0, 0.04);
     overflow: hidden;
@@ -325,7 +252,7 @@ body {
     background: #1A1512;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.3s ease;
-    flex: 0 0 290px;
+    flex: 0 0 274px;
 }
 .region-card:hover {
     transform: translateY(-6px);
@@ -472,9 +399,6 @@ body {
     margin-top: 2px;
 }
 
-@media (max-width: 1200px) {
-    .header-nav { display: none; }
-}
 @media (max-width: 1024px) {
     .hero-wrap { flex-direction: column; }
     .hero, .hero-wrap > #chat-box, .hero-wrap > div:not(.hero) { width: 100%; flex: none; height: 450px; }
@@ -483,52 +407,16 @@ body {
     .tips-cards { flex-direction: column; } 
     .tips-box { padding: 36px 20px; }
     #region::before { width: 220px; font-size: 10px; }
-    .header-container { padding: 0 16px; }
 }
 </style>
-</head>
-<body>
+{% endblock %}
 
-<!-- ===== 상단 단일 통합 헤더 ===== -->
-<header class="site-header">
-    <div class="header-container">
-        <!-- 1. 로고 영역 -->
-        <h1 style="margin: 0;">
-            <a href="{% url 'index' %}" class="header-logo">
-                <img src="{% static 'images/txt/logo.png' %}" alt="TravelMate">
-            </a>
-        </h1>
-
-        <!-- 중앙 카테고리 메뉴 -->
-        <nav>
-            <ul class="header-nav">
-                <li><a href="{% url 'tour:tlist' %}">인기여행지 TOP10</a></li>
-                <li><a href="{% url 'resv' %}">숙박·교통 바로가기</a></li>
-                <li><a href="{% url 'tour:graph_v1' %}">통계자료</a></li>
-                <li><a href="{% url 'qna:index' %}">Q&A</a></li>
-            </ul>
-        </nav>
-
-        <!-- 우측 끝 로그인 및 회원가입 -->
-        <div class="header-auth">
-            {% if request.session.session_id %}
-                <b>{{ request.session.session_nickname }}</b>님
-                <span>|</span>
-                <a href="{% url 'member:logout' %}">로그아웃</a>
-            {% else %}
-                <a href="{% url 'member:login' %}">로그인</a>
-                <span>|</span>
-                <a href="{% url 'member:join' %}">회원가입</a>
-            {% endif %}
-        </div>
-    </div>
-</header>
+{% block content %}
 
 <!-- 상단 단풍잎 애니메이션 전용 레이어 -->
 <div id="header-leaf-layer"></div>
 
 <!-- ===== 페이지마다 바뀌는 내용 ===== -->
-<main>
 <!-- ===== 6단계: 메인 상단 사진 + AI 챗봇 나란히 배치 ===== -->
 <div class="hero-wrap">
     <section class="hero">
@@ -633,16 +521,12 @@ body {
         </div>
     </div>
 </section>
-</main>
+<a href="/admin/" style="position:fixed; right:0; bottom:0; width:30px; height:30px; opacity:0; z-index:9999;"></a>
+{% endblock %}
 
-<!-- ===== 푸터 ===== -->
-<footer class="tm-footer">
-    © 2026 여행메이트
-</footer>
-
-<!-- ===== 메인 페이지 전용 스크립트 ===== -->
+{% block script %}
 <script>
-$(function(){
+$(function(){python manage.py migrate
     /* 상단 사진 자동 넘김 */
     let idx = 0;
     const slides = $('.hero-slide');
@@ -725,8 +609,7 @@ $(function(){
                 $(this).remove();
             }
         });
-    }, 1800);
+    }, 500);
 });
 </script>
-</body>
-</html>
+{% endblock %}

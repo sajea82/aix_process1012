@@ -5,6 +5,7 @@
 
 {% block head %}
     <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a4fa8139f98804626771565dbb1d671d&amp;libraries=services"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     <style>
@@ -564,7 +565,7 @@
       originRegionIdx = parseInt(document.getElementById("originRegionSelect").value, 10);
       originSpotIdx = 0;
       populateSpotSelect("originSpotSelect", originRegionIdx, originSpotIdx);
-      calculatePlanner();
+      calculatePlanner();ㄴ
     }
 
     function onDestRegionChange() {
@@ -591,17 +592,47 @@
     }
 
     function useCurrentGeolocation() {
-      if (!navigator.geolocation) return;
+      if (!navigator.geolocation) {
+        alert("현재 위치를 지원하지 않는 브라우저입니다.");
+        return;
+      }
+      if (!window.kakao?.maps?.services?.Geocoder) {
+        alert("카카오 주소 변환 기능을 불러오지 못했습니다.");
+        return;
+      }
       navigator.geolocation.getCurrentPosition((pos) => {
-          customGPSOrigin = { name: "내 현재 위치", lat: pos.coords.latitude, lng: pos.coords.longitude };
-          document.getElementById("customOriginInput").value = "현재 내 위치 (GPS 적용)";
+          const lat = pos.coords.latitude;
+          const lng = pos.coords.longitude;
+          const input = document.getElementById("customOriginInput");
+          const gpsOrigin = { name: "내 현재 위치", lat, lng };
+          customGPSOrigin = gpsOrigin;
+          input.value = gpsOrigin.name;
           calculatePlanner();
-      });
+
+          // GPS 좌표를 실제 주소로 변환
+          const geocoder = new kakao.maps.services.Geocoder();
+          geocoder.coord2Address(lng, lat, (result, status) => {
+            if (customGPSOrigin !== gpsOrigin || input.value !== gpsOrigin.name) return;
+            if (status === kakao.maps.services.Status.OK && result.length > 0) {
+              const address = result[0].road_address?.address_name ||
+                              result[0].address?.address_name;
+              if (address) {
+                gpsOrigin.name = address;
+                input.value = address;
+                calculatePlanner();
+                return;
+              }
+            }
+            alert("주소를 찾지 못해 GPS 위치로 적용했습니다.");
+          });
+      }, () => {
+          alert("현재 위치를 가져오지 못했습니다. 위치 권한을 확인해주세요.");
+      }, { enableHighAccuracy: true, timeout: 10000 });
     }
 
     function getOriginNode() {
       const customTxt = document.getElementById("customOriginInput").value.trim();
-      if (customGPSOrigin && customTxt.includes("GPS")) return customGPSOrigin;
+      if (customGPSOrigin && customTxt === customGPSOrigin.name) return customGPSOrigin;
       const reg = REGIONS_DATA[originRegionIdx];
       const spotIdx = parseInt(document.getElementById("originSpotSelect").value, 10);
       if (spotIdx >= 0 && reg.spots[spotIdx]) {

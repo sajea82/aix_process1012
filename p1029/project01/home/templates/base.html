@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}여행메이트{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'css/travel.css' %}">
+    <!-- 토스 스타일 애니메이션 -->
+    <link rel="stylesheet" href="{% static 'css/motion.css' %}">
+    <script>document.documentElement.classList.add('motion-on');</script>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+    <script src="{% static 'js/motion.js' %}"></script>
+    {% block head %}{% endblock %}
+
+    <!-- 공통 디자인 고정 : 각 페이지 CSS가 덮어써도 원래대로 되돌림 -->
+    <style>
+        body {
+            display: block !important;
+            background:
+                radial-gradient(circle at 15% 20%, rgba(243, 168, 63, 0.35) 0%, transparent 45%),
+                radial-gradient(circle at 85% 75%, rgba(251, 207, 185, 0.25) 0%, transparent 50%),
+                radial-gradient(circle at 50% 50%, rgba(245, 230, 215, 0.8) 0%, transparent 70%),
+                linear-gradient(135deg, #FAF7F2 0%, #F3EDE4 100%) !important;
+            background-attachment: fixed !important;
+            color: #262626 !important;
+            font-family: -apple-system, BlinkMacSystemFont, "Pretendard", "Noto Sans KR", sans-serif !important;
+        }
+
+            /* 메인 페이지와 같은 로고 */
+        .tm-logo .header-logo {
+            font-family: 'Playfair Display', serif !important;
+            font-size: 26px !important;
+            font-weight: 700 !important;
+            font-style: italic !important;
+            color: #A85D32 !important;
+            text-decoration: none !important;
+            display: flex !important;
+            align-items: center;
+            gap: 8px;
+            text-shadow: 0 2px 4px rgba(168, 93, 50, 0.15);
+            /* 메인과 같은 왼쪽 여백 */
+            margin-left: max(36px, calc((100vw - 1540px) / 2 + 36px)) !important;
+        
+        }
+    </style>
+</head>
+<body>
+
+<!-- ===== 헤더 (모든 페이지 공통) ===== -->
+<div class="tm-header">
+                <h1 class="tm-logo">
+            <a href="{% url 'index' %}" class="header-logo">
+                𝓣𝓻𝓪𝓿𝓮𝓵𝓜𝓪𝓽𝓮
+            </a>
+        </h1>
+    <div class="tm-bar">
+        <!-- 카테고리 메뉴 (가운데) -->
+        <nav class="tm-nav">
+            <ul>
+                <li><a href="{% static 'TravelMate_Standalone/tour.html' %}">연령대별 인기관광지 TOP10</a></li>
+                <li><a href="#">숙박·교통 바로가기</a></li>
+                <li><a href="{% url 'tour:graph_v1' %}">이전 자료</a></li>
+                <li><a href="{% url 'customer:clist' %}">게시판</a></li>
+                <li><a href="{% url 'qna:index' %}">Q&A</a></li>
+                
+            </ul>
+        </nav>
+
+        <!-- 로그인/회원가입 (오른쪽) -->
+               <div class="tm-member">
+            {% if request.session.session_id %}
+                <b>{{ request.session.session_nickname }}</b>님
+                <span>|</span>
+                <a href="{% url 'member:logout' %}">로그아웃</a>
+            {% else %}
+                <a href="{% url 'member:login' %}">로그인</a>
+                <span>|</span>
+                <a href="{% url 'member:join' %}">회원가입</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- ===== 페이지마다 바뀌는 내용 ===== -->
+<main>
+    {% block content %}{% endblock %}
+</main>
+
+<!-- ===== 푸터 ===== -->
+<footer class="tm-footer">
+    © 2026 여행메이트
+</footer>
+
+{% block script %}{% endblock %}
+</body>
+</html>

@@ -71,7 +71,31 @@
         .tm-nav a:hover {
             color: #A85D32 !important;
         }
+        .header-auth {
+            display: flex;
+            justify-self: end;
+            align-items: center;
+            gap: 10px;
+            white-space: nowrap;
+            font-size: 13.5px;
+            font-weight: 600;
+            color: #6B5B52;
+        }
+
+        .header-auth a {
+            text-decoration: none;
+            color: inherit;
+        }
+
+        .header-auth a:hover {
+            color: #A85D32;
+        }
+
+        .header-auth span {
+            color: #D1C5BD;
+        }
     </style>
+    
 </head>
 <body>
 
@@ -90,10 +114,13 @@
                 <li><a href="{% url 'tour:resv' %}">숙박·교통 바로가기</a></li>
                 <li><a href="{% url 'tour:graph_v1' %}">통계 자료</a></li>
                 <li><a href="{% url 'qna:index' %}">Q&A</a></li>
-                
+
             </ul>
         </nav>
 
+    </div>
+        <div class="header-auth">
+        {% block header_auth %}{% endblock %}
     </div>
 </div>
 

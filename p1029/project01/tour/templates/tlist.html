@@ -4,7 +4,7 @@
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/tm-top10.css' %}">
 <!--카카오맵 api 인증키 입력위치-->
-<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a4fa8139f98804626771565dbb1d671d"></script>
+<script src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=a4fa8139f98804626771565dbb1d671d&amp;libraries=services"></script>
 {% endblock %}
 {% block content %}
 <div class="tm-top10" data-api="{% url 'tour:top10_data' %}" data-region="{{ selected_code|default:'seoul' }}">

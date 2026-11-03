@@ -201,6 +201,57 @@ function getOrGeneratePlaceKeywords(tour) {
                     </div>
                 </div>
 
+
+                <!-- 팝업창 관광지 길찾기 시작 -->
+                <div class="tour-route-bar">
+
+                    <div class="tour-route-title">
+                        📍 ${tour.name} 길찾기
+                    </div>
+
+                    <div class="tour-route-field">
+                        <span class="tour-route-label">출발지</span>
+
+                        <button
+                            type="button"
+                            class="tour-route-location"
+                            id="tourRouteLocation">
+                            눌러서 현위치 확인하기
+                        </button>
+                    </div>
+
+                    <span class="tour-route-arrow">→</span>
+
+                    <div class="tour-route-field">
+                        <span class="tour-route-label">도착지</span>
+
+                        <div class="tour-route-destination">
+                            ${tour.name}    
+                        </div>
+                    </div>
+
+                    <div class="tour-route-buttons">
+
+                        <button
+                            type="button"
+                            class="tour-route-naver"
+                            id="tourRouteNaver">
+                            N 네이버 길찾기
+                        </button>
+
+                        <button
+                            type="button"
+                            class="tour-route-kakao"
+                            id="tourRouteKakao">
+                            카카오 길찾기
+                        </button>
+
+                    </div>
+
+                </div>
+                <!-- 관광지 길찾기 끝 -->
+
+
                 <div class="tour-analysis-grid">
                     <div class="tour-detail-bubble-wrap">
                         <div class="tour-bubble-header">
@@ -259,6 +310,181 @@ function getOrGeneratePlaceKeywords(tour) {
         });
 
         document.body.appendChild(overlay);
+        
+        // ==========================================
+        // 관광지 팝업 길찾기 기능
+        // ==========================================
+
+        // 길찾기 버튼 가져오기
+        const locationButton = overlay.querySelector("#tourRouteLocation");
+        const naverButton = overlay.querySelector("#tourRouteNaver");
+        const kakaoButton = overlay.querySelector("#tourRouteKakao");
+
+        // 출발지
+        let origin = null;
+
+        // 도착지 : 현재 선택한 관광지
+        const dest = {
+            name: tour.name,
+            lat: Number(tour.lat),
+            lng: Number(tour.lng)
+        };
+
+        // ==========================================
+        // 현위치 클릭 → 현재 위치 주소 표시
+        // ==========================================
+
+        function useCurrentGeolocation() {
+
+            if (!navigator.geolocation) {
+                alert("현재 위치를 지원하지 않는 브라우저입니다.");
+                return;
+            }
+
+            locationButton.textContent = "현재 위치 찾는 중...";
+
+            navigator.geolocation.getCurrentPosition(
+
+                (pos) => {
+
+                    const lat = pos.coords.latitude;
+                    const lng = pos.coords.longitude;
+
+                    // 현재 위치 좌표 저장
+                    origin = {
+                        name: "내 현재 위치",
+                        lat: lat,
+                        lng: lng
+                    };
+
+                    // 카카오 주소 변환 서비스 확인
+                    if (!window.kakao?.maps?.services?.Geocoder) {
+                        locationButton.textContent = "현위치 확인";
+                        alert("카카오 주소 변환 기능을 불러오지 못했습니다.");
+                        return;
+                    }
+
+                    // 위도·경도를 주소로 변환
+                    const geocoder = new kakao.maps.services.Geocoder();
+
+                    geocoder.coord2Address(lng, lat, (result, status) => {
+
+                        if (
+                            status === kakao.maps.services.Status.OK &&
+                            result.length > 0
+                        ) {
+
+                            // 도로명 주소 우선
+                            const roadAddress =
+                                result[0].road_address?.address_name;
+
+                            // 도로명 주소가 없으면 지번 주소
+                            const jibunAddress =
+                                result[0].address?.address_name;
+
+                            const address =
+                                roadAddress ||
+                                jibunAddress;
+
+                            if (address) {
+
+                                // 길찾기에 사용할 출발지 주소
+                                origin.name = address;
+
+                                // 버튼에 실제 주소 표시
+                                locationButton.textContent = address;
+
+                                // 마우스를 올리면 전체 주소 표시
+                                locationButton.title = address;
+
+                            } else {
+                                locationButton.textContent = "주소 확인 실패";
+                            }
+
+                        } else {
+                            locationButton.textContent = "주소 확인 실패";
+                        }
+
+                    });
+
+                },
+
+                (error) => {
+
+                    locationButton.textContent = "현위치 확인";
+
+                    if (error.code === 1) {
+                        alert("브라우저에서 위치 접근을 허용해 주세요.");
+                    } else {
+                        alert("현재 위치를 가져오지 못했습니다.");
+                    }
+
+                },
+
+                {
+                    enableHighAccuracy: true,
+                    timeout: 10000,
+                    maximumAge: 0
+                }
+            );
+        }
+
+        // 현위치 버튼 클릭
+        locationButton.addEventListener(
+            "click",
+            useCurrentGeolocation
+        );
+
+
+        // ==========================================
+        // 2. 네이버 길찾기
+        // ==========================================
+
+        naverButton.addEventListener("click", () => {
+
+            if (!origin) {
+                alert("먼저 현재 위치를 확인해주세요.");
+                return;
+            }
+
+            const sNameEnc = encodeURIComponent(origin.name);
+            const eNameEnc = encodeURIComponent(dest.name);
+
+            const naverUrl =
+                `https://map.naver.com/index.nhn?slng=${origin.lng}&slat=${origin.lat}&stext=${sNameEnc}&elng=${dest.lng}&elat=${dest.lat}&etext=${eNameEnc}&menu=route&pathType=1`;
+
+            window.open(naverUrl, "_blank", "noopener,noreferrer");
+
+        });
+
+
+        // ==========================================
+        // 3. 카카오 길찾기
+        // ==========================================
+
+        kakaoButton.addEventListener("click", () => {
+
+            if (!origin) {
+                alert("먼저 현재 위치를 확인해주세요.");
+                return;
+            }
+
+            if (!Number.isFinite(dest.lat) ||
+                !Number.isFinite(dest.lng)) {
+                alert("관광지 좌표를 확인할 수 없습니다.");
+                return;
+            }
+
+            const sNameEnc = encodeURIComponent(origin.name);
+            const eNameEnc = encodeURIComponent(dest.name);
+
+            const kakaoUrl =
+                `https://map.kakao.com/link/from/${sNameEnc},${origin.lat},${origin.lng}/to/${eNameEnc},${dest.lat},${dest.lng}`;
+
+            window.open(kakaoUrl, "_blank", "noopener,noreferrer");
+
+        });
+
         activePopup = overlay;
         document.body.style.overflow = "hidden";
         closeBtn.focus();
