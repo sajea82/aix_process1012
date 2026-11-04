@@ -102,7 +102,7 @@
 <!-- ===== 헤더 (모든 페이지 공통) ===== -->
 <div class="tm-header">
     <h1 class="tm-logo">
-        <a href="{% url 'index' %}" class="header-logo">
+        <a href="{% url 'main' %}" class="header-logo">
             <img src="{% static 'images/txt/logo.png' %}" alt="TravelMate" style="height: 120px; object-fit: contain;">
         </a>
     </h1>
@@ -113,7 +113,8 @@
                 <li><a href="{% url 'tour:tlist' %}">인기여행지 TOP10</a></li>
                 <li><a href="{% url 'tour:resv' %}">숙박·교통 바로가기</a></li>
                 <li><a href="{% url 'tour:graph_v1' %}">통계 자료</a></li>
-                <li><a href="{% url 'qna:index' %}">Q&A</a></li>
+                <li><a href="{% url 'custom:t_custom' %}">맞춤 여행</a></li>
+                <li><a href="{% url 'qna:index' %}">여행커뮤니티</a></li>
 
             </ul>
         </nav>

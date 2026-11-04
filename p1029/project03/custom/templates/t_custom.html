@@ -1,0 +1,167 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+
+<!-- 기존 홈페이지와 톤을 맞춘 전체 배경 (부드러운 크림/아이보리 톤) -->
+<div class="min-h-screen flex flex-col bg-[#FDFBF7] text-[#4A3B32] w-full">
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 flex-1 w-full">
+
+    <!-- 상단 큐레이션 타이틀 및 조건 설정 (기존 홈페이지의 베이지/브라운 톤으로 변경) -->
+    <section class="rounded-3xl bg-[#F4EBE1] border border-[#E6D5C3] text-[#4A3B32] p-6 sm:p-8 shadow-sm">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        
+        <div class="lg:col-span-6 space-y-3">
+          <span class="px-3 py-1 rounded-full bg-[#D4A373] text-white text-xs font-extrabold shadow-sm">맞춤 여행 스튜디오</span>
+          <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight">
+            세대별 맞춤 <span class="text-[#BC6C25]">테마 여행 & 도장깨기</span>
+          </h1>
+          <p class="text-xs sm:text-sm text-[#7A6B5D]">
+            도장 깨기, 혼자만의 힐링, 부모님 동반 코스까지 목적에 맞는 최적의 10월 검증 데이터를 확인하세요.
+          </p>
+        </div>
+
+        <!-- 조건 설정 박스 (화이트 카드 & 브라운 포인트) -->
+        <div class="lg:col-span-6 bg-white text-[#4A3B32] rounded-2xl p-5 shadow-sm border border-[#E6D5C3] space-y-4">
+          
+          <!-- 연령대 선택 -->
+          <div>
+            <label class="block text-[10px] font-bold text-[#7A6B5D] mb-1">연령대 선택</label>
+            <div class="grid grid-cols-5 gap-1">
+              {% for a in age_list %}
+              <a href="?region={{ selected_region }}&age={{ a }}&tab={{ active_tab }}" class="py-1 rounded text-center text-xs font-bold transition {% if selected_age == a %}bg-[#BC6C25] text-white shadow-sm{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3]{% endif %}">{{ a }}대</a>
+              {% endfor %}
+            </div>
+          </div>
+
+          <!-- DB 기반 전 지역 한글 동적 버튼 생성 -->
+          <div>
+            <label class="block text-[10px] font-bold text-[#7A6B5D] mb-1">지역 선택 (DB 연동)</label>
+            <div class="flex flex-wrap gap-1.5">
+              {% for reg in all_regions %}
+              <a href="?region={{ reg.code }}&age={{ selected_age }}&tab={{ active_tab }}" class="px-3 py-1 rounded text-[11px] font-bold transition {% if selected_region == reg.code %}bg-[#4A3B32] text-white{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3]{% endif %}">
+                {{ reg.name }}
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- 테마별 탭 메뉴 (TravelMate 브라운 포인트 컬러 적용) -->
+    <div class="flex border-b border-[#E6D5C3] gap-6">
+      <a href="?region={{ selected_region }}&age={{ selected_age }}&tab=stamp" class="pb-3 text-sm font-extrabold border-b-2 transition {% if active_tab == 'stamp' %}border-[#BC6C25] text-[#BC6C25]{% else %}border-transparent text-[#7A6B5D] hover:text-[#4A3B32]{% endif %}">
+        🏆 1. 도장 깨기 리스트 (<span id="visit-counter">0</span>개 완료)
+      </a>
+      <a href="?region={{ selected_region }}&age={{ selected_age }}&tab=healing" class="pb-3 text-sm font-extrabold border-b-2 transition {% if active_tab == 'healing' %}border-[#BC6C25] text-[#BC6C25]{% else %}border-transparent text-[#7A6B5D] hover:text-[#4A3B32]{% endif %}">
+        🧘 2. 혼자만의 힐링 여행
+      </a>
+      <a href="?region={{ selected_region }}&age={{ selected_age }}&tab=parents" class="pb-3 text-sm font-extrabold border-b-2 transition {% if active_tab == 'parents' %}border-[#BC6C25] text-[#BC6C25]{% else %}border-transparent text-[#7A6B5D] hover:text-[#4A3B32]{% endif %}">
+        🌿 3. 부모님과 동반 여행 (무장애 코스)
+      </a>
+    </div>
+
+    <!-- 랜드마크 카드 그리드 -->
+    <section class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
+        {% for tour in tour_list %}
+        <div class="bg-white rounded-2xl border border-[#E6D5C3] shadow-sm overflow-hidden flex flex-col justify-between transition hover:shadow-md">
+          <div>
+            <div class="h-36 bg-[#F4EBE1] relative">
+              <img src="{% static tour.img %}" alt="{{ tour.name }}" class="w-full h-full object-cover">
+              <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#BC6C25] text-white text-xs font-bold shadow-sm">
+                Top {{ tour.rank }} · 비율 {{ tour.ratio }}
+              </span>
+            </div>
+            <div class="p-4 space-y-2">
+              <h4 class="font-extrabold text-sm text-[#4A3B32]">{{ tour.name }}</h4>
+              <p class="text-[11px] text-[#7A6B5D]">📍 {{ tour.sigungu }} | 분류: {{ tour.category }}</p>
+              
+              <!-- 테마별 맞춤 안내 뱃지 -->
+              {% if active_tab == 'healing' %}
+              <div class="p-2 rounded-xl bg-[#F4EBE1] border border-[#E6D5C3] text-[10px] text-[#7A6B5D]">
+                🧘 혼자 조용히 사색하기 좋은 힐링 산책 명소
+              </div>
+              {% elif active_tab == 'parents' %}
+              <div class="p-2 rounded-xl bg-[#F4EBE1] border border-[#E6D5C3] text-[10px] text-[#7A6B5D]">
+                🌿 경사로가 완만하고 쉼터가 여유로운 부모님 안심 코스
+              </div>
+              {% else %}
+              <div class="p-2 rounded-xl bg-[#F4EBE1] border border-[#E6D5C3] text-[10px] text-[#7A6B5D]">
+                🏆 도장 깨기 도전 과제 명소
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          
+          <!-- 방문 체크 버튼 (TravelMate 톤에 맞춘 브라운 버튼) -->
+          <div class="p-4 pt-0">
+            <button type="button" class="visit-btn w-full py-2 rounded-xl bg-[#BC6C25] hover:bg-[#A35D20] text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5">
+              <span>📍 도장 깨기 체크</span>
+            </button>
+          </div>
+        </div>
+        {% empty %}
+        <div class="col-span-full py-16 text-center text-[#7A6B5D] text-sm">
+          선택하신 조건에 해당하는 데이터가 없습니다.
+        </div>
+        {% endfor %}
+      </div>
+    </section>
+
+  </main>
+</div>
+
+<!-- 도장 깨기 카운팅 자바스크립트 -->
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    const counterEl = document.getElementById('visit-counter');
+    const buttons = document.querySelectorAll('.visit-btn');
+
+    // 1. 페이지가 로드될 때 로컬 스토리지에 저장된 상태를 읽어와서 버튼 상태 복원
+    function loadVisitedState() {
+      let visitedCount = 0;
+      buttons.forEach((btn, index) => {
+        // 각 카드마다 고유한 키 생성 (장소 이름 활용)
+        const tourName = btn.closest('.bg-white').querySelector('h4').innerText.trim();
+        const storageKey = 'travelmate_visited_' + tourName;
+        
+        const isVisited = localStorage.getItem(storageKey) === 'true';
+        
+        if (isVisited) {
+          visitedCount++;
+          btn.className = "visit-btn w-full py-2 rounded-xl bg-[#606C38] hover:bg-[#4E582D] text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5";
+          btn.innerHTML = "✓ 방문 완료 (취소)";
+        } else {
+          btn.className = "visit-btn w-full py-2 rounded-xl bg-[#BC6C25] hover:bg-[#A35D20] text-white text-xs font-bold shadow-sm transition flex items-center justify-center gap-1.5";
+          btn.innerHTML = "📍 도장 깨기 체크";
+        }
+      });
+      if (counterEl) counterEl.innerText = visitedCount;
+    }
+
+    // 초기 상태 불러오기 실행
+    loadVisitedState();
+
+    // 2. 버튼 클릭 시 상태를 변경하고 로컬 스토리지에 저장
+    buttons.forEach((btn) => {
+      btn.addEventListener('click', function() {
+        const tourName = this.closest('.bg-white').querySelector('h4').innerText.trim();
+        const storageKey = 'travelmate_visited_' + tourName;
+        
+        let isVisited = localStorage.getItem(storageKey) === 'true';
+        isVisited = !isVisited; // 상태 반전
+        
+        // 로컬 스토리지에 저장
+        localStorage.setItem(storageKey, isVisited);
+
+        // UI 즉시 업데이트 및 전체 카운트 재계산
+        loadVisitedState();
+      });
+    });
+  });
+</script>
+{% endblock %}

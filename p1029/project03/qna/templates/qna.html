@@ -1,166 +1,636 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Q&A 게시판 | 여행메이트{% endblock %}
+{% block title %}여행 커뮤니티 | Q&A 게시판{% endblock %}
 
 {% block head %}
 <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600;700&family=Pretendard:wght@400;600;700;800&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="{% static 'css/tm-qna.css' %}?v=3">
+<link rel="stylesheet" href="{% static 'css/tm-qna.css' %}?v=5">
+
+<style>
+    /* =====================================
+       커뮤니티 게시글 수정/삭제
+    ===================================== */
+
+    .community-owner-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin: 20px 0;
+    }
+
+    .community-owner-actions form {
+        margin: 0;
+    }
+
+    .community-owner-actions button {
+        padding: 10px 22px;
+        border: 1px solid #9b806c;
+        background: transparent;
+        color: #593c2b;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    .community-owner-actions .community-delete-button {
+        border-color: #a66a62;
+        color: #a0453b;
+    }
+
+    .community-edit-box {
+        margin-top: 20px;
+        padding: 24px;
+        background: #faf5ef;
+    }
+
+    .community-edit-box h3 {
+        margin: 0 0 20px;
+        color: #593c2b;
+    }
+
+    .community-edit-box label {
+        display: block;
+        margin-bottom: 18px;
+        color: #593c2b;
+        font-weight: 600;
+    }
+
+    .community-edit-box input,
+    .community-edit-box textarea {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 8px;
+        padding: 12px;
+        border: 1px solid #d7c8ba;
+        background: #fff;
+        font: inherit;
+    }
+
+    .community-edit-box textarea {
+        resize: vertical;
+    }
+
+    .community-edit-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .community-edit-buttons button {
+        padding: 11px 24px;
+        cursor: pointer;
+    }
+
+    /* hidden 속성이 CSS에 의해 무시되지 않도록 */
+    #community-list[hidden],
+    #community-write[hidden],
+    #community-detail[hidden],
+    #community-edit[hidden],
+    #qa-write-form[hidden] {
+        display: none !important;
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
 
-<!-- Q&A 상단 소개 (resv.html과 100% 동일한 구조) -->
+<!-- =====================================
+     상단 소개
+===================================== -->
 <section class="qa-hero">
     <div class="qa-hero-inner">
-        <span class="qa-eyebrow">TRAVELMATE · HELP CENTER</span>
+
+        <span class="qa-eyebrow">
+            TRAVELMATE · COMMUNITY
+        </span>
+
         <h1>
-            더 많은 여행 이야기, <em>여행메이트</em> Q&A 게시판
+            더 많은 여행 이야기,
+            <em>여행메이트</em> 여행커뮤니티
         </h1>
-        <p>자주 묻는 질문을 찾아보고 새로운 질문을 남겨보세요.</p>
+
+        <p>
+            여행의 경험을 나누고 궁금한 점을 해결하는 공간입니다.
+        </p>
+
     </div>
-</section>                      
+</section>
 
 
-<!-- Q&A 게시판 전체 -->
 <section class="qa-wrap">
 
-    <!--<div class="qa-heading">
-        <div>
-            <span class="qa-kicker">HELP & SUPPORT</span>
-            <h2>Q&A 게시판</h2>
-            <p>자주 묻는 질문을 찾아보거나 새로운 질문을 남겨보세요.</p>
-        </div>
-    </div>-->
-
-
-    <!-- FAQ / 1:1 질문 탭 -->
+    <!-- =====================================
+         커뮤니티 / 1:1 문의 탭
+    ===================================== -->
     <div class="qa-tabs">
 
         <button type="button"
                 class="qa-tab active"
                 data-panel="faq-panel">
-            자주 묻는 질문
-            <small>FAQ</small>
+            커뮤니티
+            <small>COMMUNITY</small>
         </button>
 
         <button type="button"
                 class="qa-tab"
                 data-panel="question-panel">
-            1:1 질문 게시판
+            1:1 문의
             <small>Q&A</small>
         </button>
 
     </div>
 
 
-    <!-- FAQ 영역 -->
+    <!-- =====================================
+         커뮤니티
+    ===================================== -->
     <div id="faq-panel" class="qa-panel active">
 
-        <div class="qa-toolbar">
+        <div class="qa-community">
 
-            <!-- 카테고리 -->
-            <div class="qa-filters">
+            <h2>여행 커뮤니티</h2>
 
-                <button type="button"
-                        class="qa-filter active"
-                        data-category="전체">
-                    전체
-                </button>
-
-                <button type="button"
-                        class="qa-filter"
-                        data-category="데이터 기준">
-                    데이터 기준
-                </button>
-
-                <button type="button"
-                        class="qa-filter"
-                        data-category="대시보드 기능">
-                    대시보드 기능
-                </button>
-
-                <button type="button"
-                        class="qa-filter"
-                        data-category="지역·연령 분석">
-                    지역·연령 분석
-                </button>
-
-            </div>
-
-            <!-- 검색창 -->
-            <input
-                id="qa-search"
-                type="search"
-                placeholder="궁금한 내용을 검색해 보세요"
-                aria-label="FAQ 검색"
-            >
-
-        </div>
+            <p>
+                여행의 즐거움과 다양한 경험을 함께 나누는 공간입니다.
+            </p>
 
 
-        <!-- FAQ 질문 목록 -->
-        <div class="qa-faq-list">
+            <!-- =====================================
+                 1. 커뮤니티 게시글 목록
+            ===================================== -->
+            <div id="community-list">
 
-            {% for category, question, answer in faq %}
+                <div class="community-toolbar">
 
-            <details class="qa-faq-item"
-                     data-category="{{ category }}">
+                    <!-- 검색 -->
+                    <form method="get"
+                          action="{% url 'qna:index' %}"
+                          class="community-search">
 
-                <summary>
+                        <input type="text"
+                               name="q"
+                               value="{{ keyword }}"
+                               placeholder="제목 또는 내용 검색">
 
-                    <span class="qa-q">Q</span>
+                        <button type="submit">
+                            검색
+                        </button>
 
-                    <span class="qa-question">
-                        <small>{{ category }}</small>
-                        {{ question }}
-                    </span>
+                    </form>
 
-                    <span class="qa-arrow">⌄</span>
 
-                </summary>
+                    <!-- 로그인 회원만 글쓰기 -->
+                    {% if login_member %}
 
-                <div class="qa-answer">
+                    <button type="button"
+                            id="community-write-toggle"
+                            class="qa-primary">
+                        + 글쓰기
+                    </button>
 
-                    <b>A</b>
+                    {% else %}
 
-                    <p>{{ answer }}</p>
+                    <a href="{% url 'member:login' %}"
+                       class="qa-primary"
+                       style="display:inline-flex;
+                              align-items:center;
+                              justify-content:center;
+                              height:44px;
+                              text-decoration:none;">
+                        로그인 후 글쓰기
+                    </a>
+
+                    {% endif %}
 
                 </div>
 
-            </details>
 
-            {% endfor %}
+                <!-- 게시글 목록 -->
+                <div class="community-board">
 
-            <p class="qa-empty" hidden>
-                검색 결과가 없습니다.
-            </p>
+                    <div class="community-board-head">
+                        <span>제목</span>
+                        <span>작성자</span>
+                        <span>작성일</span>
+                        <span>댓글</span>
+                    </div>
+
+
+                    {% for post in page_obj %}
+
+                    <a href="{% url 'qna:community_detail' post.id %}"
+                       class="community-board-row">
+
+                        <span class="community-post-title">
+                            {{ post.title }}
+                        </span>
+
+                        <span>
+                            {{ post.author }}
+                        </span>
+
+                        <span>
+                            {{ post.created_at|date:'Y.m.d' }}
+                        </span>
+
+                        <span class="community-comment-count">
+                            {{ post.comment_count }}
+                        </span>
+
+                    </a>
+
+                    {% empty %}
+
+                    <div class="community-empty">
+                        아직 등록된 게시글이 없습니다.
+                    </div>
+
+                    {% endfor %}
+
+                </div>
+
+
+                <!-- 페이지 이동 -->
+                {% if page_obj.paginator.num_pages > 1 %}
+
+                <div class="community-pagination">
+
+                    {% if page_obj.has_previous %}
+
+                    <a class="community-page-btn"
+                       href="?page={{ page_obj.previous_page_number }}&q={{ keyword|urlencode }}">
+                        이전
+                    </a>
+
+                    {% endif %}
+
+
+                    {% for num in page_obj.paginator.page_range %}
+
+                        {% if page_obj.number == num %}
+
+                        <span class="community-page-btn active">
+                            {{ num }}
+                        </span>
+
+                        {% else %}
+
+                        <a class="community-page-btn"
+                           href="?page={{ num }}&q={{ keyword|urlencode }}">
+                            {{ num }}
+                        </a>
+
+                        {% endif %}
+
+                    {% endfor %}
+
+
+                    {% if page_obj.has_next %}
+
+                    <a class="community-page-btn"
+                       href="?page={{ page_obj.next_page_number }}&q={{ keyword|urlencode }}">
+                        다음
+                    </a>
+
+                    {% endif %}
+
+                </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =====================================
+                 2. 커뮤니티 글쓰기
+            ===================================== -->
+            <div id="community-write" hidden>
+
+                <h3>여행 이야기 작성</h3>
+
+                {% if login_member %}
+
+                <form method="post"
+                      action="{% url 'qna:community_write' %}"
+                      class="community-form">
+
+                    {% csrf_token %}
+
+                    <label>
+                        제목
+
+                        <input type="text"
+                               name="title"
+                               maxlength="200"
+                               required>
+                    </label>
+
+                    <!-- 작성자 정보는 로그인 세션에서 자동 저장 -->
+
+                    <label>
+                        내용
+
+                        <textarea name="content"
+                                  rows="8"
+                                  required></textarea>
+                    </label>
+
+
+                    <div class="community-form-buttons">
+
+                        <button type="button"
+                                class="community-back">
+                            취소
+                        </button>
+
+                        <button type="submit"
+                                class="qa-primary">
+                            게시글 등록
+                        </button>
+
+                    </div>
+
+                </form>
+
+                {% else %}
+
+                <p>
+                    로그인 후 게시글을 작성할 수 있습니다.
+                </p>
+
+                <button type="button"
+                        class="community-back">
+                    목록으로 돌아가기
+                </button>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =====================================
+                 3. 게시글 상세 및 댓글
+            ===================================== -->
+            <div id="community-detail" hidden>
+
+                {% if selected_post %}
+
+                <div class="qa-detail">
+
+                    <div class="qa-detail-title">
+
+                        <h2>
+                            {{ selected_post.title }}
+                        </h2>
+
+                        <p>
+                            {{ selected_post.author }}
+                            ·
+                            {{ selected_post.created_at|date:'Y.m.d' }}
+                        </p>
+
+                    </div>
+
+
+                    <div class="qa-detail-content">
+                        {{ selected_post.content|linebreaksbr }}
+                    </div>
+
+                </div>
+
+
+                <!-- =====================================
+                     작성자 본인만 수정/삭제
+                ===================================== -->
+                {% if is_owner %}
+
+                <div class="community-owner-actions">
+
+                    <button type="button"
+                            id="community-edit-toggle">
+                        수정
+                    </button>
+
+
+                    <form method="post"
+                          action="{% url 'qna:community_delete' selected_post.id %}"
+                          onsubmit="return confirm('정말 이 게시글을 삭제하시겠습니까? 삭제된 게시글과 댓글은 복구할 수 없습니다.');">
+
+                        {% csrf_token %}
+
+                        <button type="submit"
+                                class="community-delete-button">
+                            삭제
+                        </button>
+
+                    </form>
+
+                </div>
+
+
+                <!-- 게시글 수정 폼 -->
+                <div id="community-edit"
+                     class="community-edit-box"
+                     hidden>
+
+                    <h3>게시글 수정</h3>
+
+                    <form method="post"
+                          action="{% url 'qna:community_edit' selected_post.id %}">
+
+                        {% csrf_token %}
+
+                        <label>
+                            제목
+
+                            <input type="text"
+                                   name="title"
+                                   value="{{ selected_post.title }}"
+                                   maxlength="200"
+                                   required>
+                        </label>
+
+                        <label>
+                            내용
+
+                            <textarea name="content"
+                                      rows="8"
+                                      required>{{ selected_post.content }}</textarea>
+                        </label>
+
+
+                        <div class="community-edit-buttons">
+
+                            <button type="button"
+                                    id="community-edit-cancel">
+                                취소
+                            </button>
+
+                            <button type="submit"
+                                    class="qa-primary">
+                                수정 완료
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+                {% endif %}
+
+
+                <!-- =====================================
+                     4. 댓글 목록
+                ===================================== -->
+                <div class="community-comments">
+
+                    <h3>댓글</h3>
+
+
+                    {% for comment in comments %}
+
+                    <div class="community-comment">
+
+                        <strong>
+                            {{ comment.author }}
+                        </strong>
+
+                        <p>
+                            {{ comment.content|linebreaksbr }}
+                        </p>
+
+                        <small>
+                            {{ comment.created_at|date:'Y.m.d H:i' }}
+                        </small>
+
+                    </div>
+
+                    {% empty %}
+
+                    <p>
+                        아직 등록된 댓글이 없습니다.
+                    </p>
+
+                    {% endfor %}
+
+
+                    <!-- 댓글 작성 -->
+                    {% if login_member %}
+
+                    <form method="post"
+                          action="{% url 'qna:community_comment' selected_post.id %}">
+
+                        {% csrf_token %}
+
+                        <textarea name="content"
+                                  rows="3"
+                                  placeholder="댓글을 입력하세요."
+                                  required></textarea>
+
+                        <button type="submit"
+                                class="qa-primary">
+                            댓글 등록
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                    <p>
+                        댓글을 작성하려면 로그인이 필요합니다.
+                    </p>
+
+                    {% endif %}
+
+                </div>
+
+                {% endif %}
+
+
+                <button type="button"
+                        class="community-back qa-primary">
+                    목록으로 돌아가기
+                </button>
+
+            </div>
 
         </div>
 
     </div>
 
 
-    <!-- 1:1 질문 게시판 -->
+    <!-- =====================================
+         1:1 문의 게시판
+    ===================================== -->
     <div id="question-panel" class="qa-panel">
 
-        <div class="qa-board-top">
+        <div class="qa-community">
+
+            <h2>1:1 문의사항</h2>
 
             <p>
-                궁금한 내용을 남겨주시면
-                게시판에서 확인할 수 있어요.
+                궁금한 내용을 남겨주시면 게시판에서 확인할 수 있어요.
             </p>
 
-            <button type="button"
-                    id="qa-write-toggle"
-                    class="qa-primary">
-                + 질문 작성
-            </button>
+
+            <!-- 검색 + 질문 작성 -->
+            <div class="community-toolbar">
+
+                <form method="get"
+                      action="{% url 'qna:index' %}"
+                      class="community-search">
+
+                    <input type="hidden"
+                           name="tab"
+                           value="question">
+
+                    <input type="text"
+                           name="question_q"
+                           value="{{ question_keyword }}"
+                           placeholder="제목 또는 내용 검색">
+
+                    <button type="submit">
+                        검색
+                    </button>
+
+                </form>
+
+
+                <!-- 로그인 회원만 질문 작성 -->
+                {% if login_member %}
+
+                <button type="button"
+                        id="qa-write-toggle"
+                        class="qa-primary">
+                    + 질문 작성
+                </button>
+
+                {% else %}
+
+                <a href="{% url 'member:login' %}"
+                   class="qa-primary"
+                   style="display:inline-flex;
+                          align-items:center;
+                          justify-content:center;
+                          height:44px;
+                          text-decoration:none;">
+                    로그인 후 질문 작성
+                </a>
+
+                {% endif %}
+
+            </div>
 
         </div>
 
 
-        <!-- 질문 작성 폼 -->
+        <!-- =====================================
+             1:1 문의 작성 폼
+        ===================================== -->
         <form id="qa-write-form"
               method="post"
               action="{% url 'qna:ask' %}"
@@ -171,44 +641,36 @@
             <label>
                 제목
 
-                <input
-                    type="text"
-                    name="title"
-                    maxlength="200"
-                    required
-                >
+                <input type="text"
+                       name="title"
+                       maxlength="200"
+                       required>
             </label>
 
-            <label>
-                작성자
 
-                <input
-                    type="text"
-                    name="author"
-                    maxlength="50"
-                    required
-                >
-            </label>
+            <!-- 작성자 닉네임 및 회원 ID 자동 저장 -->
+
 
             <label>
                 질문 내용
 
-                <textarea
-                    name="content"
-                    rows="5"
-                    required
-                ></textarea>
+                <textarea name="content"
+                          rows="5"
+                          required></textarea>
             </label>
 
-            <button type="submit" class="qa-primary">
+
+            <button type="submit"
+                    class="qa-primary">
                 질문 등록
             </button>
 
         </form>
 
 
-        <!-- 1:1 질문 목록 -->
-
+        <!-- =====================================
+             1:1 문의 목록
+        ===================================== -->
         <div class="qa-board-list">
 
             <div class="qa-board-head">
@@ -217,16 +679,21 @@
                 <span>작성일</span>
             </div>
 
+
             {% for question in questions %}
 
             <div class="qa-board-row">
 
                 <a href="{% url 'qna:qview' question.id %}"
-                class="qa-board-link">
+                   class="qa-board-link">
 
-                    <span>{{ question.title }}</span>
+                    <span>
+                        {{ question.title }}
+                    </span>
 
-                    <span>{{ question.author }}</span>
+                    <span>
+                        {{ question.author }}
+                    </span>
 
                     <span>
                         {{ question.created_at|date:'Y.m.d' }}
@@ -234,12 +701,23 @@
 
                 </a>
 
+
                 <div class="qa-status">
+
                     {% if question.answer %}
-                        <span class="status-complete">답변 완료</span>
+
+                    <span class="status-complete">
+                        답변 완료
+                    </span>
+
                     {% else %}
-                        <span class="status-waiting">답변 대기</span>
+
+                    <span class="status-waiting">
+                        답변 대기
+                    </span>
+
                     {% endif %}
+
                 </div>
 
             </div>
@@ -247,13 +725,12 @@
             {% empty %}
 
             <p class="qa-no-posts">
-                아직 등록된 질문이 없습니다.
+                아직 등록된 문의가 없습니다.
             </p>
 
             {% endfor %}
 
         </div>
-        
 
     </div>
 
@@ -264,6 +741,77 @@
 
 {% block script %}
 
-<script src="{% static 'js/tm-qna.js' %}"></script>
+<script src="{% static 'js/tm-qna.js' %}?v=5"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    // =====================================
+    // 1. 1:1 문의 탭 자동 열기
+    // =====================================
+
+    const params = new URLSearchParams(
+        window.location.search
+    );
+
+    if (
+        window.location.hash === '#question-panel' ||
+        params.get('tab') === 'question'
+    ) {
+        const questionTab = document.querySelector(
+            '.qa-tab[data-panel="question-panel"]'
+        );
+
+        if (questionTab) {
+            questionTab.click();
+        }
+    }
+
+
+    // =====================================
+    // 2. 커뮤니티 수정 폼 열기
+    // =====================================
+
+    const editToggle = document.getElementById(
+        'community-edit-toggle'
+    );
+
+    const editBox = document.getElementById(
+        'community-edit'
+    );
+
+    const editCancel = document.getElementById(
+        'community-edit-cancel'
+    );
+
+    if (editToggle && editBox) {
+
+        editToggle.addEventListener('click', function () {
+
+            editBox.hidden = false;
+
+            editBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+
+        });
+    }
+
+
+    // =====================================
+    // 3. 커뮤니티 수정 취소
+    // =====================================
+
+    if (editCancel && editBox) {
+
+        editCancel.addEventListener('click', function () {
+            editBox.hidden = true;
+        });
+
+    }
+
+});
+</script>
 
 {% endblock %}

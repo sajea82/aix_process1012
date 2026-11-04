@@ -1,132 +1,42 @@
+
 document.addEventListener("DOMContentLoaded", function () {
 
     // =====================================
-    // 1. FAQ / Q&A 탭 전환
+    // 1. 커뮤니티 / 1:1 문의 탭 전환
     // =====================================
 
     const tabs = document.querySelectorAll(".qa-tab");
     const panels = document.querySelectorAll(".qa-panel");
 
+    function openTab(panelId) {
+
+        tabs.forEach(function (tab) {
+            tab.classList.toggle(
+                "active",
+                tab.dataset.panel === panelId
+            );
+        });
+
+        panels.forEach(function (panel) {
+            panel.classList.toggle(
+                "active",
+                panel.id === panelId
+            );
+        });
+
+    }
+
     tabs.forEach(function (tab) {
 
         tab.addEventListener("click", function () {
-
-            tabs.forEach(function (item) {
-                item.classList.remove("active");
-            });
-
-            panels.forEach(function (panel) {
-                panel.classList.remove("active");
-            });
-
-            tab.classList.add("active");
-
-            const panelId = tab.dataset.panel;
-            const targetPanel = document.getElementById(panelId);
-
-            if (targetPanel) {
-                targetPanel.classList.add("active");
-            }
-
+            openTab(tab.dataset.panel);
         });
 
     });
 
 
     // =====================================
-    // 2. FAQ 카테고리 필터
-    // =====================================
-
-    const filters = document.querySelectorAll(".qa-filter");
-    const faqItems = document.querySelectorAll(".qa-faq-item");
-    const searchInput = document.getElementById("qa-search");
-    const emptyMessage = document.querySelector(".qa-empty");
-
-    let selectedCategory = "전체";
-
-    function filterFAQ() {
-
-        const keyword = searchInput
-            ? searchInput.value.trim().toLowerCase()
-            : "";
-
-        let visibleCount = 0;
-
-        faqItems.forEach(function (item) {
-
-            const category = item.dataset.category || "";
-            const content = item.textContent.toLowerCase();
-
-            const categoryMatch =
-                selectedCategory === "전체" ||
-                category === selectedCategory;
-
-            const keywordMatch = content.includes(keyword);
-
-            if (categoryMatch && keywordMatch) {
-                item.style.display = "";
-                visibleCount++;
-            } else {
-                item.style.display = "none";
-                item.open = false;
-            }
-
-        });
-
-        if (emptyMessage) {
-            emptyMessage.hidden = visibleCount > 0;
-        }
-
-    }
-
-    filters.forEach(function (button) {
-
-        button.addEventListener("click", function () {
-
-            filters.forEach(function (item) {
-                item.classList.remove("active");
-            });
-
-            button.classList.add("active");
-
-            selectedCategory = button.dataset.category;
-
-            filterFAQ();
-
-        });
-
-    });
-
-    if (searchInput) {
-        searchInput.addEventListener("input", filterFAQ);
-    }
-
-
-    // =====================================
-    // 3. FAQ 하나씩 펼치기
-    // =====================================
-
-    faqItems.forEach(function (item) {
-
-        item.addEventListener("toggle", function () {
-
-            if (!item.open) return;
-
-            faqItems.forEach(function (other) {
-
-                if (other !== item) {
-                    other.open = false;
-                }
-
-            });
-
-        });
-
-    });
-
-
-    // =====================================
-    // 4. 질문 작성 폼 열기 / 닫기
+    // 2. 기존 1:1 문의 작성 폼
     // =====================================
 
     const writeButton = document.getElementById("qa-write-toggle");
@@ -159,18 +69,86 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // =====================================
-    // 5. 질문 게시판 자동 열기
+    // 3. 커뮤니티 화면 전환
     // =====================================
 
-    if (window.location.hash === "#question-panel") {
+    const communityList = document.getElementById("community-list");
+    const communityWrite = document.getElementById("community-write");
+    const communityDetail = document.getElementById("community-detail");
 
-        const questionTab = document.querySelector(
-            '.qa-tab[data-panel="question-panel"]'
-        );
+    const communityWriteButton = document.getElementById(
+        "community-write-toggle"
+    );
 
-        if (questionTab) {
-            questionTab.click();
+    const communityBackButtons = document.querySelectorAll(
+        ".community-back"
+    );
+
+    function showCommunityScreen(screen) {
+
+        if (communityList) {
+            communityList.hidden = screen !== "list";
         }
+
+        if (communityWrite) {
+            communityWrite.hidden = screen !== "write";
+        }
+
+        if (communityDetail) {
+            communityDetail.hidden = screen !== "detail";
+        }
+
+    }
+
+    // 커뮤니티 글쓰기 버튼
+    if (communityWriteButton) {
+
+        communityWriteButton.addEventListener("click", function () {
+            showCommunityScreen("write");
+        });
+
+    }
+
+    // 커뮤니티 취소 / 목록으로 돌아가기
+    communityBackButtons.forEach(function (button) {
+
+        button.addEventListener("click", function () {
+            showCommunityScreen("list");
+        });
+
+    });
+
+
+    // =====================================
+    // 4. URL에 따라 탭 자동 선택
+    // =====================================
+
+    // params는 한 번만 선언
+    const params = new URLSearchParams(window.location.search);
+
+    // 1:1 문의 검색 후에도 1:1 문의 탭 유지
+    if (
+        window.location.hash === "#question-panel" ||
+        params.get("tab") === "question"
+    ) {
+        openTab("question-panel");
+    } else {
+        openTab("faq-panel");
+    }
+
+
+    // =====================================
+    // 5. 커뮤니티 게시글 상세 화면
+    // =====================================
+
+    // URL에 post 번호가 있으면 상세 화면 표시
+    if (params.has("post")) {
+
+        showCommunityScreen("detail");
+
+    } else {
+
+        showCommunityScreen("list");
 
     }
 

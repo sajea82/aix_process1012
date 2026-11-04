@@ -1,101 +1,354 @@
+
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.decorators.http import require_POST
-from .models import Question
+from django.core.paginator import Paginator
+from django.db.models import Q, Count
+from django.urls import reverse
+from django.http import HttpResponseForbidden
+
+from member.models import Member
+from .models import Question, CommunityPost, CommunityComment
 
 
 # =====================================
-# 자주 묻는 질문
+# 로그인 회원 조회
 # =====================================
 
-FAQ = [
-    (
-        '데이터 기준',
-        '연령대별 관광지 TOP10 순위는 어떤 기준인가요?',
-        '한국관광데이터랩의 내비게이션 검색 데이터를 기준으로 제공합니다.'
-    ),
-    (
-        '데이터 기준',
-        '데이터는 실시간으로 업데이트되나요?',
-        '현재는 프로젝트에서 준비한 CSV 파일을 기준으로 표시됩니다.'
-    ),
-    (
-        '대시보드 기능',
-        '관광지를 선택하면 무엇을 볼 수 있나요?',
-        '해당 관광지의 위치를 카카오맵에서 확인할 수 있습니다.'
-    ),
-    (
-        '지역·연령 분석',
-        '다른 지역과 연령대도 선택할 수 있나요?',
-        '지역과 연령대를 변경하면 해당 조건의 관광지 TOP10을 확인할 수 있습니다.'
-    ),
-    (
-        '대시보드 기능',
-        '관광지 상세 팝업은 무엇인가요?',
-        '관광지의 사진과 소개 등을 확인할 수 있도록 구성한 화면입니다.'
-    ),
-    (
-        '대시보드 기능',
-        '관광지 순위가 높으면 실제 방문객도 많다는 뜻인가요?',
-        '반드시 그렇지는 않습니다. 여행메이트의 순위는 내비게이션 검색 데이터를 기반으로 하기 때문에 실제 방문객 수와 차이가 있을 수 있습니다.'
-    ),
-    (
-        '지역·연령 분석',
-        '연령대별 인기 관광지가 다른 이유는 무엇인가요?',
-        '연령대에 따라 선호하는 여행 활동과 관심사가 다를 수 있기 때문입니다. 여행메이트에서는 20대부터 60대까지 연령대별 인기 관광지를 비교하며 여행 트렌드를 살펴볼 수 있습니다.'
-    ),
-    
-]
+def get_login_member(request):
+    member_id = request.session.get('session_id')
+
+    if not member_id:
+        return None
+
+    return Member.objects.filter(id=member_id).first()
+
+
+def get_member_name(member):
+    if member is None:
+        return ''
+    return str(member.nickname)
+
 
 # =====================================
-# FAQ + 질문 목록
+# 관리자 및 작성자 확인
+# =====================================
+
+def is_admin(request):
+    return bool(
+        request.user.is_authenticated
+        and request.user.is_staff
+    )
+
+
+def is_post_owner(post, member):
+    if member is None or not post.member_id:
+        return False
+
+    return str(post.member_id) == str(member.id)
+
+
+def is_question_owner(question, member):
+    if member is None or not question.member_id:
+        return False
+
+    return str(question.member_id) == str(member.id)
+
+
+def can_view_question(request, question, member):
+    return (
+        is_admin(request)
+        or is_question_owner(question, member)
+    )
+
+
+# =====================================
+# 커뮤니티 + 1:1 문의 메인
 # =====================================
 
 def index(request):
+    login_member = get_login_member(request)
 
-    # event에서 배운 게시글 목록 방식
-    qs = Question.objects.all().order_by('-id')
+    # 로그인 여부와 관계없이 모든 문의 조회
+    questions = Question.objects.all().order_by('-id')
+
+    question_keyword = request.GET.get(
+        'question_q', ''
+    ).strip()
+
+    if question_keyword:
+        questions = questions.filter(
+            Q(title__icontains=question_keyword) |
+            Q(content__icontains=question_keyword)
+        )
+
+    # 기존 커뮤니티 목록
+    keyword = request.GET.get('q', '').strip()
+
+    posts = CommunityPost.objects.annotate(
+        comment_count=Count('comments')
+    ).order_by('-id')
+
+    if keyword:
+        posts = posts.filter(
+            Q(title__icontains=keyword) |
+            Q(content__icontains=keyword)
+        )
+
+    paginator = Paginator(posts, 5)
+    page_number = request.GET.get('page', 1)
+    page_obj = paginator.get_page(page_number)
+
+    selected_post = None
+    comments = []
+    is_owner = False
+
+    post_id = request.GET.get('post')
+
+    if post_id and post_id.isdigit():
+        selected_post = get_object_or_404(
+            CommunityPost,
+            id=int(post_id)
+        )
+
+        comments = selected_post.comments.all().order_by(
+            'created_at', 'id'
+        )
+
+        is_owner = is_post_owner(
+            selected_post, login_member
+        )
 
     context = {
-        'faq': FAQ,
-        'questions': qs,
+        'questions': questions,
+        'page_obj': page_obj,
+        'keyword': keyword,
+        'question_keyword': question_keyword,
+        'selected_post': selected_post,
+        'comments': comments,
+        'login_member': login_member,
+        'login_member_name': get_member_name(login_member),
+        'is_owner': is_owner,
     }
 
     return render(request, 'qna.html', context)
 
 
 # =====================================
-# 질문 상세 보기
+# 1:1 문의 상세
 # =====================================
 
 def qview(request, qno):
+    question = get_object_or_404(Question, id=qno)
+    login_member = get_login_member(request)
 
-    # event에서 배운 filter 방식
-    qs = get_object_or_404(Question, id=qno)
-
-    context = {
-        'question': qs,
-    }
-
-    return render(request, 'qview.html', context)
+    return render(
+        request,
+        'qview.html',
+        {
+            'question': question,
+            'is_question_owner': is_question_owner(
+                question, login_member
+            ),
+        }
+    )
 
 
 # =====================================
-# 질문 작성
+# 1:1 문의 작성
 # =====================================
 
 @require_POST
 def ask(request):
+    login_member = get_login_member(request)
+
+    if login_member is None:
+        return HttpResponseForbidden(
+            '로그인 후 문의를 작성할 수 있습니다.'
+        )
 
     title = request.POST.get('title', '').strip()
-    author = request.POST.get('author', '').strip()
     content = request.POST.get('content', '').strip()
 
-    if title and author and content:
-
-        Question.objects.create(
+    if title and content:
+        question = Question.objects.create(
             title=title[:200],
-            author=author[:50],
+            author=get_member_name(login_member)[:50],
+            member_id=str(login_member.id),
             content=content,
         )
 
+        return redirect(
+            'qna:qview',
+            qno=question.id
+        )
+
+    return redirect(
+        reverse('qna:index') + '#question-panel'
+    )
+
+
+# =====================================
+# 1:1 문의 수정
+# =====================================
+
+@require_POST
+def question_edit(request, qno):
+    login_member = get_login_member(request)
+    question = get_object_or_404(Question, id=qno)
+
+    if not is_question_owner(question, login_member):
+        return HttpResponseForbidden(
+            '본인이 작성한 문의만 수정할 수 있습니다.'
+        )
+
+    title = request.POST.get('title', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if title and content:
+        question.title = title[:200]
+        question.content = content
+        question.save(update_fields=['title', 'content'])
+
+    return redirect('qna:qview', qno=question.id)
+
+
+# =====================================
+# 1:1 문의 삭제
+# =====================================
+
+@require_POST
+def question_delete(request, qno):
+    login_member = get_login_member(request)
+    question = get_object_or_404(Question, id=qno)
+
+    if not is_question_owner(question, login_member):
+        return HttpResponseForbidden(
+            '본인이 작성한 문의만 삭제할 수 있습니다.'
+        )
+
+    question.delete()
+
+    return redirect(
+        reverse('qna:index') + '#question-panel'
+    )
+
+
+# =====================================
+# 커뮤니티 게시글 작성 (기존 유지)
+# =====================================
+
+@require_POST
+def community_write(request):
+    login_member = get_login_member(request)
+
+    if login_member is None:
+        return HttpResponseForbidden(
+            '로그인 후 게시글을 작성할 수 있습니다.'
+        )
+
+    title = request.POST.get('title', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if title and content:
+        post = CommunityPost.objects.create(
+            title=title[:200],
+            author=get_member_name(login_member)[:50],
+            member_id=str(login_member.id),
+            content=content,
+        )
+
+        return redirect(
+            reverse('qna:index') + f'?post={post.id}'
+        )
+
     return redirect('qna:index')
+
+
+# =====================================
+# 커뮤니티 게시글 상세 (기존 유지)
+# =====================================
+
+def community_detail(request, post_id):
+    get_object_or_404(CommunityPost, id=post_id)
+
+    return redirect(
+        reverse('qna:index') + f'?post={post_id}'
+    )
+
+
+# =====================================
+# 커뮤니티 게시글 수정 (기존 유지)
+# =====================================
+
+@require_POST
+def community_edit(request, post_id):
+    login_member = get_login_member(request)
+    post = get_object_or_404(CommunityPost, id=post_id)
+
+    if not is_post_owner(post, login_member):
+        return HttpResponseForbidden(
+            '본인이 작성한 게시글만 수정할 수 있습니다.'
+        )
+
+    title = request.POST.get('title', '').strip()
+    content = request.POST.get('content', '').strip()
+
+    if title and content:
+        post.title = title[:200]
+        post.content = content
+        post.save(update_fields=['title', 'content'])
+
+    return redirect(
+        reverse('qna:index') + f'?post={post.id}'
+    )
+
+
+# =====================================
+# 커뮤니티 게시글 삭제 (기존 유지)
+# =====================================
+
+@require_POST
+def community_delete(request, post_id):
+    login_member = get_login_member(request)
+    post = get_object_or_404(CommunityPost, id=post_id)
+
+    if not is_post_owner(post, login_member):
+        return HttpResponseForbidden(
+            '본인이 작성한 게시글만 삭제할 수 있습니다.'
+        )
+
+    post.delete()
+    return redirect('qna:index')
+
+
+# =====================================
+# 커뮤니티 댓글 등록 (기존 유지)
+# =====================================
+
+@require_POST
+def community_comment(request, post_id):
+    login_member = get_login_member(request)
+
+    if login_member is None:
+        return HttpResponseForbidden(
+            '로그인 후 댓글을 작성할 수 있습니다.'
+        )
+
+    post = get_object_or_404(
+        CommunityPost, id=post_id
+    )
+
+    content = request.POST.get(
+        'content', ''
+    ).strip()
+
+    if content:
+        CommunityComment.objects.create(
+            post=post,
+            author=get_member_name(login_member)[:50],
+            content=content,
+        )
+
+    return redirect(
+        reverse('qna:index') + f'?post={post.id}'
+    )

@@ -30,6 +30,8 @@ INSTALLED_APPS = [
     'tour',
     'chatbot',
     'qna',
+    'custom',
+
 ]
 
 MIDDLEWARE = [

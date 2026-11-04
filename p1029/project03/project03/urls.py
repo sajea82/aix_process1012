@@ -8,4 +8,6 @@ urlpatterns = [
     path('tour/', include('tour.urls')),
     path('chat/', include('chatbot.urls')),
     path('qna/', include('qna.urls')),
+    path('custom/', include('custom.urls')),
+
 ]

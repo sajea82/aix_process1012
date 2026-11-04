@@ -1,3 +1,4 @@
+
 {% extends 'base.html' %}
 {% load static %}
 
@@ -5,22 +6,101 @@
 
 {% block head %}
 <link rel="stylesheet" href="{% static 'css/tm-qna.css' %}">
+
+<style>
+    .qa-owner-actions {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .qa-owner-actions button {
+        padding: 11px 24px;
+        border: 1px solid #947763;
+        background: #fff;
+        color: #593c2b;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    .qa-owner-actions .qa-delete-btn {
+        color: #a0453b;
+        border-color: #a66a62;
+    }
+
+    .qa-edit-box {
+        margin-top: 22px;
+        padding: 25px;
+        background: #faf5ef;
+    }
+
+    .qa-edit-box h3 {
+        margin-top: 0;
+        color: #593c2b;
+    }
+
+    .qa-edit-box label {
+        display: block;
+        margin-bottom: 18px;
+        color: #593c2b;
+        font-weight: 600;
+    }
+
+    .qa-edit-box input,
+    .qa-edit-box textarea {
+        display: block;
+        width: 100%;
+        box-sizing: border-box;
+        margin-top: 8px;
+        padding: 12px;
+        border: 1px solid #d7c8ba;
+        background: white;
+        font: inherit;
+    }
+
+    .qa-edit-buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+    }
+
+    .qa-edit-buttons button {
+        padding: 11px 24px;
+        cursor: pointer;
+    }
+
+    .qa-edit-box[hidden] {
+        display: none !important;
+    }
+</style>
 {% endblock %}
+
 
 {% block content %}
 
-<section class="qa-wrap">
+<section class="qa-wrap"
+         style="padding-top: 70px !important;">
 
-    <div class="qa-heading">
-        <span class="qa-kicker">TRAVELMATE Q&A</span>
+    <div class="qa-heading"
+         style="margin-top: 0 !important;
+                padding-top: 0 !important;">
+
+        <span class="qa-kicker">
+            TRAVELMATE Q&A
+        </span>
+
         <h2>1:1 문의 상세</h2>
+
         <p>문의 내용과 답변을 확인할 수 있습니다.</p>
     </div>
 
-    <!-- 흰색 문의 상세 박스 시작 -->
+
+    <!-- 문의 상세 -->
     <div class="qa-detail">
 
         <div class="qa-detail-title">
+
             <h2>{{ question.title }}</h2>
 
             <p>
@@ -28,12 +108,16 @@
                 &nbsp; | &nbsp;
                 작성일 : {{ question.created_at|date:'Y.m.d' }}
             </p>
+
         </div>
+
 
         <div class="qa-detail-content">
             {{ question.content|linebreaksbr }}
         </div>
 
+
+        <!-- 관리자 답변 기존 기능 유지 -->
         <div class="qa-detail-answer">
 
             <h3>관리자 답변</h3>
@@ -51,14 +135,90 @@
         </div>
 
     </div>
-    <!-- 흰색 문의 상세 박스 끝 -->
 
 
-    <!-- 갈색 배경 위에 버튼만 표시 -->
+    <!-- 작성자 본인만 수정/삭제 -->
+    {% if is_question_owner %}
+
+    <div class="qa-owner-actions">
+
+        <button type="button"
+                id="qa-edit-toggle">
+            수정
+        </button>
+
+        <form method="post"
+              action="{% url 'qna:question_delete' question.id %}"
+              onsubmit="return confirm('정말 이 문의글을 삭제하시겠습니까? 관리자 답변도 함께 삭제됩니다.');">
+
+            {% csrf_token %}
+
+            <button type="submit"
+                    class="qa-delete-btn">
+                삭제
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- 문의 수정 폼 -->
+    <div id="qa-edit-box"
+         class="qa-edit-box"
+         hidden>
+
+        <h3>1:1 문의 수정</h3>
+
+        <form method="post"
+              action="{% url 'qna:question_edit' question.id %}">
+
+            {% csrf_token %}
+
+            <label>
+                제목
+
+                <input type="text"
+                       name="title"
+                       value="{{ question.title }}"
+                       maxlength="200"
+                       required>
+            </label>
+
+            <label>
+                문의 내용
+
+                <textarea name="content"
+                          rows="8"
+                          required>{{ question.content }}</textarea>
+            </label>
+
+            <div class="qa-edit-buttons">
+
+                <button type="button"
+                        id="qa-edit-cancel">
+                    취소
+                </button>
+
+                <button type="submit"
+                        class="qa-primary">
+                    수정 완료
+                </button>
+
+            </div>
+
+        </form>
+
+    </div>
+
+    {% endif %}
+
+
+    <!-- 목록으로 돌아가기 -->
     <div class="qa-back-bottom">
 
         <a href="{% url 'qna:index' %}#question-panel"
-            class="qa-primary">
+           class="qa-primary">
             목록으로 돌아가기
         </a>
 
@@ -66,4 +226,41 @@
 
 </section>
 
+{% endblock %}
+
+
+{% block script %}
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+    const editToggle = document.getElementById(
+        'qa-edit-toggle'
+    );
+
+    const editBox = document.getElementById(
+        'qa-edit-box'
+    );
+
+    const editCancel = document.getElementById(
+        'qa-edit-cancel'
+    );
+
+    if (editToggle && editBox) {
+        editToggle.addEventListener('click', function () {
+            editBox.hidden = false;
+            editBox.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center'
+            });
+        });
+    }
+
+    if (editCancel && editBox) {
+        editCancel.addEventListener('click', function () {
+            editBox.hidden = true;
+        });
+    }
+
+});
+</script>
 {% endblock %}

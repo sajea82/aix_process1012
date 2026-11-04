@@ -29,7 +29,7 @@
             display: flex;
             flex-direction: column;
             min-height: 100vh;
-            transform: scale(1);
+            transform: none !important;
             transform-origin: top left;     /* 1. 축소 기준점을 왼쪽 상단으로 고정하여 좌측 밀림 방지 */
             width: 100%;                    /* 2. 축소된 비율(90%)만큼 가로 폭을 100/90 = 111.11%로 늘려 화면 가득 채우기 */
             box-sizing: border-box;         /* 3. 혹시 모를 브라우저 기본 마진/패딩 간섭 차단 */
@@ -337,7 +337,481 @@
             color: #64748b;
             margin: 0;
         }
+        /* 그래프 하단 AI 데이터 브리핑 챗봇 섹션 */
+        .ai-briefing-section {
+            max-width: 1500px;
+            width: 100%;
+            margin: -1.5rem auto 3rem;
+            padding: 0 1.5rem;
+        }
+        .ai-chat-card {
+            background: linear-gradient(135deg, #ffffff 0%, #fdfaf6 100%);
+            border: 1px solid #e8dfd1;
+            border-radius: 24px;
+            padding: 1.5rem 2rem;
+            box-shadow: 0 12px 30px -8px rgba(158, 61, 36, 0.08);
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            position: relative;
+            overflow: hidden;
+        }
+        .ai-chat-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+            background: linear-gradient(180deg, #9E3D24, #D9822B);
+        }
+        .ai-chat-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        .ai-bot-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .ai-bot-avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #9E3D24, #D9822B);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 12px rgba(158, 61, 36, 0.25);
+        }
+        .ai-bot-info h3 {
+            margin: 0;
+            font-size: 1.05rem;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .ai-live-badge {
+            font-size: 0.7rem;
+            font-weight: 800;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid #fde68a;
+        }
+        .ai-bot-info p {
+            margin: 2px 0 0 0;
+            font-size: 0.82rem;
+            color: #64748b;
+        }
 
+        /* 챗봇 말풍선 영역 */
+        .ai-chat-stream {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .ai-bubble-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        .ai-bubble {
+            background: #ffffff;
+            border: 1px solid #e5d9cc;
+            border-radius: 4px 18px 18px 18px;
+            padding: 1.1rem 1.4rem;
+            color: #2c221e;
+            font-size: 0.96rem;
+            line-height: 1.65;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.03);
+            flex: 1;
+            transition: all 0.25s ease;
+        }
+        .ai-bubble strong {
+            color: #9E3D24;
+            font-weight: 800;
+        }
+        .ai-bubble .highlight-tag {
+            display: inline-block;
+            background: #fff7ed;
+            color: #c2410c;
+            border: 1px solid #ffedd5;
+            padding: 1px 7px;
+            border-radius: 6px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin: 0 2px;
+        }
+
+        /* 사용자 질문 말풍선 (우측 정렬) */
+        .user-bubble-row {
+            display: flex;
+            justify-content: flex-end;
+        }
+        .user-bubble {
+            background: #38271f;
+            color: #ffffff;
+            border-radius: 18px 4px 18px 18px;
+            padding: 0.7rem 1.1rem;
+            font-size: 0.88rem;
+            font-weight: 600;
+            max-width: 80%;
+        }
+
+        /* 하단 핵심 수치 요약 칩 & 빠른 질문 버튼 */
+        .ai-chat-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding-top: 0.8rem;
+            border-top: 1px dashed #e2d8c9;
+        }
+        .ai-kpi-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ai-kpi-chip {
+            background: #faf8f5;
+            border: 1px solid #e2d8c9;
+            border-radius: 10px;
+            padding: 6px 12px;
+            font-size: 0.8rem;
+            color: #5c4637;
+            font-weight: 600;
+        }
+        .ai-kpi-chip b {
+            color: #9E3D24;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+        .ai-quick-questions {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .ai-q-btn {
+            background: #ffffff;
+            border: 1px solid #d6c7b2;
+            color: #583c2d;
+            padding: 6px 13px;
+            border-radius: 999px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .ai-q-btn:hover {
+            background: #9E3D24;
+            color: #ffffff;
+            border-color: #9E3D24;
+            transform: translateY(-1px);
+        }
+        /* 기존 인라인 챗봇 카드 숨기기 (플로팅 위젯으로 대체) */
+        .ai-briefing-section {
+            display: none !important;
+        }
+
+        /* 플로팅 데이터 도슨트 아이콘 (우측 상단 시작 & 스크롤 완벽 고정 추적) */
+        .docent-float-btn {
+            position: fixed !important;
+            top: 340px !important;      /* 우측 상단에서 시작 */
+            right: 35px !important;
+            bottom: auto !important;
+            width: 64px;
+            height: 64px;
+            background: linear-gradient(135deg, #9E3D24, #D9822B);
+            color: #ffffff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6rem;
+            box-shadow: 0 10px 25px rgba(158, 61, 36, 0.4);
+            cursor: pointer;
+            z-index: 99990;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            border: 3px solid #ffffff;
+        }
+        .docent-float-btn:hover {
+            transform: scale(1.08);
+            box-shadow: 0 14px 32px rgba(158, 61, 36, 0.6);
+        }
+
+        /* 연령/지역 선택 변경 시 아이콘이 반짝이며 깜빡이는(Pulse) 애니메이션 */
+        @keyframes docentPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 130, 43, 0.85); }
+            50% { transform: scale(1.16); box-shadow: 0 0 0 18px rgba(217, 130, 43, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(217, 130, 43, 0); }
+        }
+        .docent-float-btn.pulse-alert {
+            animation: docentPulse 1s ease infinite;
+        }
+
+        /* 플로팅 아이콘 아래쪽(하단) 말풍선 툴팁 뱃지 */
+        .docent-float-tooltip {
+            position: absolute;
+            top: calc(100% + 12px); /* 아이콘 바로 밑으로 12px 띄워서 배치 */
+            right: 0;               /* 우측 화면 밖으로 잘리지 않도록 오른쪽 끝 정렬 */
+            background: #2c221e;
+            color: #ffffff;
+            padding: 8px 14px;
+            border-radius: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            white-space: nowrap;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+            pointer-events: none;
+            display: block;
+        }
+        /* 말풍선 위쪽 꼬리 (아이콘 정중앙을 가리키도록 설정) */
+        .docent-float-tooltip::after {
+            content: "";
+            position: absolute;
+            top: -6px;
+            right: 23px; /* 64px 아이콘의 가로 중앙 부근에 꼬리 위치 */
+            border-width: 0 6px 6px 6px;
+            border-style: solid;
+            border-color: transparent transparent #2c221e transparent;
+        }
+
+        /* 화면 정중앙 모달 팝업 배경 오버레이 */
+        .docent-modal-overlay {
+            position: fixed !important;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100vw;
+            height: 100vh;
+            background: rgba(15, 23, 42, 0.55);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99999;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.25s ease, visibility 0.25s ease;
+        }
+        .docent-modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* 모달 팝업 본체 카드 (순수 CSS로 스타일 완벽 적용) */
+        .docent-modal-box {
+            background: #ffffff;
+            border: 1px solid #e8dfd1;
+            border-radius: 24px;
+            width: 680px;
+            max-width: 94vw;
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 28px 32px;
+            box-shadow: 0 25px 60px -15px rgba(0, 0, 0, 0.3);
+            position: relative;
+            transform: translateY(20px) scale(0.98);
+            transition: transform 0.25s ease;
+            font-family: 'Pretendard', sans-serif;
+            color: #2c221e;
+        }
+        .docent-modal-overlay.active .docent-modal-box {
+            transform: translateY(0) scale(1);
+        }
+
+        /* 모달 상단 헤더 */
+        .docent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-bottom: 16px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #f0e9df;
+        }
+        .docent-header-left {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+        .docent-avatar {
+            width: 46px;
+            height: 46px;
+            border-radius: 14px;
+            background: linear-gradient(135deg, #9E3D24, #D9822B);
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            box-shadow: 0 6px 14px rgba(158, 61, 36, 0.25);
+            flex-shrink: 0;
+        }
+        .docent-title-wrap h3 {
+            margin: 0;
+            font-size: 18px;
+            font-weight: 800;
+            color: #1e293b;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .docent-live-badge {
+            font-size: 11px;
+            font-weight: 800;
+            background: #fef3c7;
+            color: #b45309;
+            padding: 2px 8px;
+            border-radius: 999px;
+            border: 1px solid #fde68a;
+        }
+        .docent-title-wrap p {
+            margin: 4px 0 0 0;
+            font-size: 13px;
+            color: #64748b;
+        }
+        .docent-close-btn {
+            background: #faf8f5;
+            border: 1px solid #e2d8c9;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            font-size: 22px;
+            font-weight: 700;
+            color: #6d5543;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .docent-close-btn:hover {
+            background: #9E3D24;
+            color: #ffffff;
+            border-color: #9E3D24;
+        }
+
+        /* 모달 본문 브리핑 박스 */
+        .docent-briefing-box {
+            background: #faf8f5;
+            border: 1px solid #e2d8c9;
+            border-radius: 18px;
+            padding: 18px 20px;
+            font-size: 15px;
+            line-height: 1.7;
+            color: #2c221e;
+            margin-bottom: 16px;
+        }
+        .docent-briefing-box strong {
+            color: #9E3D24;
+            font-weight: 800;
+        }
+
+        /* 모달 KPI 요약 칩 리스트 */
+        .docent-chips-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+        .docent-chip {
+            background: #ffffff;
+            border: 1px solid #e2d8c9;
+            border-radius: 12px;
+            padding: 7px 13px;
+            font-size: 13px;
+            font-weight: 700;
+            color: #5c4637;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+        }
+        .docent-chip b {
+            color: #9E3D24;
+            font-weight: 800;
+            margin-left: 4px;
+        }
+
+        /* 모달 하단 원클릭 질문 영역 */
+        .docent-q-section {
+            padding-top: 16px;
+            border-top: 1px dashed #e2d8c9;
+        }
+        .docent-q-title {
+            font-size: 13px;
+            font-weight: 800;
+            color: #6d5543;
+            margin-bottom: 10px;
+        }
+        .docent-q-btns {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .docent-q-btn {
+            background: #ffffff;
+            border: 1px solid #d6c7b2;
+            color: #583c2d;
+            padding: 8px 14px;
+            border-radius: 999px;
+            font-size: 13px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .docent-q-btn:hover {
+            background: #9E3D24;
+            color: #ffffff;
+            border-color: #9E3D24;
+            transform: translateY(-1px);
+        }
+
+        /* 추가 질문 답변 스트림 */
+        .docent-stream-box {
+            margin-top: 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        .docent-stream-q {
+            align-self: flex-end;
+            background: #38271f;
+            color: #ffffff;
+            padding: 10px 16px;
+            border-radius: 16px 4px 16px 16px;
+            font-size: 13px;
+            font-weight: 700;
+        }
+        .docent-stream-a {
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #2c221e;
+            padding: 14px 18px;
+            border-radius: 4px 16px 16px 16px;
+            font-size: 14px;
+            line-height: 1.65;
+        }
+        .docent-stream-a strong {
+            color: #9E3D24;
+            font-weight: 800;
+        }
     </style>
 {% endblock %}
 
@@ -573,6 +1047,63 @@
         </section>
     </main>
 
+    <!-- ===================================================================== -->
+    <!-- 2. 우측 상단 플로팅 도슨트 아이콘 docentFloatBtn과 docentModalOverlay -->
+    <!-- ===================================================================== -->
+    <div class="docent-float-btn" id="docentFloatBtn" onclick="openDocentModal()" title="AI 데이터 도슨트 열기">
+        <div class="docent-float-tooltip" id="docentFloatTooltip">✨ 클릭해서 그래프 해설 보기</div>
+        <i class="fa-solid fa-robot"></i>
+    </div>
+
+    <!-- 화면 중앙 모달 팝업창 -->
+    <div class="docent-modal-overlay" id="docentModalOverlay">
+        <div class="docent-modal-box">
+            <!-- 팝업 헤더 -->
+            <div class="docent-header">
+                <div class="docent-header-left">
+                    <div class="docent-avatar">
+                        <i class="fa-solid fa-robot"></i>
+                    </div>
+                    <div class="docent-title-wrap">
+                        <h3>
+                            여행메이트 AI 데이터 도슨트
+                            <span class="docent-live-badge">심층 분석</span>
+                        </h3>
+                        <p>선택하신 연령대·지역 그래프를 해석한 리포트입니다.</p>
+                    </div>
+                </div>
+                <button type="button" class="docent-close-btn" onclick="closeDocentModal()">&times;</button>
+            </div>
+
+            <!-- 메인 브리핑 텍스트 -->
+            <div class="docent-briefing-box" id="docentModalBriefingText">
+                데이터를 불러오는 중입니다...
+            </div>
+
+            <!-- 핵심 KPI 요약 칩 -->
+            <div class="docent-chips-row" id="docentModalKpiChips"></div>
+
+            <!-- 원클릭 추가 질문 버튼 -->
+            <div class="docent-q-section">
+                <div class="docent-q-title">💡 AI 도슨트에게 추가로 질문하기</div>
+                <div class="docent-q-btns">
+                    <button type="button" class="docent-q-btn" onclick="askModalAi('gap')">
+                        <i class="fa-solid fa-scale-balanced"></i> 1위와 2위 격차는?
+                    </button>
+                    <button type="button" class="docent-q-btn" onclick="askModalAi('ageCompare')">
+                        <i class="fa-solid fa-users"></i> 주력 연령대 분석
+                    </button>
+                    <button type="button" class="docent-q-btn" onclick="askModalAi('seasonTip')">
+                        <i class="fa-solid fa-calendar-check"></i> 최적의 방문 시기는?
+                    </button>
+                </div>
+            </div>
+
+            <!-- 추가 질의응답 표시 영역 -->
+            <div class="docent-stream-box" id="docentModalChatStream"></div>
+        </div>
+    </div>
+
     <script>
         let currentRegion = '서울';
         let currentAge = '20대';
@@ -721,8 +1252,8 @@
                             }
                         }
                     },
-                    scales: { 
-                        x: { 
+                    scales: {
+                        x: {
                             beginAtZero: true,
                             ticks: {
                                 maxRotation: 30,
@@ -735,7 +1266,7 @@
                             }
                         },
                         y: { ticks: { font: { weight: 'bold', size: 14 } } }
-                    } 
+                    }
                 }
             });
         }
@@ -900,7 +1431,7 @@
             renderSeasonLegend();
         }
 
-        // 2. 연령대 및 지역 선택 시 그래프 업데이트 
+        // 연령대 및 지역 선택 시 그래프 업데이트 
         // [수정] 30대~70대 버튼 클릭 시에도 사이즈 변화 없이 데이터만 즉시 업데이트
         function updateSeasonChartHighlight() {
             if (!seasonChart) return;
@@ -938,10 +1469,11 @@
             seasonChart.update();
             renderSeasonLegend(); // 2줄 범례 상태 업데이트
             updateSeasonMap();    // [추가] 전국 지도 강조 상태 및 연령대 컬러 동기화
+            updateAiBriefing();
         }
         
 
-        // [추가] 광역시도별 최고 성수기(피크 계절) 계산 및 전국 지도 컬러링 함수
+        // 광역시도별 최고 성수기(피크 계절) 계산 및 전국 지도 컬러링 함수
         const peakSeasonMeta = {
             '가을': { label: '🍂 가을 (9~11월)', indices: [0, 1, 2], fill: 'rgba(251, 146, 60, 0.78)', hex: '#fb923c' },
             '겨울': { label: '❄️ 겨울 (12~2월)', indices: [3, 4, 5], fill: 'rgba(56, 189, 248, 0.78)', hex: '#38bdf8' },
@@ -1048,7 +1580,7 @@
             // =========================================================================
             // 1. <계절별 인기 여행지> 탭 선택 시
             // =========================================================================
-            // 1. <계절별 인기 여행지> 탭 선택 시
+            
             if (currentMode === 'season') {
                 wrapper.classList.add('season-mode');
 
@@ -1190,7 +1722,221 @@
                     path.style.fill = '#f8fafc';
                 }
             });
+            updateAiBriefing();
         }
+        
+
+    /* ===================================================================== */
+    /* 3. [JS 추가] 데이터 도슨트 설명 */
+    /* ===================================================================== */
+
+    // 전역 저장용 변수
+    let currentBriefingHTML = "";
+    let currentChipsHTML = "";
+
+    // 연령이나 지역 버튼을 클릭했을 때 플로팅 아이콘이 깜빡거리게 하는 함수
+    function triggerDocentAlert() {
+        const btn = document.getElementById('docentFloatBtn');
+        const tooltip = document.getElementById('docentFloatTooltip');
+        if (!btn) return;
+
+        btn.classList.add('pulse-alert');
+        if (tooltip) {
+            tooltip.textContent = `✨ ${currentAge} · ${currentMode === 'season' ? (selectedSeasonRegion || '전국') : currentRegion} 해설 도착!`;
+            tooltip.style.display = 'block';
+        }
+    }
+
+    // 도슨트 모달창 열기
+    function openDocentModal() {
+        const overlay = document.getElementById('docentModalOverlay');
+        const btn = document.getElementById('docentFloatBtn');
+        const tooltip = document.getElementById('docentFloatTooltip');
+        if (!overlay) return;
+
+        overlay.classList.add('active');
+        if (btn) btn.classList.remove('pulse-alert');
+        if (tooltip) tooltip.textContent = "✨ 클릭해서 그래프 해설 보기";
+        document.body.style.overflow = 'hidden';
+    }
+
+    // 도슨트 모달창 닫기
+    function closeDocentModal() {
+        const overlay = document.getElementById('docentModalOverlay');
+        if (!overlay) return;
+
+        overlay.classList.remove('active');
+        document.body.style.overflow = '';
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') closeDocentModal();
+    });
+
+    document.getElementById('docentModalOverlay')?.addEventListener('click', (e) => {
+        if (e.target.id === 'docentModalOverlay') closeDocentModal();
+    });
+
+    // 실시간 그래프 데이터 해석 및 모달 내용 업데이트
+    function updateAiBriefing() {
+        const textEl = document.getElementById('docentModalBriefingText');
+        const chipsEl = document.getElementById('docentModalKpiChips');
+        const streamEl = document.getElementById('docentModalChatStream');
+        if (!textEl || !chipsEl) return;
+
+        if (streamEl) streamEl.innerHTML = '';
+
+        if (currentMode === 'region') {
+            const regionData = dashboardData[currentRegion];
+            if (!regionData) return;
+
+            const ranked = Object.keys(regionData)
+                .map(dist => ({
+                    name: dist,
+                    visitors: getAgeVisitors(regionData[dist], currentAge) || 0,
+                    ratio: regionData[dist][currentAge] || 0,
+                    total: regionData[dist]['총방문자수'] || 0
+                }))
+                .filter(item => item.visitors > 0)
+                .sort((a, b) => b.visitors - a.visitors);
+
+            if (ranked.length < 3) return;
+
+            const top1 = ranked[0];
+            const top2 = ranked[1];
+            const top3 = ranked[2];
+            const regionTotalAgeVisitors = ranked.reduce((acc, cur) => acc + cur.visitors, 0);
+            const top3Share = ((top1.visitors + top2.visitors + top3.visitors) / regionTotalAgeVisitors * 100).toFixed(1);
+            const highestRatioDist = [...ranked].sort((a, b) => b.ratio - a.ratio)[0];
+            const formatMan = (num) => Math.round(num / 10000).toLocaleString() + '만 명';
+
+            currentBriefingHTML = `
+                현재 조회 중이신 <strong>[${currentRegion} · ${currentAge}]</strong> 방문 분석 리포트입니다! 📊<br>
+                <strong>${currentAge}</strong> 여행객이 해당 기간 가장 많이 찾은 1위 지역은 <strong>${top1.name}</strong>(약 <strong>${formatMan(top1.visitors)}</strong>, 연령 비중 ${top1.ratio}%)이며, 
+                2위 <strong>${top2.name}</strong>(${formatMan(top2.visitors)}), 3위 <strong>${top3.name}</strong>(${formatMan(top3.visitors)}) 순으로 집계되었습니다. 
+                상위 3개 지역의 점유율은 <strong>${top3Share}%</strong>이며, 해당 연령대 밀집도가 가장 높은 특화 지역은 <strong>${highestRatioDist.name}(${highestRatioDist.ratio}%)</strong>입니다.
+            `;
+
+            currentChipsHTML = `
+                <div class="docent-chip">🥇 1위 지역 <b>${top1.name} (${formatMan(top1.visitors)})</b></div>
+                <div class="docent-chip">🔥 밀집도 1위 <b>${highestRatioDist.name} (${highestRatioDist.ratio}%)</b></div>
+                <div class="docent-chip">📈 TOP3 점유율 <b>${top3Share}%</b></div>
+            `;
+        } else {
+            const ageRegions = (monthlyData.regions && monthlyData.regions[currentAge]) 
+                               ? monthlyData.regions[currentAge] 
+                               : monthlyData.regions;
+            if (!ageRegions || !monthlyData.months) return;
+
+            const targetReg = selectedSeasonRegion || '서울';
+            const arr = ageRegions[targetReg];
+            if (!arr) return;
+
+            const stats = getRegionSeasonStats(targetReg, currentAge);
+            let maxMonthIdx = 0;
+            let minMonthIdx = 0;
+            arr.forEach((val, idx) => {
+                if (val > arr[maxMonthIdx]) maxMonthIdx = idx;
+                if (val < arr[minMonthIdx]) minMonthIdx = idx;
+            });
+
+            const peakMonthName = monthlyData.months[maxMonthIdx];
+            const lowMonthName = monthlyData.months[minMonthIdx];
+            const formatMan = (num) => Math.round(num / 10000).toLocaleString() + '만 명';
+
+            if (!selectedSeasonRegion) {
+                currentBriefingHTML = `
+                    현재 <strong>[${currentAge} · 전국 계절별 트렌드]</strong>를 확인하고 계십니다! 🍂❄️🌸🌿<br>
+                    대표 권역인 <strong>서울</strong>은 <strong>${peakSeasonMeta[stats.peakSeason].label}</strong>에 방문객이 가장 많았으며(연간 <strong>${stats.share}%</strong>), 
+                    월별로는 <strong>${peakMonthName}(${formatMan(arr[maxMonthIdx])})</strong>에 정점을 찍었습니다. 
+                    우측 상단이나 지도에서 특정 <strong>지역 버튼(강원, 제주 등)</strong>을 누르시면 해당 지역의 피크 타임을 상세히 분석해 드립니다.
+                `;
+            } else {
+                currentBriefingHTML = `
+                    선택하신 <strong>[${targetReg} · ${currentAge}]</strong>의 월별 방문 흐름 리포트입니다! 📈<br>
+                    <strong>${targetReg}</strong>의 최고 성수기는 <strong>${peakSeasonMeta[stats.peakSeason].label}</strong>이며 해당 기간에 약 <strong>${formatMan(stats.maxVal)}</strong>(연간 <strong>${stats.share}%</strong>)이 집중되었습니다. 
+                    가장 붐비는 달은 <strong>${peakMonthName}</strong>, 가장 여유로운 달은 <strong>${lowMonthName}</strong>입니다.
+                `;
+            }
+
+            currentChipsHTML = `
+                <div class="docent-chip">📍 분석 지역 <b>${selectedSeasonRegion || '전국 (서울 기준)'}</b></div>
+                <div class="docent-chip">🏆 최고 성수기 <b>${peakSeasonMeta[stats.peakSeason].label}</b></div>
+                <div class="docent-chip">📅 최다 방문월 <b>${peakMonthName}</b></div>
+            `;
+        }
+
+        textEl.innerHTML = currentBriefingHTML;
+        chipsEl.innerHTML = currentChipsHTML;
+
+        triggerDocentAlert();
+    }
+
+    // 모달 내부 원클릭 추가 질문 응답 함수
+    function askModalAi(type) {
+        const streamEl = document.getElementById('docentModalChatStream');
+        if (!streamEl) return;
+
+        let qText = "";
+        let aText = "";
+        const formatMan = (num) => Math.round(num / 10000).toLocaleString() + '만 명';
+
+        if (type === 'gap') {
+            qText = "1위와 2위 지역의 격차는 얼마나 나나요?";
+            if (currentMode === 'region') {
+                const regionData = dashboardData[currentRegion];
+                const ranked = Object.keys(regionData)
+                    .map(dist => ({ name: dist, val: getAgeVisitors(regionData[dist], currentAge) || 0 }))
+                    .sort((a, b) => b.val - a.val);
+                const diff = ranked[0].val - ranked[1].val;
+                const ratio = (ranked[0].val / Math.max(1, ranked[1].val)).toFixed(2);
+                aText = `<strong>${currentRegion} ${currentAge}</strong> 기준 1위 <strong>${ranked[0].name}</strong>과 2위 <strong>${ranked[1].name}</strong>의 격차는 약 <strong>${formatMan(diff)}</strong>이며, 1위 지역이 약 <strong>${ratio}배</strong> 더 많이 방문했습니다.`;
+            } else {
+                const targetReg = selectedSeasonRegion || '서울';
+                const stats = getRegionSeasonStats(targetReg, currentAge);
+                const sortedSeasons = Object.entries(stats.sums).sort((a, b) => b[1] - a[1]);
+                const diff = sortedSeasons[0][1] - sortedSeasons[1][1];
+                aText = `<strong>${targetReg}(${currentAge})</strong>의 1위 계절(${sortedSeasons[0][0]})과 2위 계절(${sortedSeasons[1][0]})의 방문객 차이는 약 <strong>${formatMan(diff)}</strong>입니다.`;
+            }
+        } else if (type === 'ageCompare') {
+            qText = "이 지역을 가장 주도적으로 방문하는 핵심 연령대는 누구인가요?";
+            const targetReg = (currentMode === 'season' && selectedSeasonRegion) ? selectedSeasonRegion : currentRegion;
+            if (dashboardData[targetReg]) {
+                const dists = Object.keys(dashboardData[targetReg]);
+                const ageTotals = { '20대': 0, '30대': 0, '40대': 0, '50대': 0, '60대': 0, '70대': 0 };
+                dists.forEach(d => {
+                    Object.keys(ageTotals).forEach(age => {
+                        ageTotals[age] += getAgeVisitors(dashboardData[targetReg][d], age) || 0;
+                    });
+                });
+                const bestAge = Object.entries(ageTotals).sort((a, b) => b[1] - a[1])[0];
+                aText = `<strong>${targetReg}</strong>에서 가장 방문 비중이 높은 주력 연령층은 <strong>${bestAge[0]}</strong>(총 <strong>${formatMan(bestAge[1])}</strong>)입니다!`;
+            } else {
+                const ages = ['20대', '30대', '40대', '50대', '60대', '70대'];
+                const sumsByAge = ages.map(a => ({
+                    age: a,
+                    sum: (monthlyData.regions[a][targetReg] || []).reduce((acc, v) => acc + v, 0)
+                })).sort((a, b) => b.sum - a.sum);
+                aText = `연간 월별 데이터를 기준으로 <strong>${targetReg}</strong>을(를) 가장 많이 찾은 연령대는 <strong>${sumsByAge[0].age}</strong>입니다.`;
+            }
+        } else if (type === 'seasonTip') {
+            qText = "최적의 방문 시기는 언제인가요?";
+            const targetReg = (currentMode === 'season' && selectedSeasonRegion) ? selectedSeasonRegion : currentRegion;
+            const ageRegions = monthlyData.regions[currentAge];
+            const arr = ageRegions[targetReg] || ageRegions['서울'];
+            let maxIdx = 0, minIdx = 0;
+            arr.forEach((v, i) => {
+                if (v > arr[maxIdx]) maxIdx = i;
+                if (v < arr[minIdx]) minIdx = i;
+            });
+            aText = `활기찬 분위기를 원하신다면 방문객이 집중되는 <strong>${monthlyData.months[maxIdx]}</strong>을, 여유로운 힐링을 원하신다면 <strong>${monthlyData.months[minIdx]}</strong> 방문을 추천합니다! 💡`;
+        }
+
+        streamEl.innerHTML = `
+            <div class="docent-stream-q">Q. ${qText}</div>
+            <div class="docent-stream-a">🤖 ${aText}</div>
+        `;
+    }
     </script>
 </div>
 <!-- 기존 그래프 컨테이너 끝 -->

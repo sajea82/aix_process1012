@@ -17,46 +17,35 @@ from django.contrib.auth import authenticate, login as auth_login
 
     # 로그인 : GET → 화면, POST → 아이디/비밀번호 확인
 def login(request):
-
-    # =====================================
-    # 1. 로그인 페이지 접속
-    # =====================================
     if request.method == 'GET':
         return render(request, 'login.html')
 
     id = request.POST.get('id', '')
     pw = request.POST.get('pw', '')
+    next_url = request.POST.get('next') or '/'
 
-    # =====================================
-    # 2. Django 관리자 계정 확인
-    # =====================================
+    # 1. Django 관리자 계정 확인
     admin_user = authenticate(
         request,
         username=id,
         password=pw
     )
 
-    # 관리자 계정이면 admin 페이지로 이동
     if admin_user is not None and admin_user.is_staff:
         auth_login(request, admin_user)
         return redirect('/admin/')
 
-    # =====================================
-    # 3. 기존 일반 회원 로그인
-    # =====================================
+    # 2. 기존 일반 회원 로그인 (DB 검증)
     qs = Member.objects.filter(id=id)
 
     if qs.exists() and check_password(pw, qs[0].pw):
-
         # 로그인 성공 → 세션에 저장
         request.session['session_id'] = id
         request.session['session_nickname'] = qs[0].nickname
 
-        return redirect('index')
+        return redirect(next_url)
 
-    # =====================================
-    # 4. 로그인 실패
-    # =====================================
+    # 3. 로그인 실패
     context = {
         'msg': '아이디 또는 비밀번호가 맞지 않습니다.',
         'id': id

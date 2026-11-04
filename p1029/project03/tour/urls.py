@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from tour import views
 
 app_name = 'tour'
 urlpatterns = [
@@ -14,4 +15,6 @@ urlpatterns = [
     path('graph_v1/', views.graph_v1, name='graph_v1'),
     # 예약연결 페이지 : /tour/resv/
     path('resv/', views.resv, name='resv'),
+    path('recommendations/', views.get_tour_recommendations, name='recommendations')
+
 ]

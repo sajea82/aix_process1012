@@ -44,9 +44,7 @@ def top10_data(request):
             if rank > 10:
                 continue
             name = row['관심지점명']
-            filename = name.replace(' ', '') + '.jpg'
-            image_file = Path(settings.BASE_DIR) / 'static' / 'images' / 'tour' / code / filename
-            img = f'images/tour/{code}/{filename}' if image_file.exists() else 'images/tour/noimage.jpg'
+            img = Tour(region=code, name=name).img
             tours.append({'rank': rank, 'name': name, 'sigungu': row['시군구'],
                         'category': row['구분'], 'ratio': ratio, 'lat': lat,
                         'lng': lng, 'img': static(img)})
@@ -132,3 +130,126 @@ def resv(request):
         'db_spots_json': json.dumps(unique_spots, ensure_ascii=False)
     }
     return render(request, 'resv.html', context)
+
+
+# =====================================================================
+# 추천 알고리즘 API 뷰 (실제 Tour 모델 및 img 프로퍼티 연동)
+# =====================================================================
+def get_tour_recommendations(request):
+    if request.method == 'GET':
+        age_param = request.GET.get('age', '30대')
+        
+        # 연령대 키 정밀 매칭 (JSON의 키: '20대', '30대', '40대', '50대', '60대')
+        age_key = '30대'
+        age_val = 30
+        if '20' in age_param: 
+            age_key = '20대'
+            age_val = 20
+        elif '30' in age_param: 
+            age_key = '30대'
+            age_val = 30
+        elif '40' in age_param: 
+            age_key = '40대'
+            age_val = 40
+        elif '50' in age_param: 
+            age_key = '50대'
+            age_val = 50
+        elif '60' in age_param or '70' in age_param: 
+            age_key = '60대'
+            age_val = 60
+
+        # 1. 25년 10월(index 1) 광역시도별·연령대별 방문자수 데이터 직접 내장 (파일 경로 오류로 인한 0명 출력 원천 차단)
+        VISITOR_DATA_2510 = {
+            "20대": {
+                "서울": 35031393, "경기": 25307352, "강원": 4269308, "부산": 8533383,
+                "대구": 6048716, "인천": 4753981, "광주": 3513890, "대전": 4033452,
+                "울산": 2119868, "세종": 567811, "충북": 3724190, "충남": 4591009,
+                "전북": 3667118, "전남": 3975707, "경북": 5358587, "경남": 5509596, "제주": 1578626
+            },
+            "30대": {
+                "서울": 40112850, "경기": 33898286, "강원": 4632996, "부산": 9647880,
+                "대구": 6538082, "인천": 5889558, "광주": 3435714, "대전": 4089330,
+                "울산": 2571088, "세종": 613173, "충북": 4375926, "충남": 5621221,
+                "전북": 4103279, "전남": 4465109, "경북": 5985225, "경남": 6629604, "제주": 2085575
+            },
+            "40대": {
+                "서울": 31190780, "경기": 30143600, "강원": 4625191, "부산": 8827971,
+                "대구": 5537484, "인천": 5055879, "광주": 3032127, "대전": 3429655,
+                "울산": 2353869, "세종": 536213, "충북": 4141602, "충남": 5648823,
+                "전북": 4149253, "전남": 4770137, "경북": 5938088, "경남": 6647238, "제주": 1813435
+            },
+            "50대": {
+                "서울": 32561187, "경기": 33514849, "강원": 5654332, "부산": 10209916,
+                "대구": 6862085, "인천": 5834118, "광주": 3746860, "대전": 4066102,
+                "울산": 2848048, "세종": 572816, "충북": 5282501, "충남": 6631264,
+                "전북": 5498481, "전남": 6293078, "경북": 7465441, "경남": 8191258, "제주": 1901368
+            },
+            "60대": {
+                "서울": 27068730, "경기": 27922825, "강원": 5192958, "부산": 10205368,
+                "대구": 5810093, "인천": 5177050, "광주": 3158952, "대전": 3477823,
+                "울산": 2397839, "세종": 447053, "충북": 4481026, "충남": 5517481,
+                "전북": 4466489, "전남": 5078020, "경북": 6257806, "경남": 7069795, "제주": 1541581
+            }
+        }
+        
+        visitor_map = dict(VISITOR_DATA_2510.get(age_key, VISITOR_DATA_2510["30대"]))
+
+        # 2. DB 지역 코드 맵핑 딕셔너리 (사용자 작성본 유지 + db.sqlite3의 bs, dg, ic 약어 호환 추가)
+        code_to_korean = {
+            'seoul': '서울', 'SEOUL': '서울', '서울': '서울',
+            'gg': '경기', 'GG': '경기', '경기': '경기', 'gyeonggi': '경기',
+            'incheon': '인천', 'INCHEON': '인천', '인천': '인천', 'ic': '인천', 'IC': '인천',
+            'gw': '강원', 'GW': '강원', '강원': '강원', 'gangwon': '강원',
+            'cb': '충북', 'CB': '충북', '충북': '충북', 'chungbuk': '충북',
+            'cn': '충남', 'CN': '충남', '충남': '충남', 'chungnam': '충남',
+            'dj': '대전', 'daejeon': '대전', 'DAEJEON': '대전', '대전': '대전',
+            'sj': '세종', 'SJ': '세종', '세종': '세종', 'sejong': '세종',
+            'jb': '전북', 'JB': '전북', '전북': '전북', 'jeonbuk': '전북',
+            'jn': '전남', 'JN': '전남', '전남': '전남', 'jeonnam': '전남',
+            'gj': '광주', 'gwangju': '광주', 'GWANGJU': '광주', '광주': '광주',
+            'gn': '경북', 'GN': '경북', '경북': '경북', 'gb': '경북', 'gyeongbuk': '경북',
+            'gs': '경남', 'GS': '경남', '경남': '경남', 'gyeongnam': '경남',
+            'daegu': '대구', 'DAEGU': '대구', '대구': '대구', 'dg': '대구', 'DG': '대구',
+            'ulsan': '울산', 'ULSAN': '울산', '울산': '울산',
+            'busan': '부산', 'BUSAN': '부산', '부산': '부산', 'bs': '부산', 'BS': '부산',
+            'jj': '제주', 'JJ': '제주', '제주': '제주', 'jeju': '제주',
+        }
+
+        # 3. DB에서 사용자가 선택한 연령대(age=age_val) 데이터만 필터링하여 조회
+        tours = Tour.objects.filter(age=age_val)
+        if not tours.exists():
+            tours = Tour.objects.all()
+
+        # 4. 개별 관광지(장소)별 방문자수 계산: (광역시도 10월 방문자수) * (관광지 비율 % / 100)
+        spot_list = []
+        for t in tours:
+            raw_reg = str(t.region).strip().lower()
+            norm_region = code_to_korean.get(raw_reg, code_to_korean.get(str(t.region).strip(), str(t.region).strip()))
+            
+            # 해당 광역시도의 25년 10월 전체 방문자수
+            region_total_visitors = visitor_map.get(norm_region, 0)
+            
+            # 장소별 방문자수 산출: 광역시도 방문자수 * (장소 비율 / 100)
+            spot_visitors = int(round(region_total_visitors * (float(t.ratio) / 100.0)))
+
+            spot_list.append({
+                'region': norm_region,
+                'sigungu': t.sigungu,
+                'title': t.name,
+                'category': t.category,
+                'visitor_count': spot_visitors,
+                'region_visitors': region_total_visitors,
+                'ratio': t.ratio,
+                'img_url': static(t.img),
+                'description': f"{age_key} 방문객이 선호하는 {norm_region} {t.sigungu}의 인기 명소입니다.<br>(25년 10월 약 {spot_visitors:,}명 방문)"
+            })
+
+        # 5. 계산된 장소별 방문자수(visitor_count) 기준으로 전국 내림차순 정렬 후 TOP 3 추출
+        sorted_spots = sorted(spot_list, key=lambda x: x['visitor_count'], reverse=True)
+        results = sorted_spots[:3]
+
+        return JsonResponse({'status': 'success', 'recommendations': results})
+
+    return JsonResponse({'status': 'fail'}, status=400)
+
+    
