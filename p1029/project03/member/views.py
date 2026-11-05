@@ -15,6 +15,7 @@ import string
 from django.contrib.auth import authenticate, login as auth_login
 
 
+
     # 로그인 : GET → 화면, POST → 아이디/비밀번호 확인
 def login(request):
     if request.method == 'GET':
@@ -22,7 +23,7 @@ def login(request):
 
     id = request.POST.get('id', '')
     pw = request.POST.get('pw', '')
-    next_url = request.POST.get('next') or '/'
+    next_url = request.POST.get('next') or '/main/'
 
     # 1. Django 관리자 계정 확인
     admin_user = authenticate(
@@ -39,12 +40,16 @@ def login(request):
     qs = Member.objects.filter(id=id)
 
     if qs.exists() and check_password(pw, qs[0].pw):
-        # 로그인 성공 → 세션에 저장
+        # 로그인 성공 → 커스텀 세션 및 인증 플래그 통합 저장
         request.session['session_id'] = id
         request.session['session_nickname'] = qs[0].nickname
+        # 다른 앱/로직과의 혼선을 줄이기 위한 동기화 세션 키 설정
+        request.session['member_id'] = id 
+
+        request.session.modified = True
 
         return redirect(next_url)
-
+    
     # 3. 로그인 실패
     context = {
         'msg': '아이디 또는 비밀번호가 맞지 않습니다.',
@@ -133,7 +138,7 @@ def step01(request):
 # 로그아웃 : 세션 비우기
 def logout(request):
     request.session.flush()
-    return redirect('index')
+    return redirect('member:login')
 
 
 # 회원가입 : GET → 화면, POST → 저장
@@ -157,30 +162,38 @@ def join(request):
     if request.method == 'GET':
         return render(request, 'join.html', {'regions': regions})
 
+    # AJAX 요청 여부 파악
+    is_ajax = request.headers.get('x-requested-with') == 'xmlhttprequest'
+
     # 아이디 중복 확인
     id = request.POST.get('id', '').strip()
 
     if not id or len(id) > 30:
-        return render(request, 'join.html', {
-            'msg': '아이디를 1~30자로 입력해 주세요.', 'regions': regions,
-        })
+        error_msg = '아이디를 1~30자로 입력해 주세요.'
+        if is_ajax:
+            return JsonResponse({'success': False, 'msg': error_msg}, status=400)
+        return render(request, 'join.html', {'msg': error_msg, 'regions': regions})
 
     if Member.objects.filter(id=id).exists():
-        context = {
-        'msg': '이미 사용 중인 아이디입니다.',
-        'regions': regions,
-        }
-        return render(request, 'join.html', context)
+        error_msg = '이미 사용 중인 아이디입니다.'
+        if is_ajax:
+            return JsonResponse({'success': False, 'msg': error_msg}, status=400)
+        return render(request, 'join.html', {'msg': error_msg, 'regions': regions})
 
-    Member.objects.create(
-        id       = id,
-        pw       = make_password(request.POST.get('pw', '')),   # 암호화 저장
-        name     = request.POST.get('name', ''),
-        nickname = request.POST.get('nickname', ''),
-        tel      = request.POST.get('tel', ''),
-        gender   = request.POST.get('gender', ''),
-        age_group = request.POST.get('age_group', ''),
-        living_region = request.POST.get('living_region', ''),
-        interest_region = request.POST.get('interest_region', ''),
-    )
-    return redirect('/member/login/?joined=1')
+    try:
+        Member.objects.create(
+            id       = id,
+            pw       = make_password(request.POST.get('pw', '')),
+            name     = request.POST.get('name', ''),
+            nickname = request.POST.get('nickname', ''),
+            tel      = request.POST.get('tel', ''),
+            gender   = request.POST.get('gender', ''),
+            age_group = request.POST.get('age_group', ''),
+            living_region = request.POST.get('living_region', ''),
+            interest_region = request.POST.get('interest_region', ''),
+        )
+    except Exception as e:
+        print("🚨 회원가입 데이터 저장 중 에러 발생:", str(e))
+        return JsonResponse({'success': False, 'msg': f'서버 저장 오류: {str(e)}'}, status=400)
+
+    return JsonResponse({'success': True, 'msg': '회원가입이 완료되었습니다.'})

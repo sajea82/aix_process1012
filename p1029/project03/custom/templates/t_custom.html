@@ -25,22 +25,26 @@
         <!-- 조건 설정 박스 (화이트 카드 & 브라운 포인트) -->
         <div class="lg:col-span-6 bg-white text-[#4A3B32] rounded-2xl p-5 shadow-sm border border-[#E6D5C3] space-y-4">
           
-          <!-- 연령대 선택 -->
+        <!-- 연령대 선택 -->
           <div>
             <label class="block text-[10px] font-bold text-[#7A6B5D] mb-1">연령대 선택</label>
-            <div class="grid grid-cols-5 gap-1">
+            <div class="grid grid-cols-5 gap-1.5">
               {% for a in age_list %}
-              <a href="?region={{ selected_region }}&age={{ a }}&tab={{ active_tab }}" class="py-1 rounded text-center text-xs font-bold transition {% if selected_age == a %}bg-[#BC6C25] text-white shadow-sm{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3]{% endif %}">{{ a }}대</a>
+              <a href="?region={{ selected_region }}&age={{ a }}&tab={{ active_tab }}" 
+                 class="py-1.5 rounded-lg text-center text-xs font-bold transition shadow-sm {% if selected_age == a %}bg-[#BC6C25] text-white shadow-md{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3] hover:shadow{% endif %}">
+                {{ a }}대
+              </a>
               {% endfor %}
             </div>
           </div>
 
-          <!-- DB 기반 전 지역 한글 동적 버튼 생성 -->
+          <!-- DB 기반 전 지역 한글 동적 버튼 생성 (9개, 8개 2줄 정렬) -->
           <div>
-            <label class="block text-[10px] font-bold text-[#7A6B5D] mb-1">지역 선택 (DB 연동)</label>
-            <div class="flex flex-wrap gap-1.5">
+            <label class="block text-[10px] font-bold text-[#7A6B5D] mb-1">지역 선택</label>
+            <div class="grid grid-cols-9 gap-1.5">
               {% for reg in all_regions %}
-              <a href="?region={{ reg.code }}&age={{ selected_age }}&tab={{ active_tab }}" class="px-3 py-1 rounded text-[11px] font-bold transition {% if selected_region == reg.code %}bg-[#4A3B32] text-white{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3]{% endif %}">
+              <a href="?region={{ reg.code }}&age={{ selected_age }}&tab={{ active_tab }}" 
+                 class="py-1.5 rounded-lg text-center text-[11px] font-bold transition shadow-sm {% if selected_region == reg.code %}bg-[#4A3B32] text-white shadow-md{% else %}bg-[#F4EBE1] text-[#7A6B5D] hover:bg-[#E6D5C3] hover:shadow{% endif %}">
                 {{ reg.name }}
               </a>
               {% endfor %}
@@ -73,7 +77,7 @@
             <div class="h-36 bg-[#F4EBE1] relative">
               <img src="{% static tour.img %}" alt="{{ tour.name }}" class="w-full h-full object-cover">
               <span class="absolute top-3 left-3 px-2.5 py-1 rounded-full bg-[#BC6C25] text-white text-xs font-bold shadow-sm">
-                Top {{ tour.rank }} · 비율 {{ tour.ratio }}
+                Top {{ tour.rank }}
               </span>
             </div>
             <div class="p-4 space-y-2">

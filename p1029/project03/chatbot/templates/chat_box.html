@@ -132,8 +132,39 @@ function sendMsg(text){
 function resetChat(){
     if(!confirm('대화 내용을 지우고 새로 시작할까요?')) return;
     $.ajax({
-        url:"{% url 'chatbot:reset' %}", headers:{'X-CSRFToken':CSRF}, type:'post', dataType:'json',
-        success:function(){ location.reload(); }
+        url:"{% url 'chatbot:reset' %}",
+        headers:{'X-CSRFToken':CSRF},
+        type:'post',
+        dataType:'json',
+        success:function(){
+            // 1. 화면 전체를 새로고침(location.reload)하는 대신,
+            //    채팅창 본문(#chatBody)만 남기고 안의 대화 내용을 싹 지웁니다.
+            const chatBody = document.getElementById('chatBody');
+
+            // 2. 처음 켰을 때 나왔던 날짜와 환영 메시지(웰컴 버블 + 추천 버튼들)를 다시 그려줍니다.
+            chatBody.innerHTML = `
+                <div class="tc-date"><span id="today">${$('#today').text()}</span></div>
+                <div class="tc-msg bot">
+                    <div class="tc-avatar sm">T</div>
+                    <div class="tc-main">
+                        <div class="tc-name">트래비</div>
+                        <div class="tc-bubble welcome">
+                            <b>안녕하세요{% if request.session.session_nickname %} {{ request.session.session_nickname }}님{% endif %}! 맞춤추천 AI 트래비예요.</b><br>
+                            지역, 기간, 연령대, 누구와 가는지 알려주시면 <b>연령대별 인기관광지 데이터</b>로 여행코스를 짜 드려요.
+                            <div class="tc-menu">
+                                <button type="button" onclick="sendMsg('1박2일 여행코스 추천해줘')"><i>🗺️</i>코스 추천</button>
+                                <button type="button" onclick="sendMsg('20대에게 인기 많은 부산 관광지 알려줘')"><i>🔥</i>연령대별 인기</button>
+                                <button type="button" onclick="sendMsg('부모님과 가기 좋은 여행지 추천해줘')"><i>👨‍👩‍👧</i>동행별 추천</button>
+                                <button type="button" onclick="sendMsg('요즘 계절에 가기 좋은 여행지 알려줘')"><i>🍁</i>계절 여행지</button>
+                            </div>
+                        </div>
+                        <div class="tc-chips">
+                            {% for q in quick %}<button type="button" class="tc-chip" onclick="sendMsg(this.textContent)">{{ q }}</button>{% endfor %}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
     });
 }
 

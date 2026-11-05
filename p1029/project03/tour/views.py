@@ -44,10 +44,25 @@ def top10_data(request):
             if rank > 10:
                 continue
             name = row['관심지점명']
-            img = Tour(region=code, name=name).img
-            tours.append({'rank': rank, 'name': name, 'sigungu': row['시군구'],
-                        'category': row['구분'], 'ratio': ratio, 'lat': lat,
-                        'lng': lng, 'img': static(img)})
+            filename = name.replace(' ', '') + '.jpg'
+
+            # Tour 모델의 img 프로퍼티 로직과 동일하게 맞춤
+            folder = Path(settings.BASE_DIR) / 'static' / 'images' / 'tour' / code
+            if (folder / filename).exists():
+                img_path = f'images/tour/{code}/{filename}'
+            else:
+                # 한글 깨짐 대응 파일명 체크 (모델과 동일)
+                filename2 = ''.join(c if ord(c) < 128 else f'#U{ord(c):04x}' for c in filename)
+                if (folder / filename2).exists():
+                    img_path = f'images/tour/{code}/{filename2}'
+                else:
+                    img_path = 'images/tour/noimage.jpg'
+
+            tours.append({
+                'rank': rank, 'name': name, 'sigungu': row['시군구'],
+                'category': row['구분'], 'ratio': ratio, 'lat': lat,
+                'lng': lng, 'img': static(img_path) # 만약 다른 함수들과 형식을 맞춘다면 static()을 제거하고 템플릿에서 처리할 수도 있습니다.
+            })
     tours.sort(key=lambda t: t['rank'])
     return JsonResponse({'region_name': region_names[code], 'tours': tours[:10]})
 
@@ -137,9 +152,12 @@ def resv(request):
 # =====================================================================
 def get_tour_recommendations(request):
     if request.method == 'GET':
-        age_param = request.GET.get('age', '30대')
+        raw_age_param = request.GET.get('age', '30대')
         
-        # 연령대 키 정밀 매칭 (JSON의 키: '20대', '30대', '40대', '50대', '60대')
+        # 특수문자(+) 및 '이상' 등의 수식어를 제거하여 순수 숫자 및 대(代) 단위 추출 (예: '60대+' -> '60대')
+        age_param = raw_age_param.replace('+', '').replace('이상', '').strip()
+        
+        # 연령대 키 정밀 매칭 (VISITOR_DATA_2510의 키: '20대', '30대', '40대', '50대', '60대')
         age_key = '30대'
         age_val = 30
         if '20' in age_param: 

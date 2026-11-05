@@ -10,6 +10,7 @@
   <!-- Pretendard Font -->
   <link rel="stylesheet" as="style" crossorigin href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css" />
   <link rel="stylesheet" href="{% static 'css/style.css' %}">
+  
   <script>
     tailwind.config = {
       theme: {
@@ -290,20 +291,15 @@
           </div>
         </div>
 
-        <!-- 하단 다이나믹 버튼 -->
         <!-- 하단 다이나믹 버튼 (높이 및 패딩 증대, 은은하고 화사한 글로우/빛나는 효과 추가) -->
         <div class="pt-4 flex gap-2.5 sm:gap-3 shrink-0 animate-slide-up-4">
           <button id="btnStats" type="button" class="flex-1 py-4 sm:py-4.5 px-3 border border-blue-300 text-blue-900 bg-gradient-to-b from-blue-50 to-blue-100/90 rounded-2xl text-[12px] sm:text-[13px] font-bold hover:bg-blue-100 flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-blue-500/20 hover:shadow-blue-500/30 hover:scale-[1.02] active:scale-95 transition-all cursor-pointer leading-tight">
-            <span class="text-[13px] sm:text-[14px]">📊 1위 이유 보기</span>
+            <span class="text-[13px] sm:text-[14px]">📊 1위 이유 알아보기</span>
             <span class="text-[10px] text-blue-600 font-semibold">데이터 확인</span>
           </button>
-          <button id="btnTop10" type="button" class="flex-1 py-4 sm:py-4.5 px-3 border border-amber-300 text-amber-900 bg-gradient-to-b from-amber-50 to-amber-100/90 rounded-2xl text-[12px] sm:text-[13px] font-bold transition-all flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-amber-500/20 hover:shadow-amber-500/30 hover:scale-[1.02] active:scale-95 cursor-pointer leading-tight">
-            <span class="text-[13px] sm:text-[14px]">🏆 1위 핫플 TOP10</span>
+          <button id="btnTop10" type="button" class="flex-1 py-4 sm:py-4.5 px-3 border-2 border-amber-400 text-amber-950 bg-gradient-to-b from-amber-50 via-amber-100 to-amber-200 rounded-2xl text-[12px] sm:text-[13px] font-extrabold flex flex-col items-center justify-center gap-0.5 shadow-xl shadow-amber-500/40 hover:shadow-amber-500/60 hover:scale-105 active:scale-95 transition-all cursor-pointer leading-tight animate-bounce">
+            <span class="text-[13px] sm:text-[14px]">🏆 더 많은 추천지 보기</span>
             <span class="text-[10px] text-amber-700 font-semibold">인기 관광명소</span>
-          </button>
-          <button id="btnBook" type="button" class="flex-1 py-4 sm:py-4.5 px-3 border border-emerald-300 text-emerald-900 bg-gradient-to-b from-emerald-50 to-emerald-100/90 rounded-2xl text-[12px] sm:text-[13px] font-bold transition-all flex flex-col items-center justify-center gap-0.5 shadow-lg shadow-emerald-500/20 hover:shadow-emerald-500/30 hover:scale-[1.02] active:scale-95 cursor-pointer leading-tight">
-            <span class="text-[13px] sm:text-[14px]">🎫 1위 예약하기</span>
-            <span class="text-[10px] text-emerald-700 font-semibold">숙박 및 교통</span>
           </button>
         </div>
       </div>
@@ -518,6 +514,7 @@
     window.DJANGO_CHECK_ID_URL = "{% url 'member:check_id' %}";
   </script>
   <!-- 자바스크립트 로직 -->
+  <script src="{% static 'js/recommend.js' %}"></script>
   <script src="{% static 'js/nindex.js' %}"></script>
 </body>
 </html>

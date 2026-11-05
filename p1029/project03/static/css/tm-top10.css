@@ -686,3 +686,158 @@
         min-width: 180px;
     }
 }
+
+
+/* 1. 좌우 그리드 및 전체 높이 동기화 */
+.tour-analysis-grid {
+    display: grid;
+    grid-template-columns: 1.15fr 0.85fr; /* 좌측 버블맵 : 우측 패널 비율 */
+    gap: 16px;
+    align-items: stretch; /* 좌우 높이를 바닥까지 강제 일치시킴 */
+}
+
+.tour-detail-bubble-wrap {
+    display: flex;
+    flex-direction: column;
+    background: #FFFFFF;
+    border: 1px solid #EFE8E1;
+    border-radius: 18px;
+    box-shadow: 0 4px 14px rgba(74, 59, 50, 0.04);
+}
+
+.tour-analysis-side {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    height: 100%; /* 좌측 높이에 맞춰 끝까지 늘어남 */
+}
+
+/* 2. 시즌 추천 카드 디자인 (아래 연관어 순위 카드와 톤앤매너 통일) */
+.tour-season-card {
+    background: #FFFFFF;
+    border: 1px solid #EFE8E1;
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(74, 59, 50, 0.04);
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.tour-season-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #F3EDE6;
+    padding-bottom: 10px;
+}
+
+.tour-season-title-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tour-season-badge {
+    font-size: 10px;
+    font-weight: 800;
+    color: #9E3D24;
+    background: #FAEEEB;
+    padding: 2px 7px;
+    border-radius: 6px;
+    letter-spacing: 0.5px;
+}
+
+.tour-season-header h5 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #342316;
+}
+
+.tour-season-content {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.tour-season-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    background: #FAF7F4;
+    padding: 8px 12px;
+    border-radius: 10px;
+    border: 1px solid #F4EBE2;
+}
+
+.tour-season-label-col {
+    flex-shrink: 0;
+}
+
+.tour-season-tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 700;
+    color: #8C684C;
+    background: #FFFFFF;
+    border: 1px solid #E9DEC8;
+    padding: 2px 7px;
+    border-radius: 6px;
+}
+
+.tour-season-tag.tag-weather {
+    color: #D9822B;
+    border-color: #F7E0C8;
+}
+
+.tour-season-tag.tag-alt {
+    color: #2D5A43;
+    border-color: #CBE2D4;
+}
+
+.tour-season-desc {
+    margin: 0;
+    font-size: 12px;
+    color: #4A3B32;
+    line-height: 1.45;
+    word-break: keep-all;
+    font-weight: 500;
+    padding-top: 1px;
+}
+
+/* 3. 연관어 순위 카드 (하단 공간을 가득 채우고 스크롤 생성) */
+.tour-ranking-card {
+    background: #FFFFFF;
+    border: 1px solid #EFE8E1;
+    border-radius: 18px;
+    padding: 16px 18px;
+    box-shadow: 0 4px 14px rgba(74, 59, 50, 0.04);
+    display: flex;
+    flex-direction: column;
+    flex: 1; /* 남은 세로 공간을 모두 채워 좌측 버블 맵과 하단 라인을 맞춤 */
+    min-height: 250px;
+}
+
+.tour-ranking-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid #F3EDE6;
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+}
+
+.tour-ranking-header h5 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 800;
+    color: #342316;
+}
+
+.tour-ranking-list {
+    flex: 1;
+    overflow-y: auto; /* 순위 데이터가 길면 카드 안에서 부드럽게 스크롤 */
+    max-height: 340px; /* 필요에 맞게 조정 가능 */
+    padding-right: 4px;
+}

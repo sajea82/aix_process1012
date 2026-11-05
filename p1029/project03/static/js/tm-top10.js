@@ -274,12 +274,14 @@ function getOrGeneratePlaceKeywords(tour) {
                     </div>
 
                 </div>
+
+                
                 <!-- 관광지 길찾기 끝 -->
 
                 <div class="tour-analysis-grid">
                     <div class="tour-detail-bubble-wrap">
                         <div class="tour-bubble-header">
-                            <h4>🫧 '${tour.name}' 연관어 가중치 버블 맵 <small>(마우스오버 및 드래그 지원)</small></h4>
+                            <h4>🫧 '${tour.name}' 연관어 가중치 버블 맵</h4>
                             <div class="tour-bubble-legend">
                                 <span><i style="background:#9E3D24;"></i>1~3위</span>
                                 <span><i style="background:#D9822B;"></i>4~10위</span>
@@ -300,29 +302,40 @@ function getOrGeneratePlaceKeywords(tour) {
 
                     <div class="tour-analysis-side">
 
-                        <!-- 시즌별 추천 정보 -->
-                        <div id="popupSeasonContext" class="tour-focus-card">
-                            <div class="tour-focus-eyebrow">🌸 SEASON RECOMMENDATION</div>
-
-                            <h5 class="tour-focus-subtitle">시즌별 방문 추천</h5>
-
-                            <div class="season-info">
-                                <strong>추천 시즌</strong>
-                                <p id="seasonRecommend">-</p>
+                        <!-- 시즌별 추천 정보 (연관어 카드 톤앤매너와 통일) -->
+                        <div id="popupSeasonContext" class="tour-season-card">
+                            <div class="tour-season-header">
+                                <div class="tour-season-title-wrap">
+                                    <span class="tour-season-badge">SEASON GUIDE</span>
+                                    <h5>🌸 시즌별 방문 추천</h5>
+                                </div>
                             </div>
 
-                            <div class="season-info">
-                                <strong>날씨 팁</strong>
-                                <p id="seasonWeather">-</p>
-                            </div>
+                            <div class="tour-season-content">
+                                <div class="tour-season-row">
+                                    <div class="tour-season-label-col">
+                                        <span class="tour-season-tag">추천 시즌</span>
+                                    </div>
+                                    <div class="tour-season-desc" id="seasonRecommend">-</div>
+                                </div>
 
-                            <div class="season-info">
-                                <strong>대체 추천</strong>
-                                <p id="seasonAlternative">-</p>
+                                <div class="tour-season-row">
+                                    <div class="tour-season-label-col">
+                                        <span class="tour-season-tag tag-weather">날씨 팁</span>
+                                    </div>
+                                    <div class="tour-season-desc" id="seasonWeather">-</div>
+                                </div>
+
+                                <div class="tour-season-row">
+                                    <div class="tour-season-label-col">
+                                        <span class="tour-season-tag tag-alt">대체 추천</span>
+                                    </div>
+                                    <div class="tour-season-desc" id="seasonAlternative">-</div>
+                                </div>
                             </div>
                         </div>
 
-                        <!-- 기존 연관어 순위 카드 -->
+                        <!-- 기존 연관어 순위 카드 (하단 늘어남 및 내부 스크롤 적용) -->
                         <div class="tour-ranking-card">
                             <div class="tour-ranking-header">
                                 <h5>📊 연관어 순위 및 맥락 목록</h5>
@@ -333,6 +346,7 @@ function getOrGeneratePlaceKeywords(tour) {
 
                     </div>
                 </div>
+            </div>
         `;
 
         popup.appendChild(closeBtn);

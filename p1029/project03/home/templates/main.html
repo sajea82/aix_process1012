@@ -4,7 +4,7 @@
 {% block title %}여행메이트 - 메인{% endblock %}
 {% block header_auth %}
 <div class="header-auth">
-    {% if request.session.session_id %}
+    {% if request.session.session_id or request.session.member_id %}
         <b>{{ request.session.session_nickname }}</b>님
         <span>|</span>
         <a href="{% url 'member:logout' %}">로그아웃</a>
