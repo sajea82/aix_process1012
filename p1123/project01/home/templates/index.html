@@ -1,0 +1,454 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학습 로드맵 & 자료 공유 - 처음 만나는 AI 융복합 시각 학습북</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      width: 100%;
+      min-height: 100vh;
+      font-family: "Jua", "Gaegu", "Pretendard", "Malgun Gothic", sans-serif;
+      background:
+        radial-gradient(circle at 12% 10%, rgba(255, 248, 194, 0.8), transparent 32%),
+        linear-gradient(180deg, #96d863 0%, #7ec94b 48%, #67b838 100%);
+      color: #223319;
+      overflow-x: hidden;
+    }
+
+    .hub-wrap {
+      max-width: 1120px;
+      margin: 0 auto;
+      padding: 36px 24px 72px;
+    }
+
+    /* 상단 네비게이션 바 */
+    .top-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      background: rgba(255, 253, 245, 0.92);
+      border: 3px solid #d7f2b3;
+      border-radius: 999px;
+      padding: 10px 20px;
+      box-shadow: 0 6px 0 rgba(56, 128, 28, 0.16);
+      margin-bottom: 34px;
+    }
+
+    .brand-link {
+      text-decoration: none;
+      color: #2f6f18;
+      font-size: 1.12rem;
+      font-weight: 800;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .nav-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .nav-pill {
+      text-decoration: none;
+      font-size: 0.92rem;
+      font-weight: 700;
+      color: #2f6f18;
+      background: #eef9df;
+      border: 2px solid #bce48c;
+      padding: 6px 14px;
+      border-radius: 999px;
+      transition: transform 0.15s ease, background 0.15s ease;
+    }
+
+    .nav-pill:hover {
+      background: #dff4c3;
+      transform: translateY(-2px);
+    }
+
+    .nav-pill.resource-pill {
+      background: #fff3d6;
+      border-color: #ffc266;
+      color: #9c4f06;
+    }
+
+    /* 페이지 헤더 */
+    .hub-header {
+      text-align: center;
+      margin-bottom: 36px;
+    }
+
+    .hub-badge {
+      display: inline-block;
+      background: #fffdf5;
+      color: #3a8720;
+      border: 2.5px solid #d7f2b3;
+      border-radius: 999px;
+      padding: 6px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      box-shadow: 0 4px 0 rgba(56, 128, 28, 0.16);
+      margin-bottom: 12px;
+    }
+
+    .hub-title {
+      font-size: clamp(1.9rem, 4vw, 2.9rem);
+      color: #fffdf7;
+      text-shadow: 0 3px 0 #3b8820, 0 7px 14px rgba(32, 72, 15, 0.25);
+      margin-bottom: 10px;
+    }
+
+    .hub-sub {
+      color: #f6ffe8;
+      font-size: 1.05rem;
+      background: rgba(44, 96, 23, 0.25);
+      display: inline-block;
+      padding: 10px 20px;
+      border-radius: 18px;
+      border: 2px solid rgba(255, 255, 255, 0.32);
+    }
+
+    /* 섹션 제목 */
+    .section-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 16px;
+      color: #fffdf7;
+      text-shadow: 0 2px 0 #3b8820;
+    }
+
+    .section-heading h2 {
+      font-size: 1.45rem;
+    }
+
+    .section-heading span {
+      font-size: 0.92rem;
+      background: rgba(255, 253, 245, 0.9);
+      color: #2f6f18;
+      padding: 4px 12px;
+      border-radius: 999px;
+      font-weight: 700;
+    }
+
+    /* 과목 로드맵 그리드 */
+    .roadmap-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+      gap: 18px;
+      margin-bottom: 44px;
+    }
+
+    .course-card {
+      background: #fffdf5;
+      border: 3px solid #d5f0b1;
+      border-radius: 24px;
+      padding: 22px 20px;
+      box-shadow: 0 8px 0 rgba(56, 128, 28, 0.18);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 14px;
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .course-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 12px 0 rgba(56, 128, 28, 0.22);
+    }
+
+    .step-tag {
+      display: inline-block;
+      align-self: flex-start;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 4px 11px;
+      border-radius: 999px;
+      background: #eef9df;
+      color: #2f6f18;
+      border: 1.5px solid #bce48c;
+      margin-bottom: 8px;
+    }
+
+    .course-card h3 {
+      font-size: 1.32rem;
+      color: #223319;
+      margin-bottom: 6px;
+    }
+
+    .course-card p {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: #526848;
+    }
+
+    .course-link {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      background: #ff9f43;
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.95rem;
+      padding: 10px 16px;
+      border-radius: 999px;
+      border: 2.5px solid #fff7e6;
+      box-shadow: 0 4px 0 #d67418;
+      transition: transform 0.14s ease, background 0.14s ease;
+    }
+
+    .course-link:hover {
+      background: #ffa954;
+      transform: translateY(-2px);
+    }
+
+    .course-link.lab-btn {
+      background: #4ea8de;
+      box-shadow: 0 4px 0 #2b78a8;
+    }
+
+    .course-link.lab-btn:hover {
+      background: #63b5e6;
+    }
+
+    /* 자료 및 공유 사이트 경유 영역 */
+    .resource-gateway {
+      background: #fffdf5;
+      border: 3.5px solid #ffd27d;
+      border-radius: 28px;
+      padding: 28px 24px;
+      box-shadow: 0 10px 0 rgba(186, 118, 24, 0.18);
+    }
+
+    .gateway-top {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .gateway-top h2 {
+      font-size: 1.45rem;
+      color: #8c4605;
+    }
+
+    .gateway-top p {
+      font-size: 0.96rem;
+      color: #5d6452;
+      margin-top: 4px;
+    }
+
+    .gateway-badge {
+      background: #fff3d6;
+      color: #9c4f06;
+      border: 2px solid #ffc266;
+      padding: 6px 14px;
+      border-radius: 999px;
+      font-size: 0.88rem;
+      font-weight: 700;
+    }
+
+    .gateway-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+    }
+
+    .gateway-card {
+      background: #fffaf0;
+      border: 2.5px dashed #f4b851;
+      border-radius: 20px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .gateway-card h3 {
+      font-size: 1.15rem;
+      color: #3a3220;
+      margin-bottom: 6px;
+    }
+
+    .gateway-card p {
+      font-size: 0.9rem;
+      line-height: 1.48;
+      color: #665e4c;
+    }
+
+    .gateway-action {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 800;
+      color: #8c4605;
+      background: #ffe5ad;
+      border: 2px solid #f2b441;
+      padding: 8px 14px;
+      border-radius: 999px;
+      transition: background 0.15s ease;
+    }
+
+    .gateway-action:hover {
+      background: #ffd885;
+    }
+
+    @media (max-width: 600px) {
+      .hub-wrap {
+        padding: 24px 16px 56px;
+      }
+      .top-nav {
+        border-radius: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="hub-wrap">
+    <!-- 상단 바 -->
+    <header class="top-nav">
+      <a href="{% url 'home:cover' %}" class="brand-link">
+        <span>처음 만나는 AI 융복합 시각 학습북</span>
+      </a>
+      <nav class="nav-actions" aria-label="빠른 이동">
+        <a href="#roadmap-section" class="nav-pill">학습 로드맵</a>
+        <a href="#resources-section" class="nav-pill resource-pill">자료·공유 경유</a>
+        <!-- 나중에 전용 경유 페이지 URL이 생기면 아래 href를 연결하세요 -->
+        <a href="#resources-section" class="nav-pill">공유 링크 모음</a>
+      </nav>
+    </header>
+
+    <!-- 메인 타이틀 -->
+    <section class="hub-header">
+      <div class="hub-badge">책장을 펼쳤어요! 원하는 발걸음부터 골라보세요</div>
+      <h1 class="hub-title">AI 융복합 학습 여정 지도</h1>
+      <p class="hub-sub">
+        각 코너에서는 <strong>개념·비유 → 애니메이션 → 예측 후 실행 → 직접 만져보기</strong> 순서로 가볍게 체험해요.
+      </p>
+    </section>
+
+    <!-- 과목별 학습 페이지 이동 자리 -->
+    <section id="roadmap-section" aria-label="과목별 학습 로드맵">
+      <div class="section-heading">
+        <h2>차근차근 따라가는 학습 코너</h2>
+      </div>
+
+      <div class="roadmap-grid">
+        <!-- 각 앱의 urls.py가 연결되면 href를 연결해 쓰시면 됩니다 -->
+        <article class="course-card">
+          <div>
+            <span class="step-tag">1단계 · 기초 체력</span>
+            <h3>Python</h3>
+            <p>변수 상자, 조건 갈림길, 반복 흐름을 눈으로 따라가며 코드 감각을 익혀요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link">Python 코너 열기 →</a>
+        </article>
+
+        <article class="course-card">
+          <div>
+            <span class="step-tag">2단계 · 표 데이터</span>
+            <h3>pandas</h3>
+            <p>행과 열로 된 표를 자르고, 합치고, 빈칸(0)을 채우며 데이터가 변하는 모습을 봐요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link">pandas 코너 열기 →</a>
+        </article>
+
+        <article class="course-card">
+          <div>
+            <span class="step-tag">3단계 · 패턴 찾기</span>
+            <h3>머신러닝 (ML)</h3>
+            <p>데이터에서 규칙을 찾아 예측하는 과정을 쉬운 비유와 변화 단계로 살펴봐요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link">ML 코너 열기 →</a>
+        </article>
+
+        <article class="course-card">
+          <div>
+            <span class="step-tag">4단계 · 깊은 연결</span>
+            <h3>딥러닝 (DL)</h3>
+            <p>여러 층을 거치며 신호가 전달되고 학습이 다듬어지는 흐름을 직관적으로 이해해요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link">DL 코너 열기 →</a>
+        </article>
+
+        <article class="course-card">
+          <div>
+            <span class="step-tag">5단계 · 화면과 동작</span>
+            <h3>HTML · JS</h3>
+            <p>뼈대(HTML) 위에 버튼과 움직임(JS)을 더해 내 생각을 화면에 띄워 봐요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link">HTML·JS 코너 열기 →</a>
+        </article>
+
+        <article class="course-card">
+          <div>
+            <span class="step-tag">최종 단계 · 함께 합치기</span>
+            <h3>융합 체험관</h3>
+            <p>앞에서 배운 조각들이 하나의 흐름으로 이어지는 종합 체험 공간이에요.</p>
+          </div>
+          <a href="#roadmap-section" class="course-link lab-btn">체험관 입장하기 →</a>
+        </article>
+      </div>
+    </section>
+
+    <!-- 자료 및 공유 사이트 경유 자리 -->
+    <section id="resources-section" class="resource-gateway" aria-label="자료 및 공유 사이트 경유">
+      <div class="gateway-top">
+        <div>
+          <h2>자료 &amp; 공유 사이트 경유 자리</h2>
+          <p>
+            모든 실습 파일·참고 사이트·공유 자료를 한곳에 무겁게 쌓아 두지 않고,
+            필요할 때 골라 갈 수 있도록 연결해 두는 경유 구역이에요.
+          </p>
+        </div>
+        <span class="gateway-badge">외부·공유 자료 연결 게이트웨이</span>
+      </div>
+
+      <div class="gateway-grid">
+        <article class="gateway-card">
+          <div>
+            <h3>실습용 샘플 데이터 · 파일함</h3>
+            <p>연습용 CSV/엑셀 샘플이나 참고 파일을 내려받을 수 있는 공유 드라이브·저장소 연결 자리예요.</p>
+          </div>
+          <a href="#resources-section" class="gateway-action">샘플 자료실로 이동 (연결 예정)</a>
+        </article>
+
+        <article class="gateway-card">
+          <div>
+            <h3>공식 문서 · 입문 참고 사이트</h3>
+            <p>학습 중에 더 깊이 찾아보고 싶을 때 바로 넘어갈 수 있는 공식 가이드·참고 링크 모음 자리예요.</p>
+          </div>
+          <a href="#resources-section" class="gateway-action">참고 사이트 보기 (연결 예정)</a>
+        </article>
+
+        <article class="gateway-card">
+          <div>
+            <h3>수강생 · 팀 공유 게시판 / 링크</h3>
+            <p>만든 결과물이나 팁, 보충 자료를 서로 주고받을 공유 공간으로 이어지는 경유 자리예요.</p>
+          </div>
+          <a href="#resources-section" class="gateway-action">공유 공간 열기 (연결 예정)</a>
+        </article>
+      </div>
+    </section>
+  </div>
+</body>
+</html>
